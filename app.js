@@ -11,7 +11,7 @@ exports.firstLegHandler = (event, context, callback) => {
     config.clientKey,
     config.clientSecret,
     config.oAuthVersion,
-    config.authorizeCallbackUri,
+    event.queryStringParameters.oauth_callback,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
     config.oAuthCustomHeaders,
@@ -44,7 +44,6 @@ exports.firstLegHandler = (event, context, callback) => {
 
 exports.thirdLegHandler = (event, context, callback) => {
   const receivedBody = JSON.parse(event.body);
-
   const {
     requestToken,
     requestTokenSecret,
@@ -57,7 +56,7 @@ exports.thirdLegHandler = (event, context, callback) => {
     config.clientKey,
     config.clientSecret,
     config.oAuthVersion,
-    config.authorizeCallbackUri,
+    event.queryStringParameters.oauth_callback,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
     config.oAuthCustomHeaders,
@@ -93,7 +92,7 @@ const sendResponse = responseData => ({
   headers: {
     'Access-Control-Allow-Origin': '*',
   },
-  body: JSON.stringify(responseData.body ? responseData.body : responseData),
+  body: (responseData.body ? responseData.body : responseData),
   isBase64Encoded: false,
 });
 
@@ -108,7 +107,6 @@ const sendError = error => ({
 
 exports.oAuthSignRequestGet = async (event) => {
   const receivedData = JSON.parse(JSON.stringify(event));
-
   const {
     url,
     accessToken,
@@ -118,13 +116,11 @@ exports.oAuthSignRequestGet = async (event) => {
   const response = await doSignAndGet(url, accessToken, accessTokenSecret)
     .then(sendResponse)
     .catch(sendError);
-
   return response;
 };
 
 exports.oAuthSignRequestPost = async (event) => {
   const receivedBody = JSON.parse(event.body);
-
   const {
     url,
     accessToken,
