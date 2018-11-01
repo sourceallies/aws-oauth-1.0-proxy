@@ -243,6 +243,13 @@
                 "ValidationDomain": "sourceallies.com"
             }
         }
+    },
+    "ApiGateway": {
+        "Type": "AWS::ApiGateway::DomainName",
+        "Properties": {
+            "CertificateArn": {"Ref": "Certificate"},
+            "DomainName": "agpoint.dev.sourceallies.com",
+        }
     }
   },
   "Outputs" : {
