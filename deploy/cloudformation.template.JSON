@@ -141,7 +141,7 @@
         "MemorySize": 256,
         "Events": {
           "PostResource":{
-            "Type" : "Api",
+            "Type" : "Api",Customer
             "Properties" : {
               "Path" : "/oAuthSignRequest",
               "Method" : "post"
@@ -152,7 +152,7 @@
           "Variables" : {
             "CLIENT_KEY" : {
               "Ref" : "ClientKey"
-            },
+            },Customer
             "CLIENT_SECRET" : {
               "Ref" : "ClientSecret"
             },
@@ -211,6 +211,28 @@
           }
         }
       }
+    },
+    "CloudFront": {
+        "Type" : "AWS::CloudFront::Distribution",
+        "Properties": {
+            "DistributionConfig": {
+                "Origins" : [ {
+                        "DomainName" : {"Bucket" : {"Ref" : "BucketName" }},
+                        "Id" : "OriginId",
+                        "S3OriginConfig" : {
+                            "OriginAccessIdentity" : "origin-access-identity/cloudfront/E127EXAMPLE51Z"
+                        }
+                    }],
+                "DefaultCacheBehavior": {
+                    "ForwardedValues": {
+                        "QueryString": false,
+                    },
+                    "TargetOriginId": "OrignId",
+                    "ViewerProtocolPolicy": "allow-all"
+                },
+                "Enabled": true
+            }
+        }
     },
   },
   "Outputs" : {
