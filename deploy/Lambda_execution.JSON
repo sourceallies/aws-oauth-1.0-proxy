@@ -7,6 +7,16 @@
         "Service": "lambda.amazonaws.com"
       },
       "Action": "sts:AssumeRole"
-    }
+  },
+  {
+            "Sid": "AllowCloudFrontUpdateDistribution",
+            "Effect": "Allow",
+            "Action": [
+                "cloudfront:updateDistribution"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
   ]
 }
