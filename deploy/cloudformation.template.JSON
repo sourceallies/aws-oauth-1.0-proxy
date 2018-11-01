@@ -19,6 +19,9 @@
     },
     "AuthorizeCallbackUri": {
       "Type": "String"
+    },
+    "BasePath" : {
+        "Type": "String"
     }
   },
   "Resources" : {
@@ -244,11 +247,11 @@
             }
         }
     },
-    "ApiGateway": {
-        "Type": "AWS::ApiGateway::DomainName",
+    "BasePathMapping": {
+        "Type" : "AWS::ApiGateway::BasePathMapping",
         "Properties": {
-            "CertificateArn": {"Ref": "Certificate"},
-            "DomainName": "agpoint.dev.sourceallies.com",
+            "BasePath": {"Ref": "BasePath"},
+            "RestApiId": {"Fn::ImporteValue": {"Fn:Join": { ["", [{"Ref": {"BucketName"}}, "ApiId"]]}}}
         }
     },
     "DNSEntry": {
