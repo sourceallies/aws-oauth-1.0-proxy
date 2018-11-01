@@ -234,6 +234,16 @@
             }
         }
     },
+    "Certificate": {
+        "Type": "AWS::CertificateManager::Certificate",
+        "Properties": {
+            "DomainName": "agpoint.dev.sourceallies.com",
+            "DomainValidationOptions": {
+                "DomainName": ["agpoint.dev.sourceallies.com"],
+                "ValidationDomain": "sourceallies.com"
+            }
+        }
+    }
   },
   "Outputs" : {
     "ApiURL" : {
