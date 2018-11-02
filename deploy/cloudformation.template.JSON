@@ -20,9 +20,6 @@
     "AuthorizeCallbackUri": {
       "Type": "String"
     },
-    "BasePath" : {
-        "Type": "String"
-    }
   },
   "Resources" : {
     "OAuthFirstLegLambda": {
@@ -215,56 +212,60 @@
         }
       }
     },
-    "CloudFront": {
-        "Type" : "AWS::CloudFront::Distribution",
-        "Properties": {
-            "DistributionConfig": {
-                "Origins" : [ {
-                        "DomainName" : {"Bucket" : {"Ref" : "BucketName" }},
-                        "Id" : "OriginId",
-                        "S3OriginConfig" : {
-                            "OriginAccessIdentity" : "origin-access-identity/cloudfront/E127EXAMPLE51Z"
-                        }
-                    }],
-                "DefaultCacheBehavior": {
-                    "ForwardedValues": {
-                        "QueryString": false,
-                    },
-                    "TargetOriginId": "OrignId",
-                    "ViewerProtocolPolicy": "allow-all"
-                },
-                "Enabled": true
-            }
-        }
+    "DomainNameARecord": {
+       "Type": "AWS::Route53::RecordSetGroup",
+       "Properties": {
+          "Comment": "Points to an API Gateway Custom Domain a.k.a. CloudFront Distribution",
+          "HostedZoneId": null,
+          "RecordSets": [
+             {
+                "Name": {"Bucket" : { "Ref" : "ApiUrl" }},
+                "Type": "A",
+                "AliasTarget": {
+                   "HostedZoneId": "Z2FDTNDATAQYW2",
+                   "DNSName": null
+                }
+             }
+          ]
+       }
     },
-    "Certificate": {
-        "Type": "AWS::CertificateManager::Certificate",
-        "Properties": {
-            "DomainName": "agpoint.dev.sourceallies.com",
-            "DomainValidationOptions": {
-                "DomainName": ["agpoint.dev.sourceallies.com"],
-                "ValidationDomain": "sourceallies.com"
-            }
-        }
+    "AppBasePathMapping": {
+       "Type": "AWS::ApiGateway::BasePathMapping",
+       "Properties": {
+          "BasePath": "app",
+          "DomainName": null,
+          "RestApiId": {
+             "Fn::ImportValue": {
+                "Fn::Join": [
+                   "",
+                   [
+                      null,
+                      "ApiId"
+                   ]
+                ]
+             }
+          },
+          "Stage": "Prod"
+       }
     },
-    "BasePathMapping": {
-        "Type" : "AWS::ApiGateway::BasePathMapping",
-        "Properties": {
-            "BasePath": {"Ref": "BasePath"},
-            "RestApiId": {"Fn::ImporteValue": {"Fn:Join": { ["", [{"Ref": {"BucketName"}}, "ApiId"]]}}}
-        }
-    },
-    "DNSEntry": {
-        "Type": "AWS::Route53::RecordSet",
-        "Properties" : {
-            "Type": "A",
-            "HostedZoneName": "dev.sourceallies.com",
-            "Name": "deedee.dev.sourceallies.com",
-            "AliasTarget": {
-                "DNSName": {"GetAtt": "CloudFront.DomainName"},
-                "HostedZoneId": "Z2FDTNDATAQYW2"
-            }
-        }
+    "ApiBasePathMapping": {
+       "Type": "AWS::ApiGateway::BasePathMapping",
+       "Properties": {
+          "BasePath": "store",
+          "DomainName": null,
+          "RestApiId": {
+             "Fn::ImportValue": {
+                "Fn::Join": [
+                   "",
+                   [
+                      null,
+                      "ApiId"
+                   ]
+                ]
+             }
+          },
+          "Stage": "Prod"
+       }
     }
   },
   "Outputs" : {
