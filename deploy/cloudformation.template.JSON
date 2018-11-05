@@ -2,6 +2,15 @@
   "AWSTemplateFormatVersion" : "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
   "Parameters": {
+    "HostedZone" : {
+      "Type" : "String"
+    },
+    "DomainName": {
+      "Type" : "String"
+    },
+    "StackName": {
+      "Type" : "String"
+    },
     "ClientKey" : {
       "Type" : "String"
     },
@@ -216,10 +225,10 @@
        "Type": "AWS::Route53::RecordSetGroup",
        "Properties": {
           "Comment": "Points to an API Gateway Custom Domain a.k.a. CloudFront Distribution",
-          "HostedZoneId": null,
+          "HostedZoneId": {"Ref" : "HostedZone"},
           "RecordSets": [
              {
-                "Name": {"Bucket" : { "Ref" : "ApiUrl" }},
+                "Name": { "Ref" : "ApiUrl" },
                 "Type": "A",
                 "AliasTarget": {
                    "HostedZoneId": "Z2FDTNDATAQYW2",
@@ -233,13 +242,13 @@
        "Type": "AWS::ApiGateway::BasePathMapping",
        "Properties": {
           "BasePath": "app",
-          "DomainName": null,
+          "DomainName": {"Ref" : "DomainName"},
           "RestApiId": {
              "Fn::ImportValue": {
                 "Fn::Join": [
                    "",
                    [
-                      null,
+                      {"Ref": "StackName"},
                       "ApiId"
                    ]
                 ]
@@ -248,25 +257,6 @@
           "Stage": "Prod"
        }
     },
-    "ApiBasePathMapping": {
-       "Type": "AWS::ApiGateway::BasePathMapping",
-       "Properties": {
-          "BasePath": "store",
-          "DomainName": null,
-          "RestApiId": {
-             "Fn::ImportValue": {
-                "Fn::Join": [
-                   "",
-                   [
-                      null,
-                      "ApiId"
-                   ]
-                ]
-             }
-          },
-          "Stage": "Prod"
-       }
-    }
   },
   "Outputs" : {
     "ApiURL" : {
