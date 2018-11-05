@@ -29,6 +29,9 @@
     "AuthorizeCallbackUri": {
       "Type": "String"
     },
+    "CloudFrontDomain": {
+        "Type": "String"
+    }
   },
   "Resources" : {
     "OAuthFirstLegLambda": {
@@ -232,7 +235,7 @@
                 "Type": "A",
                 "AliasTarget": {
                    "HostedZoneId": "Z2FDTNDATAQYW2",
-                   "DNSName": null
+                   "DNSName": {"Ref": "CloudFrontDomain"}
                 }
              }
           ]
