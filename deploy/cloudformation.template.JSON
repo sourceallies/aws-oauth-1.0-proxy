@@ -39,7 +39,7 @@
         },
         "Policies": [ "AWSLambdaFullAccess" ],
         "Runtime": "nodejs8.10",
-        "Timeout": 3,
+        "Timeout": 30,
         "MemorySize": 256,
         "Events": {
           "PostResource":{
@@ -88,7 +88,7 @@
         },
         "Policies": [ "AWSLambdaFullAccess" ],
         "Runtime": "nodejs8.10",
-        "Timeout": 3,
+        "Timeout": 30,
         "MemorySize": 256,
         "Events": {
           "PostResource":{
@@ -137,7 +137,7 @@
         },
         "Policies": [ "AWSLambdaFullAccess" ],
         "Runtime": "nodejs8.10",
-        "Timeout": 3,
+        "Timeout": 30,
         "MemorySize": 256,
         "Events": {
           "PostResource":{
@@ -183,7 +183,7 @@
         },
         "Policies": [ "AWSLambdaFullAccess" ],
         "Runtime": "nodejs8.10",
-        "Timeout": 3,
+        "Timeout": 30,
         "MemorySize": 256,
         "Events": {
           "GetResource":{
@@ -211,7 +211,7 @@
           }
         }
       }
-    },
+    }
   },
   "Outputs" : {
     "ApiURL" : {
