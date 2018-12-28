@@ -10,6 +10,6 @@ echo "Running webpack..."
 npm run build
 
 echo "Zipping files to be deployed..."
-zip artifact.zip index.js
+zip -r artifact.zip index.js node_modules
 
 echo "Build successful"

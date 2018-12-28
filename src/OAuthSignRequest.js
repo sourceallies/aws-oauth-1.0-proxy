@@ -33,6 +33,37 @@ const doSignAndGet = (linkToOpen, accessToken, accessTokenSecret) => {
   });
 };
 
+const doSignAndDelete = (linkToOpen, accessToken, accessTokenSecret) => {
+  const oAuthSession = new OAuth(
+    config.firstLegUri,
+    config.thirdLegUri,
+    config.clientKey,
+    config.clientSecret,
+    config.oAuthVersion,
+    config.authorizeCallbackUri,
+    config.oAuthSignatureMethod,
+    config.oAuthNonceSize,
+    config.oAuthCustomHeaders,
+  );
+
+  return new Promise((resolve, reject) => {
+    oAuthSession.delete(
+      linkToOpen,
+      accessToken,
+      accessTokenSecret,
+      (error, responseData, result) => {
+        if (error) {
+          reject(error);
+        }
+        if (result.statusCode <= 200 && result.statusCode < 300) {
+          resolve(responseData);
+        }
+        resolve(getStatusText(result.statusCode));
+      },
+    );
+  });
+};
+
 const doSignAndPost = (
   linkToOpen,
   accessToken,
@@ -74,5 +105,6 @@ const doSignAndPost = (
 
 module.exports = {
   doSignAndGet,
+  doSignAndDelete,
   doSignAndPost,
 };

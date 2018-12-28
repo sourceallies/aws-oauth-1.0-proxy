@@ -95,6 +95,160 @@ describe('OAuth Sign Request', () => {
     });
   });
 
+  describe('Do Sign and Delete', () => {
+    const mockOAuth = (fakeResponseData = chance.string()) => {
+      const OAuth = require('oauth');
+
+      OAuth.OAuth = jest.fn().mockImplementation(() => ({
+        delete: (fakeLink, fakeAccessToken, fakeAccessTokenSecret, callback) => {
+          callback(null, fakeResponseData, { statusCode: 200 });
+        },
+      }));
+
+      return OAuth;
+    };
+
+    it('is a function', () => {
+      const { doSignAndDelete } = require('../src/OAuthSignRequest');
+
+      expect(doSignAndDelete).toEqual(expect.any(Function));
+    });
+
+    it('create an Oauth correctly with correct params', () => {
+      process.env.CLIENT_KEY = chance.string();
+      process.env.CLIENT_SECRET = chance.string();
+
+
+      const oauthConfig = require('../config');
+
+      oauthConfig.oAuthNonceSize = chance.string();
+      const OAuth = mockOAuth();
+
+      const { doSignAndDelete } = require('../src/OAuthSignRequest');
+
+      doSignAndDelete();
+
+      expect(OAuth.OAuth).toBeCalledWith(
+        config.firstLegUri,
+        config.thirdLegUri,
+        oauthConfig.clientKey,
+        oauthConfig.clientSecret,
+        oauthConfig.oAuthVersion,
+        oauthConfig.authorizeCallbackUri,
+        oauthConfig.oAuthSignatureMethod,
+        oauthConfig.oAuthNonceSize,
+        oauthConfig.oAuthCustomHeaders,
+      );
+
+      delete process.env.CLIENT_KEY;
+      delete process.env.CLIENT_SECRET;
+    });
+
+    it('calls Oauth delete with the provided link, token, and secret', () => {
+      const OAuth = require('oauth');
+      const mockDelete = jest.fn();
+      OAuth.OAuth = jest.fn().mockImplementation(() => ({
+        delete: mockDelete,
+      }));
+
+      const linkToOpen = chance.url();
+      const accessToken = chance.string();
+      const accessTokenSecret = chance.string();
+
+      const { doSignAndDelete } = require('../src/OAuthSignRequest');
+
+      doSignAndDelete(linkToOpen, accessToken, accessTokenSecret);
+
+      expect(mockDelete).toBeCalledWith(
+        linkToOpen,
+        accessToken,
+        accessTokenSecret,
+        expect.any(Function)
+      );
+    });
+
+    it('returns a promise', () => {
+      mockOAuth();
+
+      const linkToOpen = chance.url();
+      const accessToken = chance.string();
+      const accessTokenSecret = chance.string();
+
+      const { doSignAndDelete } = require('../src/OAuthSignRequest');
+
+      expect(doSignAndDelete(linkToOpen, accessToken, accessTokenSecret))
+        .toBeInstanceOf(Promise);
+    });
+
+    it('rejects when api offline', async () => {
+      expect.assertions(1);
+
+      const OAuth = require('oauth');
+      const fakeError = new Error(chance.string());
+      OAuth.OAuth = jest.fn().mockImplementation(() => ({
+        delete: (fakeLink, fakeAccessToken, fakeAccessTokenSecret, callback) => {
+          callback(fakeError, null, null);
+        },
+      }));
+
+      const linkToOpen = chance.url();
+      const accessToken = chance.string();
+      const accessTokenSecret = chance.string();
+
+      const { doSignAndDelete } = require('../src/OAuthSignRequest');
+
+      try {
+        await doSignAndDelete(linkToOpen, accessToken, accessTokenSecret);
+      } catch (e) {
+        expect(e).toEqual(fakeError);
+      }
+    });
+
+    it('resolves with status code message upon non-2xx responses', async () => {
+      expect.assertions(1);
+
+      const OAuth = require('oauth');
+      const fakeResponse = {
+        statusCode: chance.integer({ min: 400, max: 599 }),
+      };
+      OAuth.OAuth = jest.fn().mockImplementation(() => ({
+        delete: (fakeLink, fakeAccessToken, fakeAccessTokenSecret, callback) => {
+          callback(null, null, fakeResponse);
+        },
+      }));
+
+      const linkToOpen = chance.url();
+      const accessToken = chance.string();
+      const accessTokenSecret = chance.string();
+
+      const { doSignAndDelete } = require('../src/OAuthSignRequest');
+
+      const result = await doSignAndDelete(linkToOpen, accessToken, accessTokenSecret);
+      expect(result).toBe(getStatusText(fakeResponse.statusCode));
+    });
+
+    it('resolves with the response body upon 2xx response', async () => {
+      expect.assertions(1);
+
+      const OAuth = require('oauth');
+      const fakeResponse = { stuff: chance.string() };
+      OAuth.OAuth = jest.fn().mockImplementation(() => ({
+        delete: (fakeLink, fakeAccessToken, fakeAccessTokenSecret, callback) => {
+          callback(null, fakeResponse, { statusCode: 200 });
+        },
+      }));
+
+      const linkToOpen = chance.url();
+      const accessToken = chance.string();
+      const accessTokenSecret = chance.string();
+
+      const { doSignAndDelete } = require('../src/OAuthSignRequest');
+
+      const result = await doSignAndDelete(linkToOpen, accessToken, accessTokenSecret);
+      expect(result).toBe(fakeResponse);
+    });
+  });
+
   describe('Do Sign and Post', () => {
     const mockOAuth = (fakeResponseData = chance.string()) => {
       const OAuth = require('oauth');
@@ -115,11 +269,10 @@ describe('OAuth Sign Request', () => {
       expect(doSignAndPost).toEqual(expect.any(Function));
     });
 
-    it('creat an Oauth correctly with correct params', () => {
+    it('create an Oauth correctly with correct params', () => {
       process.env.CLIENT_KEY = chance.string();
       process.env.CLIENT_SECRET = chance.string();
 
-      jest.resetModules();
 
       const oauthConfig = require('../config');
 
@@ -148,8 +301,7 @@ describe('OAuth Sign Request', () => {
 
     it('posts correctly', () => {
       const OAuth = require('oauth');
-      const fakeResponseData = chance.string();
-      const mockPost = jest.fn().mockResolvedValue(fakeResponseData);
+      const mockPost = jest.fn();
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         post: mockPost,
