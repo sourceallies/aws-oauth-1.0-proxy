@@ -9,10 +9,10 @@ set +o allexport
 echo "Assuming IAM Admin Role..."
 source /bin/assumeRole $ADMIN_ARN
 
-echo "Removing the S3 bucket..."
-bucketName="${BUCKET_NAME}-${DEPLOY_ENVIRONMENT,,}"
-aws s3 rb s3://$bucketName --force
-aws s3api wait bucket-not-exists --bucket $bucketName
+# echo "Removing the S3 bucket..."
+# bucketName="${BUCKET_NAME}-${DEPLOY_ENVIRONMENT,,}"
+# aws s3 rb s3://$bucketName --force
+# aws s3api wait bucket-not-exists --bucket $bucketName
 
 echo "Creating a new S3 bucket..."
 aws s3 mb s3://$bucketName
