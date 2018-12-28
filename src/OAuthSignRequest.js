@@ -60,7 +60,7 @@ const doSignAndDelete = (linkToOpen, accessToken, accessTokenSecret) => {
         if (error) {
           reject(error);
         }
-        if (result.statusCode <= 200 && result.statusCode < 300) {
+        if (result.statusCode >= 200 && result.statusCode < 300) {
           resolve(responseData);
         }
         resolve(getStatusText(result.statusCode));

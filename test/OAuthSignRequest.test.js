@@ -209,7 +209,7 @@ describe('OAuth Sign Request', () => {
 
       const OAuth = require('oauth');
       const fakeResponse = {
-        statusCode: chance.integer({ min: 400, max: 599 }),
+        statusCode: chance.integer({ min: 300, max: 599 }),
       };
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         delete: (fakeLink, fakeAccessToken, fakeAccessTokenSecret, callback) => {
@@ -234,7 +234,7 @@ describe('OAuth Sign Request', () => {
       const fakeResponse = { stuff: chance.string() };
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         delete: (fakeLink, fakeAccessToken, fakeAccessTokenSecret, callback) => {
-          callback(null, fakeResponse, { statusCode: 200 });
+          callback(null, fakeResponse, { statusCode: chance.integer({ min: 200, max: 299 }) });
         },
       }));
 
