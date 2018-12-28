@@ -43,10 +43,10 @@ echo "Describing stack events..."
 aws cloudformation describe-stack-events --stack-name $STACK_NAME
 
 echo "Updating lambda code"
-aws lambda update-function-code --function-name oauth-sign-request-get --s3-bucket aws-oauth-proxy-dev --s3-key artifact.zip
-aws lambda update-function-code --function-name oauth-sign-request-post --s3-bucket aws-oauth-proxy-dev --s3-key artifact.zip
-aws lambda update-function-code --function-name oauth-sign-request-delete --s3-bucket aws-oauth-proxy-dev --s3-key artifact.zip
-aws lambda update-function-code --function-name oauth-first-leg --s3-bucket aws-oauth-proxy-dev --s3-key artifact.zip
-aws lambda update-function-code --function-name oauth-third-leg --s3-bucket aws-oauth-proxy-dev --s3-key artifact.zip
+aws lambda update-function-code --function-name oauth-sign-request-get --s3-bucket $bucketName --s3-key artifact.zip
+aws lambda update-function-code --function-name oauth-sign-request-post --s3-bucket $bucketName --s3-key artifact.zip
+aws lambda update-function-code --function-name oauth-sign-request-delete --s3-bucket $bucketName --s3-key artifact.zip
+aws lambda update-function-code --function-name oauth-first-leg --s3-bucket $bucketName --s3-key artifact.zip
+aws lambda update-function-code --function-name oauth-third-leg --s3-bucket $bucketName --s3-key artifact.zip
 
 echo "Deploy successful"
