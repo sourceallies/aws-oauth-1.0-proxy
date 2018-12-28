@@ -10,7 +10,7 @@ echo "Assuming IAM Admin Role..."
 source /bin/assumeRole $ADMIN_ARN
 
 # echo "Removing the S3 bucket..."
-# bucketName="${BUCKET_NAME}-${DEPLOY_ENVIRONMENT,,}"
+bucketName="${BUCKET_NAME}-${DEPLOY_ENVIRONMENT,,}"
 # aws s3 rb s3://$bucketName --force
 # aws s3api wait bucket-not-exists --bucket $bucketName
 
