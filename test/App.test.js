@@ -331,6 +331,79 @@ describe('Lambda handlers', () => {
     });
   });
 
+  describe('OAuth Sign Request Delete Handler', () => {
+    it('signs and deletes the request, then returns the response', async () => {
+      const url = chance.url();
+      const accessToken = chance.string();
+      const accessTokenSecret = chance.string();
+
+      const event = {
+        queryStringParameters: {
+          url,
+          accessToken,
+          accessTokenSecret,
+        },
+      };
+
+      const OAuthSignRequest = require('../src/OAuthSignRequest');
+
+      const fakeResponseData = {};
+      const numberOfResponseDataKeys = chance.natural({ min: 2, max: 5 });
+
+      for (let i = 0; i < numberOfResponseDataKeys; i += 1) {
+        fakeResponseData[chance.string()] = chance.string();
+      }
+
+      fakeResponseData.status = chance.natural();
+
+      OAuthSignRequest.doSignAndDelete = jest.fn().mockResolvedValue(fakeResponseData);
+
+      const { oAuthSignRequestDelete } = require('../app');
+
+      const responseData = await oAuthSignRequestDelete(event);
+
+      expect(OAuthSignRequest.doSignAndDelete).toBeCalledWith(url, accessToken, accessTokenSecret);
+      const response = {
+        statusCode: fakeResponseData.status,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify(fakeResponseData),
+        isBase64Encoded: false,
+      };
+
+      expect(responseData).toEqual(response);
+    });
+
+    it('returns an error when an error occurs during the signing and delete', async () => {
+      const OAuthSignRequest = require('../src/OAuthSignRequest');
+      const fakeError = new Error(chance.string());
+      OAuthSignRequest.doSignAndDelete = jest.fn().mockRejectedValue(fakeError);
+      const { oAuthSignRequestDelete } = require('../app');
+
+      const fakeEvent = {
+        queryStringParameters: {
+          url: chance.url(),
+          accessToken: chance.string(),
+          accessTokenSecret: chance.string(),
+        },
+      };
+
+      const returnedError = await oAuthSignRequestDelete(fakeEvent);
+
+      const fakeErrorResponse = {
+        statusCode: 502,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify(fakeError),
+        isBase64Encoded: false,
+      };
+
+      expect(returnedError).toEqual(fakeErrorResponse);
+    });
+  });
+
   describe('OAuth Sign Request Post Handler', () => {
     let oAuthSignRequestPost;
 

@@ -180,7 +180,7 @@ describe('OAuth Sign Request', () => {
         .toBeInstanceOf(Promise);
     });
 
-    it.skip('rejects when api offline', async () => {
+    it('rejects when api offline', async () => {
       expect.assertions(1);
 
       const OAuth = require('oauth');
