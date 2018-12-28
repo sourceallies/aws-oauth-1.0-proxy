@@ -7,7 +7,6 @@ chmod -r 500:501 node_modules
 npm run test
 
 echo "Running webpack..."
-npm prune --production
 npm run build
 
 echo "Zipping files to be deployed..."
