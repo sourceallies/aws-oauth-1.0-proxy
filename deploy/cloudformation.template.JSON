@@ -232,7 +232,7 @@
         "Timeout": 30,
         "MemorySize": 256,
         "Events": {
-          "GetResource":{
+          "DeleteResource":{
             "Type" : "Api",
             "Properties" : {
               "Path" : "/oAuthSignRequest",
