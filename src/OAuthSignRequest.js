@@ -52,6 +52,11 @@ const doSignAndDelete = (linkToOpen, accessToken, accessTokenSecret) => {
       accessToken,
       accessTokenSecret,
       (error, responseData, result) => {
+        console.log('Delete Result', {
+          error,
+          responseData,
+          result,
+        });
         if (error) {
           reject(error);
         }
