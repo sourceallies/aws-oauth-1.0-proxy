@@ -100,6 +100,7 @@ const doSignAndPost = (
           error,
           responseData,
           result,
+          resultHeaders: result.headers,
         });
         if (result.statusCode < 200 || result.statusCode >= 300) {
           resolve(getStatusText(result.statusCode));
