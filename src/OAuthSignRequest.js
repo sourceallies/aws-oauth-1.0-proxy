@@ -99,8 +99,8 @@ const doSignAndPost = (
         console.log("Post Response From Deere", {
           error,
           responseData,
-          result
-        };
+          result,
+        });
         if (result.statusCode < 200 || result.statusCode >= 300) {
           resolve(getStatusText(result.statusCode));
         } else if (error) {
