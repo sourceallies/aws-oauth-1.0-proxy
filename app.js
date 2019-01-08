@@ -92,6 +92,7 @@ const sendResponse = responseData => ({
   statusCode: responseData.status,
   headers: {
     'Access-Control-Allow-Origin': '*',
+    'location': responseData.headers ? responseData.headers.location : undefined,
   },
   body: JSON.stringify(responseData.body ? responseData.body : responseData),
   isBase64Encoded: false,
