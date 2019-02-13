@@ -51,7 +51,7 @@
         },
         "Policies": [ "AWSLambdaFullAccess" ],
         "Runtime": "nodejs8.10",
-        "Timeout": 3,
+        "Timeout": 30,
         "MemorySize": 256,
         "Events": {
           "PostResource":{
@@ -100,7 +100,7 @@
         },
         "Policies": [ "AWSLambdaFullAccess" ],
         "Runtime": "nodejs8.10",
-        "Timeout": 3,
+        "Timeout": 30,
         "MemorySize": 256,
         "Events": {
           "PostResource":{
@@ -149,7 +149,7 @@
         },
         "Policies": [ "AWSLambdaFullAccess" ],
         "Runtime": "nodejs8.10",
-        "Timeout": 3,
+        "Timeout": 30,
         "MemorySize": 256,
         "Events": {
           "PostResource":{
@@ -195,7 +195,7 @@
         },
         "Policies": [ "AWSLambdaFullAccess" ],
         "Runtime": "nodejs8.10",
-        "Timeout": 3,
+        "Timeout": 30,
         "MemorySize": 256,
         "Events": {
           "GetResource":{
@@ -260,6 +260,52 @@
           "Stage": "Prod"
        }
     },
+    "OAuthSignRequestDeleteLambda": {
+      "Type": "AWS::Serverless::Function",
+      "Properties": {
+        "CodeUri": {
+          "Bucket" : {
+            "Ref" : "BucketName"
+          },
+          "Key": "artifact.zip"
+        },
+        "Description": "OAuth Sign Request Delete Lambda Function",
+        "FunctionName": "oauth-sign-request-delete",
+        "Handler": "index.oAuthSignRequestDelete",
+        "Role": {
+          "Fn::Sub" : "arn:aws:iam::${AWS::AccountId}:role/basic-lambda-execution-role"
+        },
+        "Policies": [ "AWSLambdaFullAccess" ],
+        "Runtime": "nodejs8.10",
+        "Timeout": 30,
+        "MemorySize": 256,
+        "Events": {
+          "DeleteResource":{
+            "Type" : "Api",
+            "Properties" : {
+              "Path" : "/oAuthSignRequest",
+              "Method" : "delete"
+            }
+          }
+        },
+        "Environment" : {
+          "Variables" : {
+            "CLIENT_KEY" : {
+              "Ref" : "ClientKey"
+            },
+            "CLIENT_SECRET" : {
+              "Ref" : "ClientSecret"
+            },
+            "OAUTH_CUSTOM_HEADERS": {
+              "Ref": "OAuthCustomHeaders"
+            },
+            "AUTHORIZE_CALLBACK_URI": {
+              "Ref": "AuthorizeCallbackUri"
+            }
+          }
+        }
+      }
+    }
   },
   "Outputs" : {
     "ApiURL" : {

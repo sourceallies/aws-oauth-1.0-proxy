@@ -9,14 +9,14 @@ set +o allexport
 echo "Assuming IAM Admin Role..."
 source /bin/assumeRole $ADMIN_ARN
 
-echo "Removing the S3 bucket..."
+# echo "Removing the S3 bucket..."
 bucketName="${BUCKET_NAME}-${DEPLOY_ENVIRONMENT,,}"
-aws s3 rb s3://$bucketName --force
-aws s3api wait bucket-not-exists --bucket $bucketName
+# aws s3 rb s3://$bucketName --force
+# aws s3api wait bucket-not-exists --bucket $bucketName
 
-echo "Creating a new S3 bucket..."
-aws s3 mb s3://$bucketName
-aws s3api wait bucket-exists --bucket $bucketName
+# echo "Creating a new S3 bucket..."
+# aws s3 mb s3://$bucketName
+# aws s3api wait bucket-exists --bucket $bucketName
 
 echo "Putting the zipped code into the S3 bucket..."
 aws s3api put-object --bucket $bucketName --key artifact.zip --body artifact.zip
@@ -53,5 +53,12 @@ aws cloudformation deploy --stack-name $STACK_NAME \
 
 echo "Describing stack events..."
 aws cloudformation describe-stack-events --stack-name $STACK_NAME
+
+echo "Updating lambda code"
+aws lambda update-function-code --function-name oauth-sign-request-get --s3-bucket $bucketName --s3-key artifact.zip
+aws lambda update-function-code --function-name oauth-sign-request-post --s3-bucket $bucketName --s3-key artifact.zip
+aws lambda update-function-code --function-name oauth-sign-request-delete --s3-bucket $bucketName --s3-key artifact.zip
+aws lambda update-function-code --function-name oauth-first-leg --s3-bucket $bucketName --s3-key artifact.zip
+aws lambda update-function-code --function-name oauth-third-leg --s3-bucket $bucketName --s3-key artifact.zip
 
 echo "Deploy successful"

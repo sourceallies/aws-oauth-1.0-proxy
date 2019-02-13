@@ -1,7 +1,7 @@
 const { OAuth } = require('oauth');
 const config = require('./config');
-const { doSignAndGet } = require('./src/OAuthSignRequest');
-const { doSignAndPost } = require('./src/OAuthSignRequest');
+const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSignRequest');
+
 require('dotenv').config();
 
 exports.firstLegHandler = (event, context, callback) => {
@@ -92,6 +92,7 @@ const sendResponse = responseData => ({
   statusCode: responseData.status,
   headers: {
     'Access-Control-Allow-Origin': '*',
+    'location': responseData.headers ? responseData.headers.location : undefined,
   },
   body: JSON.stringify(responseData.body ? responseData.body : responseData),
   isBase64Encoded: false,
@@ -139,6 +140,22 @@ exports.oAuthSignRequestPost = async (event) => {
     JSON.stringify(data),
     config.oAuthCustomContentType,
   )
+    .then(sendResponse)
+    .catch(sendError);
+
+  return response;
+};
+
+exports.oAuthSignRequestDelete = async (event) => {
+  const receivedData = JSON.parse(JSON.stringify(event));
+
+  const {
+    url,
+    accessToken,
+    accessTokenSecret,
+  } = receivedData.queryStringParameters;
+
+  const response = await doSignAndDelete(url, accessToken, accessTokenSecret)
     .then(sendResponse)
     .catch(sendError);
 
