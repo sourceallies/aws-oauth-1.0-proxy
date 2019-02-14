@@ -11,6 +11,7 @@ source /bin/assumeRole $ADMIN_ARN
 
 # echo "Removing the S3 bucket..."
 bucketName="${BUCKET_NAME}-${DEPLOY_ENVIRONMENT,,}"
+echo $bucketName
 # aws s3 rb s3://$bucketName --force
 # aws s3api wait bucket-not-exists --bucket $bucketName
 
