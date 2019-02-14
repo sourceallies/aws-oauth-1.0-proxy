@@ -198,7 +198,7 @@ Resources:
         - Name: oauthproxy.dev.sourceallies.com
           Type: A
           AliasTarget:
-            HostedZoneId:
+            HostedZoneId: Z2FDTNDATAQYW2
             DNSName: dwaw2irwsnvsg.cloudfront.net
   AppBasePathMapping:
     Type: "AWS::ApiGateway::BasePathMapping"
