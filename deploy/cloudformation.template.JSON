@@ -29,9 +29,6 @@
     "AuthorizeCallbackUri": {
       "Type": "String"
     },
-    "CloudFrontDomain": {
-        "Type": "String"
-    }
   },
   "Resources" : {
     "OAuthFirstLegLambda": {
