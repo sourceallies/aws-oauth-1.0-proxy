@@ -198,8 +198,16 @@ Resources:
         - Name: oauthproxy.dev.sourceallies.com
           Type: A
           AliasTarget:
-            HostedZoneId: Z2FDTNDATAQYW2
+            HostedZoneId:
+
+
             DNSName: dwaw2irwsnvsg.cloudfront.net
+  AppBasePathMapping:
+    Type: "AWS::ApiGateway::BasePathMapping"
+    Properties:
+      BasePath: App
+      DomainName: !Ref DomainName
+      RestApiId: aws-oauth-proxy
 Outputs:
   ApiURL:
     Description: API endpoint for the lambdas
