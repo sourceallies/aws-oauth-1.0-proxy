@@ -203,9 +203,9 @@ Resources:
   AppBasePathMapping:
     Type: "AWS::ApiGateway::BasePathMapping"
     Properties:
-      BasePath: App
+      BasePath: app
       DomainName: oauthproxy.dev.sourceallies.com
-      RestApiId: aws-oauth-proxy
+      RestApiId: bjor0osp15
 Outputs:
   ApiURL:
     Description: API endpoint for the lambdas
