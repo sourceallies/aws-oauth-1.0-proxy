@@ -199,14 +199,12 @@ Resources:
           Type: A
           AliasTarget:
             HostedZoneId:
-
-
             DNSName: dwaw2irwsnvsg.cloudfront.net
   AppBasePathMapping:
     Type: "AWS::ApiGateway::BasePathMapping"
     Properties:
       BasePath: App
-      DomainName: !Ref DomainName
+      DomainName: oauthproxy.dev.sourceallies.com
       RestApiId: aws-oauth-proxy
 Outputs:
   ApiURL:
