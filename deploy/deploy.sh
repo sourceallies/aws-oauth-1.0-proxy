@@ -22,12 +22,12 @@ echo "Putting the zipped code into the S3 bucket..."
 aws s3api put-object --bucket $bucketName --key artifact.zip --body artifact.zip
 
 echo "Hosted Zone"
-host_zone=$(aws route53 list-hosted-zones-by-name --query 'HostedZones[?Name == `'sourceallies.com.'`].Id')
+host_zone=$(aws route53 list-hosted-zones-by-name --query 'HostedZones[?Name == `'dev.sourceallies.com.'`].Id')
 IFS="/" read -r -a host_zone <<< "${host_zone}"
 host_zone_name=${host_zone[2]}
 
 echo "Getting cloudfront domain name..."
-cloud_front_domain=$(aws get-domain-name --query 'distributionDomainName' --domain-name ${ApiUrl})
+cloud_front_domain=$(aws get-domain-name --query 'distributionDomainName' --domain-name oauth-lambda)
 
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
@@ -45,7 +45,7 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         StackName=$STACK_NAME\
         ApiUrl=$API_URL \
         HostedZone=$host_zone_name \
-        DomainName="${bamboo_domain_name}" \
+        DomainName=${bamboo_domain_name} \
         OAuthCustomHeaders=$OAUTH_CUSTOM_HEADERS \
         AuthorizeCallbackUri=$AUTHORIZE_CALLBACK_URI \
         CloudFrontDomain=$cloud_front_domain \

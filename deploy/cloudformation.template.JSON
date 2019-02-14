@@ -231,7 +231,7 @@
           "HostedZoneId": {"Ref" : "HostedZone"},
           "RecordSets": [
              {
-                "Name": { "Ref" : "ApiUrl" },
+                "Name": { "Ref" : "DomainName" },
                 "Type": "A",
                 "AliasTarget": {
                    "HostedZoneId": "Z2FDTNDATAQYW2",
