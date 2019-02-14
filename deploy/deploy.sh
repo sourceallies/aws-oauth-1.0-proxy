@@ -28,7 +28,8 @@ IFS="/" read -r -a host_zone <<< "${host_zone}"
 host_zone_name=${host_zone[2]}
 
 echo "stuff..."
-echo aws apigateway get-domain-names
+OUTPUT="$(apigateway get-domain-names)"
+echo "${OUTPUT}"
 
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
