@@ -50,7 +50,6 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         DomainName=${bamboo_domain_name} \
         OAuthCustomHeaders=$OAUTH_CUSTOM_HEADERS \
         AuthorizeCallbackUri=$AUTHORIZE_CALLBACK_URI \
-        CloudFrontDomainName=
     --no-fail-on-empty-changeset \
 
 echo "Describing stack events..."
