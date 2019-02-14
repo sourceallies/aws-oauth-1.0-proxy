@@ -184,6 +184,17 @@ Resources:
             Ref: OAuthCustomHeaders
           AUTHORIZE_CALLBACK_URI:
             Ref: AuthorizeCallbackUri
+  DomainNameARecord:
+    Type: 'AWS::Route53::RecordSetGroup'
+    Properties:
+      Comment: Points to an API Gateway Custom Domain a.k.a. CloudFront Distribution
+      HostedZoneId: !Ref HostedZone
+      RecordSets:
+        - Name: !Ref DomainName
+          Type: A
+          AliasTarget:
+            HostedZoneId: Z2FDTNDATAQYW2
+            DNSName: d3e76pnsuf1p3n.cloudfront.net
 Outputs:
   ApiURL:
     Description: API endpoint for the lambdas
