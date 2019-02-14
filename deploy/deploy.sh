@@ -28,7 +28,7 @@ IFS="/" read -r -a host_zone <<< "${host_zone}"
 host_zone_name=${host_zone[2]}
 
 echo "stuff..."
-OUTPUT="$(apigateway get-domain-names)"
+OUTPUT="$(aws apigateway get-domain-names)"
 echo "${OUTPUT}"
 
 echo "Creating the lambdas..."
