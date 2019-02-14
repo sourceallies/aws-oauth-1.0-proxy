@@ -190,7 +190,7 @@ Resources:
     Type: 'AWS::Route53::RecordSetGroup'
     Properties:
       Comment: Points to an API Gateway Custom Domain a.k.a. CloudFront Distribution
-      HostedZoneId: !Ref HostedZone
+      HostedZoneId: Z2FDTNDATAQYW2
       RecordSets:
         - Name: !Ref DomainName
           Type: A
