@@ -29,7 +29,7 @@ host_zone_name=${host_zone[2]}
 
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
-    --template-file deploy/cloudformation.template.json \
+    --template-file deploy/cloudformation.template.yaml \
     --tags \
         Customer=$CUSTOMER \
         Name=$NAME \
