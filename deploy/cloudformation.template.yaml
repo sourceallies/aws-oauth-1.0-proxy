@@ -193,7 +193,7 @@ Resources:
     Type: 'AWS::Route53::RecordSetGroup'
     Properties:
       Comment: Points to an API Gateway Custom Domain a.k.a. CloudFront Distribution
-      HostedZoneId: Z2FDTNDATAQYW2
+      HostedZoneId: Z2LBG8W17PXZI7
       RecordSets:
         - Name: oauthproxy.dev.sourceallies.com
           Type: A
