@@ -195,11 +195,11 @@ Resources:
       Comment: Points to an API Gateway Custom Domain a.k.a. CloudFront Distribution
       HostedZoneId: Z2FDTNDATAQYW2
       RecordSets:
-        - Name: !Ref DomainName
+        - Name: oauthproxy.dev.sourceallies.com
           Type: A
           AliasTarget:
             HostedZoneId: Z2FDTNDATAQYW2
-            DNSName: !Ref CloudFrontDomainName
+            DNSName: dwaw2irwsnvsg.cloudfront.net
 Outputs:
   ApiURL:
     Description: API endpoint for the lambdas
