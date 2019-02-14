@@ -16,6 +16,9 @@ Parameters:
     Type: String
   DomainName:
     Type: String
+  CloudFrontDomainName:
+    Type: String
+    Description: Domain name for Cloudfront distribution of APIG Custom Domain Name
 Resources:
   OAuthFirstLegLambda:
     Type: AWS::Serverless::Function
@@ -196,7 +199,7 @@ Resources:
           Type: A
           AliasTarget:
             HostedZoneId: Z2FDTNDATAQYW2
-            DNSName: d3e76pnsuf1p3n.cloudfront.net
+            DNSName: !Ref CloudFrontDomainName
 Outputs:
   ApiURL:
     Description: API endpoint for the lambdas

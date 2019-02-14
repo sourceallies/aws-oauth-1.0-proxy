@@ -27,6 +27,9 @@ host_zone=$(aws route53 list-hosted-zones-by-name --query 'HostedZones[?Name == 
 IFS="/" read -r -a host_zone <<< "${host_zone}"
 host_zone_name=${host_zone[2]}
 
+echo "stuff..."
+echo aws apigateway get-domain-names
+
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
     --template-file deploy/cloudformation.template.yaml \
@@ -46,6 +49,7 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         DomainName=${bamboo_domain_name} \
         OAuthCustomHeaders=$OAUTH_CUSTOM_HEADERS \
         AuthorizeCallbackUri=$AUTHORIZE_CALLBACK_URI \
+        CloudFrontDomainName=
     --no-fail-on-empty-changeset \
 
 echo "Describing stack events..."
