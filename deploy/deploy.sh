@@ -22,14 +22,11 @@ echo $bucketName
 echo "Putting the zipped code into the S3 bucket..."
 aws s3api put-object --bucket $bucketName --key artifact.zip --body artifact.zip
 
-echo "Hosted Zone"
-host_zone=$(aws route53 list-hosted-zones-by-name --query 'HostedZones[?Name == `'dev.sourceallies.com.'`].Id')
-IFS="/" read -r -a host_zone <<< "${host_zone}"
-host_zone_name=${host_zone[2]}
+echo "Getting API ID"
+apiId=$(aws apigateway get-rest-apis --query '(items[?name==`aws-oauth-proxy`].id)[0]')
 
-echo "stuff..."
-OUTPUT="$(aws apigateway get-domain-names)"
-echo "${OUTPUT}"
+echo "Getting Distribution Domain Name"
+distributionDomainName=$(aws apigateway get-domain-names --query '(items[?domainName==`dev.sourceallies.com`].distributionDomainName)[0]')
 
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
@@ -50,6 +47,8 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         DomainName=${bamboo_domain_name} \
         OAuthCustomHeaders=$OAUTH_CUSTOM_HEADERS \
         AuthorizeCallbackUri=$AUTHORIZE_CALLBACK_URI \
+        RestApiId=$apiId \
+        DistributionDomainName=$distributionDomainName
     --no-fail-on-empty-changeset \
 
 echo "Describing stack events..."

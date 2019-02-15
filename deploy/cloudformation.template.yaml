@@ -16,9 +16,10 @@ Parameters:
     Type: String
   DomainName:
     Type: String
-  CloudFrontDomainName:
+  RestApiId:
     Type: String
-    Description: Domain name for Cloudfront distribution of APIG Custom Domain Name
+  DistributionDomainName:
+    Type: String
 Resources:
   OAuthFirstLegLambda:
     Type: AWS::Serverless::Function
@@ -199,13 +200,13 @@ Resources:
           Type: A
           AliasTarget:
             HostedZoneId: Z2FDTNDATAQYW2
-            DNSName: dwaw2irwsnvsg.cloudfront.net
+            DNSName: !Ref DistributionDomainName
   AppBasePathMapping:
     Type: "AWS::ApiGateway::BasePathMapping"
     Properties:
       BasePath: app
       DomainName: oauthproxy.dev.sourceallies.com
-      RestApiId: bjor0osp15
+      RestApiId: !Ref RestApiId
 Outputs:
   ApiURL:
     Description: API endpoint for the lambdas
