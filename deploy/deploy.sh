@@ -24,6 +24,7 @@ aws s3api put-object --bucket $bucketName --key artifact.zip --body artifact.zip
 
 echo "Getting API ID"
 apiId=$(aws apigateway get-rest-apis --query '(items[?name==`aws-oauth-proxy`].id)[0]')
+echo $apiId
 
 echo "Getting Distribution Domain Name"
 distributionDomainName=$(aws apigateway get-domain-names --query '(items[?domainName==`dev.sourceallies.com`].distributionDomainName)[0]')
