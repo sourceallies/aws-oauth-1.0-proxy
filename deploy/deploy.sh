@@ -26,7 +26,7 @@ echo "Getting API ID"
 apiId=$(aws apigateway get-rest-apis --output text --query '(items[?name==`aws-oauth-proxy`].id)[0]')
 
 echo "Getting Distribution Domain Name"
-distributionDomainName=$(aws apigateway get-domain-names --output text --query '(items[?domainName==`dev.sourceallies.com`].distributionDomainName)[0]')
+distributionDomainName=$(aws apigateway get-domain-names --output text --query '(items[?domainName==`oauthproxy.dev.sourceallies.com`].distributionDomainName)[0]')
 
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
