@@ -200,7 +200,7 @@ Resources:
           Type: A
           AliasTarget:
             HostedZoneId: Z2FDTNDATAQYW2
-            DNSName: d3o0s93vtf3xx5.cloudfront.net
+            DNSName: !Ref DistributionDomainName
   AppBasePathMapping:
     Type: "AWS::ApiGateway::BasePathMapping"
     Properties:
