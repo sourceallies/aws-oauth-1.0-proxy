@@ -48,7 +48,7 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         OAuthCustomHeaders=$OAUTH_CUSTOM_HEADERS \
         AuthorizeCallbackUri=$AUTHORIZE_CALLBACK_URI \
         RestApiId=$apiId \
-        DistributionDomainName=$distributionDomainName
+        DistributionDomainName=$distributionDomainName \
     --no-fail-on-empty-changeset \
 
 echo "Describing stack events..."
