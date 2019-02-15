@@ -23,11 +23,10 @@ echo "Putting the zipped code into the S3 bucket..."
 aws s3api put-object --bucket $bucketName --key artifact.zip --body artifact.zip
 
 echo "Getting API ID"
-apiId=$(aws apigateway get-rest-apis --query '(items[?name==`aws-oauth-proxy`].id)[0]')
-echo $apiId
+apiId=$(aws apigateway get-rest-apis --output text --query '(items[?name==`aws-oauth-proxy`].id)[0]')
 
 echo "Getting Distribution Domain Name"
-distributionDomainName=$(aws apigateway get-domain-names --query '(items[?domainName==`dev.sourceallies.com`].distributionDomainName)[0]')
+distributionDomainName=$(aws apigateway get-domain-names --output text --query '(items[?domainName==`dev.sourceallies.com`].distributionDomainName)[0]')
 
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
