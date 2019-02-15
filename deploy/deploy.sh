@@ -11,6 +11,7 @@ source /bin/assumeRole $ADMIN_ARN
 
 # echo "Removing the S3 bucket..."
 bucketName="${BUCKET_NAME}-${DEPLOY_ENVIRONMENT,,}"
+echo $bucketName
 # aws s3 rb s3://$bucketName --force
 # aws s3api wait bucket-not-exists --bucket $bucketName
 
@@ -21,9 +22,15 @@ bucketName="${BUCKET_NAME}-${DEPLOY_ENVIRONMENT,,}"
 echo "Putting the zipped code into the S3 bucket..."
 aws s3api put-object --bucket $bucketName --key artifact.zip --body artifact.zip
 
+echo "Getting API ID"
+apiId=$(aws apigateway get-rest-apis --output text --query '(items[?name==`aws-oauth-proxy`].id)[0]')
+
+echo "Getting Distribution Domain Name"
+distributionDomainName=$(aws apigateway get-domain-names --output text --query '(items[?domainName==`oauthproxy.dev.sourceallies.com`].distributionDomainName)[0]')
+
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
-    --template-file deploy/cloudformation.template.JSON \
+    --template-file deploy/cloudformation.template.yaml \
     --tags \
         Customer=$CUSTOMER \
         Name=$NAME \
@@ -34,9 +41,14 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         ClientKey=$CLIENT_KEY \
         ClientSecret=$CLIENT_SECRET \
         BucketName=$bucketName \
+        StackName=$STACK_NAME\
         ApiUrl=$API_URL \
+        HostedZone=$host_zone_name \
+        DomainName=${bamboo_domain_name} \
         OAuthCustomHeaders=$OAUTH_CUSTOM_HEADERS \
         AuthorizeCallbackUri=$AUTHORIZE_CALLBACK_URI \
+        RestApiId=$apiId \
+        DistributionDomainName=$distributionDomainName \
     --no-fail-on-empty-changeset \
 
 echo "Describing stack events..."
