@@ -21,9 +21,18 @@ bucketName="${BUCKET_NAME}-${DEPLOY_ENVIRONMENT,,}"
 echo "Putting the zipped code into the S3 bucket..."
 aws s3api put-object --bucket $bucketName --key artifact.zip --body artifact.zip
 
+echo "Getting API ID"
+apiId=$(aws apigateway get-rest-apis --output text --query "(items[?name=='${STACK_NAME}'].id)[0]")
+
+echo "Getting Distribution Domain Name"
+DistributionDomainName=$(aws apigateway get-domain-names --output text --query "(items[?domainName=='${DOMAIN_NAME}'].distributionDomainName)[0]")
+
+echo "Getting Distribution Hosted Zone ID"
+DistributionHostedZoneID=$(aws apigateway get-domain-names --output text --query "(items[?domainName=='${DOMAIN_NAME}'].distributionHostedZoneId)[0]")
+
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
-    --template-file deploy/cloudformation.template.JSON \
+    --template-file deploy/cloudformation.template.yaml \
     --tags \
         Customer=$CUSTOMER \
         Name=$NAME \
@@ -34,9 +43,16 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         ClientKey=$CLIENT_KEY \
         ClientSecret=$CLIENT_SECRET \
         BucketName=$bucketName \
+        StackName=$STACK_NAME\
         ApiUrl=$API_URL \
+        HostedZone=$host_zone_name \
+        DomainName=${bamboo_domain_name} \
         OAuthCustomHeaders=$OAUTH_CUSTOM_HEADERS \
         AuthorizeCallbackUri=$AUTHORIZE_CALLBACK_URI \
+        RestApiId=$apiId \
+        DistributionDomainName=$DistributionDomainName \
+        DistributionHostedZoneID=$DistributionHostedZoneID \
+        DomainName=$DOMAIN_NAME \
     --no-fail-on-empty-changeset \
 
 echo "Describing stack events..."

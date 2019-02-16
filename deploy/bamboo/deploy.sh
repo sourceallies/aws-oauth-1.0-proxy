@@ -17,6 +17,8 @@ CLIENT_SECRET=$bamboo_CLIENT_SECRET
 API_URL=$bamboo_API_URL
 AUTHORIZE_CALLBACK_URI=$bamboo_AUTHORIZE_CALLBACK_URI
 OAUTH_CUSTOM_HEADERS=$bamboo_OAUTH_CUSTOM_HEADERS
+DOMAIN_NAME=$bamboo_DOMAIN_NAME
+
 
 # Look up the IAM admin role ARN for the environment we are deploying into
 ADMIN_ARN="$(printenv bamboo_SAI_${DEPLOY_ENVIRONMENT}_ADMIN_ARN )"
@@ -36,6 +38,7 @@ echo "API_URL=${API_URL}" >> .env
 echo "AUTHORIZE_CALLBACK_URI=${AUTHORIZE_CALLBACK_URI}" >> .env
 echo "OAUTH_CUSTOM_HEADERS=${OAUTH_CUSTOM_HEADERS}" >> .env
 echo "ADMIN_ARN=${ADMIN_ARN}" >> .env
+echo "DOMAIN_NAME=${DOMAIN_NAME}" >> .env
 
 # Run deploy script
 bash deploy/deploy.sh
