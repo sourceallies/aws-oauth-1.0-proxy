@@ -28,7 +28,7 @@ echo "Getting Distribution Domain Name"
 DistributionDomainName=$(aws apigateway get-domain-names --output text --query "(items[?domainName=='${DOMAIN_NAME}'].distributionDomainName)[0]")
 
 echo "Getting Distribution Hosted Zone ID"
-DistributionHostedZoneID=$(aws apigateway get-domain-names --output text --query "(items[?domainName=='${DOMAIN_NAME}'].distributionHostedZoneId)[0]")
+DistributionHostedZoneID=$(aws route53 list-hosted-zones-by-name --query "(HostedZones[?Name=='${DOMAIN_PARENT}'].Id)[0]" --output text)
 
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
@@ -53,6 +53,7 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         DistributionDomainName=$DistributionDomainName \
         DistributionHostedZoneID=$DistributionHostedZoneID \
         DomainName=$DOMAIN_NAME \
+        DomainParent=$DOMAIN_PARENT \
     --no-fail-on-empty-changeset \
 
 echo "Describing stack events..."

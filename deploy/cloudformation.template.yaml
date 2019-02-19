@@ -211,5 +211,5 @@ Resources:
 Outputs:
   ApiURL:
     Description: API endpoint for the lambdas
-    Value:
+    Value: 
       Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
