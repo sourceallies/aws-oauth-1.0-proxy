@@ -43,10 +43,9 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         ClientKey=$CLIENT_KEY \
         ClientSecret=$CLIENT_SECRET \
         BucketName=$bucketName \
-        StackName=$STACK_NAME\
+        StackName=$STACK_NAME \
         ApiUrl=$API_URL \
         HostedZone=$host_zone_name \
-        DomainName=${bamboo_domain_name} \
         OAuthCustomHeaders=$OAUTH_CUSTOM_HEADERS \
         AuthorizeCallbackUri=$AUTHORIZE_CALLBACK_URI \
         RestApiId=$apiId \
