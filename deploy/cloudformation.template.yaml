@@ -19,7 +19,7 @@ Parameters:
     Type: String
   DistributionDomainName:
     Type: String
-  DistributionHostedZoneID:
+  DomainParentHostedZoneID:
     Type: String
 Resources:
   OAuthFirstLegLambda:
@@ -195,7 +195,7 @@ Resources:
     Type: 'AWS::Route53::RecordSetGroup'
     Properties:
       Comment: Points to an API Gateway Custom Domain a.k.a. CloudFront Distribution
-      HostedZoneId: !Ref DistributionHostedZoneID
+      HostedZoneId: !Ref DomainParentHostedZoneID
       RecordSets:
         - Name: !Ref DomainName
           Type: A
@@ -211,5 +211,6 @@ Resources:
 Outputs:
   ApiURL:
     Description: API endpoint for the lambdas
-    Value: 
-      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+    Value: !Sub
+      - https://${customDomain}/app/Prod/
+      - { customDomain: !Ref DomainName }
