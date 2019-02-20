@@ -32,7 +32,7 @@ CertificateArn=$(aws acm list-certificates --query "(CertificateSummaryList[?Dom
 
 domainExists=$(aws apigateway get-domain-names --query "items[?domainName=='${DOMAIN_NAME}']")
 
-if [ ${domainExists} != "[]" ]; then
+if [ "$domainExists" != "[]" ]; then
   echo "Deleting the Domain"
   aws apigateway delete-domain-name --domain-name $DOMAIN_NAME
 fi
