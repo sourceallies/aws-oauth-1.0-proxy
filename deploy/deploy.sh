@@ -24,9 +24,6 @@ aws s3api put-object --bucket $bucketName --key artifact.zip --body artifact.zip
 echo "Getting API ID"
 apiId=$(aws apigateway get-rest-apis --output text --query "(items[?name=='${STACK_NAME}'].id)[0]")
 
-echo "Getting Distribution Domain Name"
-DistributionDomainName=$(aws apigateway get-domain-names --output text --query "(items[?domainName=='${DOMAIN_NAME}'].distributionDomainName)[0]")
-
 echo "Getting Distribution Hosted Zone ID"
 DomainParentHostedZoneID=$(aws route53 list-hosted-zones-by-name --query "(HostedZones[?Name=='${DOMAIN_PARENT}'].Id)[0]" --output text)
 
@@ -49,7 +46,6 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         OAuthCustomHeaders=$OAUTH_CUSTOM_HEADERS \
         AuthorizeCallbackUri=$AUTHORIZE_CALLBACK_URI \
         RestApiId=$apiId \
-        DistributionDomainName=$DistributionDomainName \
         DomainParentHostedZoneID=$DomainParentHostedZoneID \
         DomainName=$DOMAIN_NAME \
         DomainParent=$DOMAIN_PARENT \

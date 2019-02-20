@@ -17,8 +17,6 @@ Parameters:
     Type: String
   RestApiId:
     Type: String
-  DistributionDomainName:
-    Type: String
   DomainParentHostedZoneID:
     Type: String
 Resources:
@@ -201,13 +199,17 @@ Resources:
           Type: A
           AliasTarget:
             HostedZoneId: Z2FDTNDATAQYW2
-            DNSName: !Ref DistributionDomainName
+            DNSName: !GetAtt CustomDomain.DistributionDomainName
   AppBasePathMapping:
     Type: "AWS::ApiGateway::BasePathMapping"
     Properties:
       BasePath: app
       DomainName: !Ref DomainName
       RestApiId: !Ref RestApiId
+  CustomDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: !Ref DomainName
 Outputs:
   ApiURL:
     Description: API endpoint for the lambdas
