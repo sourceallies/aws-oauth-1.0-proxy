@@ -27,6 +27,9 @@ apiId=$(aws apigateway get-rest-apis --output text --query "(items[?name=='${STA
 echo "Getting Distribution Hosted Zone ID"
 DomainParentHostedZoneID=$(aws route53 list-hosted-zones-by-name --query "(HostedZones[?Name=='${DOMAIN_PARENT}'].Id)[0]" --output text)
 
+echo "Getting Certificate"
+CertificateArn=$(aws acm list-certificates --query "(CertificateSummaryList[?DomainName=='${DOMAIN_CERTIFICATE}'].CertificateArn)[0]" --output text)
+
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
     --template-file deploy/cloudformation.template.yaml \
@@ -49,6 +52,7 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         DomainParentHostedZoneID=$DomainParentHostedZoneID \
         DomainName=$DOMAIN_NAME \
         DomainParent=$DOMAIN_PARENT \
+        CertificateArn=$CertificateArn \
     --no-fail-on-empty-changeset \
 
 echo "Describing stack events..."

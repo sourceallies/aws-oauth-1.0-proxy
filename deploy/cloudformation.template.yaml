@@ -19,6 +19,8 @@ Parameters:
     Type: String
   DomainParentHostedZoneID:
     Type: String
+  CertificateArn:
+    Type: String
 Resources:
   OAuthFirstLegLambda:
     Type: AWS::Serverless::Function
@@ -209,6 +211,7 @@ Resources:
   CustomDomain:
     Type: AWS::ApiGateway::DomainName
     Properties:
+      CertificateArn: !Ref CertificateArn
       DomainName: !Ref DomainName
 Outputs:
   ApiURL:

@@ -19,6 +19,7 @@ AUTHORIZE_CALLBACK_URI=$bamboo_AUTHORIZE_CALLBACK_URI
 OAUTH_CUSTOM_HEADERS=$bamboo_OAUTH_CUSTOM_HEADERS
 DOMAIN_NAME=$bamboo_DOMAIN_NAME
 DOMAIN_PARENT=$bamboo_DOMAIN_PARENT
+DOMAIN_CERTIFICATE=$bamboo_DOMAIN_CERTIFICATE
 
 
 # Look up the IAM admin role ARN for the environment we are deploying into
@@ -41,6 +42,7 @@ echo "OAUTH_CUSTOM_HEADERS=${OAUTH_CUSTOM_HEADERS}" >> .env
 echo "ADMIN_ARN=${ADMIN_ARN}" >> .env
 echo "DOMAIN_NAME=${DOMAIN_NAME}" >> .env
 echo "DOMAIN_PARENT=${DOMAIN_PARENT}" >> .env
+echo "DOMAIN_CERTIFICATE=${DOMAIN_CERTIFICATE}" >> .env
 
 # Run deploy script
 bash deploy/deploy.sh
