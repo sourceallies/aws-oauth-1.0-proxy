@@ -30,8 +30,13 @@ DomainParentHostedZoneID=$(aws route53 list-hosted-zones-by-name --query "(Hoste
 echo "Getting Certificate"
 CertificateArn=$(aws acm list-certificates --query "(CertificateSummaryList[?DomainName=='${DOMAIN_CERTIFICATE}'].CertificateArn)[0]" --output text)
 
-echo "Deleting the Domain"
-aws apigateway delete-domain-name --domain-name $DOMAIN_NAME 2>/dev/null
+domainExists=$(aws apigateway get-domain-names --query "items[?domainName=='${DOMAIN_NAME}']")
+
+if ["$DOMAIN_NAME" != "[]"]
+then
+  echo "Deleting the Domain"
+  aws apigateway delete-domain-name --domain-name $DOMAIN_NAME
+fi
 
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
