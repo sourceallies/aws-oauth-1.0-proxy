@@ -22,8 +22,11 @@ describe('Lambda handlers', () => {
       }));
 
       const { firstLegHandler } = require('../app');
-
-      const event = chance.string();
+      const event = {
+        queryStringParameters: {
+          oauth_callback: chance.string(),
+        },
+      };
       const context = chance.string();
       const callback = jest.fn();
 
@@ -37,7 +40,7 @@ describe('Lambda handlers', () => {
         config.clientKey,
         config.clientSecret,
         config.oAuthVersion,
-        config.authorizeCallbackUri,
+        event.queryStringParameters.oauth_callback,
         config.oAuthSignatureMethod,
         config.oAuthNonceSize,
         config.oAuthCustomHeaders,
@@ -55,7 +58,11 @@ describe('Lambda handlers', () => {
 
       const { firstLegHandler } = require('../app');
 
-      const event = chance.string();
+      const event = {
+        queryStringParameters: {
+          oauth_callback: chance.string(),
+        },
+      };
       const context = chance.string();
       const callback = jest.fn();
 
@@ -81,7 +88,11 @@ describe('Lambda handlers', () => {
 
       const { firstLegHandler } = require('../app');
 
-      const event = chance.string();
+      const event = {
+        queryStringParameters: {
+          oauth_callback: chance.string(),
+        },
+      };
       const context = chance.string();
       const callback = jest.fn();
 
@@ -119,7 +130,11 @@ describe('Lambda handlers', () => {
 
       const { firstLegHandler } = require('../app');
 
-      const event = chance.string();
+      const event = {
+        queryStringParameters: {
+          oauth_callback: chance.string(),
+        },
+      };
       const context = chance.string();
       const callback = jest.fn();
 
@@ -145,6 +160,9 @@ describe('Lambda handlers', () => {
         requestTokenSecret: chance.string(),
         verifier: chance.string(),
       }),
+      queryStringParameters: {
+        oauth_callback: chance.string(),
+      },
     });
 
     it('should be a function', () => {
@@ -283,7 +301,7 @@ describe('Lambda handlers', () => {
         headers: {
           'Access-Control-Allow-Origin': '*',
         },
-        body: JSON.stringify(fakeResponseData),
+        body: fakeResponseData,
         isBase64Encoded: false,
       };
 
@@ -490,7 +508,7 @@ describe('Lambda handlers', () => {
           'Access-Control-Allow-Origin': '*',
           location: response.headers.location,
         },
-        body: JSON.stringify(fakeResponseData),
+        body: fakeResponseData,
         isBase64Encoded: false,
       };
 
