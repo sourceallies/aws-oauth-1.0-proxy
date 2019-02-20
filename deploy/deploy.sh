@@ -30,6 +30,8 @@ DomainParentHostedZoneID=$(aws route53 list-hosted-zones-by-name --query "(Hoste
 echo "Getting Certificate"
 CertificateArn=$(aws acm list-certificates --query "(CertificateSummaryList[?DomainName=='${DOMAIN_CERTIFICATE}'].CertificateArn)[0]" --output text)
 
+echo CertificateArn
+
 domainExists=$(aws apigateway get-domain-names --query "items[?domainName=='${DOMAIN_NAME}']")
 
 if [ "$domainExists" != "[]" ]; then
