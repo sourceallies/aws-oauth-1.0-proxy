@@ -23,6 +23,7 @@ aws s3api put-object --bucket $bucketName --key artifact.zip --body artifact.zip
 
 echo "Getting API ID"
 apiId=$(aws apigateway get-rest-apis --output text --query "(items[?name=='${STACK_NAME}'].id)[0]")
+echo $apiId
 
 echo "Getting Distribution Hosted Zone ID"
 DomainParentHostedZoneID=$(aws route53 list-hosted-zones-by-name --query "(HostedZones[?Name=='${DOMAIN_PARENT}'].Id)[0]" --output text)
