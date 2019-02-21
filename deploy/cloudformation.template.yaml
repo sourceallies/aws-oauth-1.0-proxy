@@ -19,8 +19,6 @@ Parameters:
     Type: String
   DomainParentHostedZoneID:
     Type: String
-  CertificateArn:
-    Type: String
   DistributionDomainName:
     Type: String
 Resources:
