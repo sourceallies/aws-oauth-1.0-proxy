@@ -27,3 +27,9 @@ Resources:
       BasePath: app
       DomainName: !Ref DomainName
       RestApiId: !Ref RestApiId
+Outputs:
+  ApiURL:
+    Description: API endpoint for the lambdas
+    Value: !Sub
+      - https://${customDomain}/app/Prod/
+      - { customDomain: !Ref DomainName }
