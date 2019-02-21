@@ -21,16 +21,11 @@ bucketName="${BUCKET_NAME}-${DEPLOY_ENVIRONMENT,,}"
 echo "Putting the zipped code into the S3 bucket..."
 aws s3api put-object --bucket $bucketName --key artifact.zip --body artifact.zip
 
-echo "Getting API ID"
-apiId=$(aws apigateway get-rest-apis --output text --query "(items[?name=='${STACK_NAME}'].id)[0]")
-echo $apiId
-
 echo "Getting Distribution Hosted Zone ID"
 DomainParentHostedZoneID=$(aws route53 list-hosted-zones-by-name --query "(HostedZones[?Name=='${DOMAIN_PARENT}'].Id)[0]" --output text)
 
 echo "Getting Certificate"
 CertificateArn=$(aws acm list-certificates --query "(CertificateSummaryList[?DomainName=='${CERTIFICATE_DOMAIN}'].CertificateArn)[0]" --output text)
-
 echo $CertificateArn
 
 domainExists=$(aws apigateway get-domain-names --query "items[?domainName=='${DOMAIN_NAME}']")
@@ -41,7 +36,6 @@ fi
 
 echo "Getting Distribution Domain Name"
 DistributionDomainName=$(aws apigateway get-domain-names --output text --query "(items[?domainName=='${DOMAIN_NAME}'].distributionDomainName)[0]")
-
 
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
@@ -61,12 +55,27 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         HostedZone=$host_zone_name \
         OAuthCustomHeaders=$OAUTH_CUSTOM_HEADERS \
         AuthorizeCallbackUri=$AUTHORIZE_CALLBACK_URI \
-        RestApiId=$apiId \
         DomainParentHostedZoneID=$DomainParentHostedZoneID \
-        DomainName=$DOMAIN_NAME \
-        DomainParent=$DOMAIN_PARENT \
-        DistributionDomainName=$DistributionDomainName \
     --no-fail-on-empty-changeset \
+
+echo "Getting API ID"
+apiId=$(aws apigateway get-rest-apis --output text --query "(items[?name=='${STACK_NAME}'].id)[0]")
+echo $apiId
+
+    aws cloudformation deploy --stack-name "${STACK_NAME}-domain" \
+        --template-file deploy/domain.template.yaml \
+        --tags \
+            Customer=$CUSTOMER \
+            Name=$NAME \
+            Contact=$CONTACT \
+            ContactEmail=$CONTACT_EMAIL \
+            Release=$RELEASE_NUMBER \
+        --parameter-overrides \
+            RestApiId=$apiId \
+            DomainParentHostedZoneID=$DomainParentHostedZoneID \
+            DomainName=$DOMAIN_NAME \
+            DistributionDomainName=$DistributionDomainName \
+        --no-fail-on-empty-changeset \
 
 echo "Describing stack events..."
 aws cloudformation describe-stack-events --stack-name $STACK_NAME

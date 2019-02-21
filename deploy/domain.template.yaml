@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Domain
+Parameters:
+  DomainName:
+    Type: String
+  RestApiId:
+    Type: String
+  DomainParentHostedZoneID:
+    Type: String
+  DistributionDomainName:
+    Type: String
+Resources:
+  DomainNameARecord:
+    Type: 'AWS::Route53::RecordSetGroup'
+    Properties:
+      Comment: Points to an API Gateway Custom Domain a.k.a. CloudFront Distribution
+      HostedZoneId: !Ref DomainParentHostedZoneID
+      RecordSets:
+        - Name: !Ref DomainName
+          Type: A
+          AliasTarget:
+            HostedZoneId: Z2FDTNDATAQYW2
+            DNSName: !Ref DistributionDomainName
+  AppBasePathMapping:
+    Type: "AWS::ApiGateway::BasePathMapping"
+    Properties:
+      BasePath: app
+      DomainName: !Ref DomainName
+      RestApiId: !Ref RestApiId

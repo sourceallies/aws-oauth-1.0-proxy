@@ -17,8 +17,6 @@ Parameters:
     Type: String
   RestApiId:
     Type: String
-  DomainParentHostedZoneID:
-    Type: String
   DistributionDomainName:
     Type: String
 Resources:
@@ -191,23 +189,6 @@ Resources:
             Ref: OAuthCustomHeaders
           AUTHORIZE_CALLBACK_URI:
             Ref: AuthorizeCallbackUri
-  DomainNameARecord:
-    Type: 'AWS::Route53::RecordSetGroup'
-    Properties:
-      Comment: Points to an API Gateway Custom Domain a.k.a. CloudFront Distribution
-      HostedZoneId: !Ref DomainParentHostedZoneID
-      RecordSets:
-        - Name: !Ref DomainName
-          Type: A
-          AliasTarget:
-            HostedZoneId: Z2FDTNDATAQYW2
-            DNSName: !Ref DistributionDomainName
-  AppBasePathMapping:
-    Type: "AWS::ApiGateway::BasePathMapping"
-    Properties:
-      BasePath: app
-      DomainName: !Ref DomainName
-      RestApiId: !Ref RestApiId
 Outputs:
   ApiURL:
     Description: API endpoint for the lambdas
