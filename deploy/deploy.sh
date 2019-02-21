@@ -33,11 +33,14 @@ CertificateArn=$(aws acm list-certificates --query "(CertificateSummaryList[?Dom
 echo $CertificateArn
 
 domainExists=$(aws apigateway get-domain-names --query "items[?domainName=='${DOMAIN_NAME}']")
-
-if [ "$domainExists" != "[]" ]; then
-  echo "Deleting the Domain"
-  aws apigateway delete-domain-name --domain-name $DOMAIN_NAME
+if [ "$domainExists" = "[]" ]; then
+  echo "Creating Domain Name"
+  aws apigateway create-domain-name --domain-name ${DOMAIN_NAME} --certificate-arn $CertificateArn
 fi
+
+echo "Getting Distribution Domain Name"
+DistributionDomainName=$(aws apigateway get-domain-names --output text --query "(items[?domainName=='${DOMAIN_NAME}'].distributionDomainName)[0]")
+
 
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
@@ -61,7 +64,7 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         DomainParentHostedZoneID=$DomainParentHostedZoneID \
         DomainName=$DOMAIN_NAME \
         DomainParent=$DOMAIN_PARENT \
-        CertificateArn=$CertificateArn \
+        DistributionDomainName=$DistributionDomainName \
     --no-fail-on-empty-changeset \
 
 echo "Describing stack events..."
