@@ -13,12 +13,6 @@ Parameters:
     Type: String
   AuthorizeCallbackUri:
     Type: String
-  DomainName:
-    Type: String
-  RestApiId:
-    Type: String
-  DistributionDomainName:
-    Type: String
 Resources:
   OAuthFirstLegLambda:
     Type: AWS::Serverless::Function
