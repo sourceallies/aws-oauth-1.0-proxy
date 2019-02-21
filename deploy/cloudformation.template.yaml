@@ -197,7 +197,7 @@ Resources:
       Comment: Points to an API Gateway Custom Domain a.k.a. CloudFront Distribution
       HostedZoneId: !Ref DomainParentHostedZoneID
       RecordSets:
-        - Name: !Ref Domain
+        - Name: !Ref DomainName
           Type: A
           AliasTarget:
             HostedZoneId: Z2FDTNDATAQYW2
@@ -206,7 +206,7 @@ Resources:
     Type: "AWS::ApiGateway::BasePathMapping"
     Properties:
       BasePath: app
-      DomainName: !Ref Domain
+      DomainName: !Ref DomainName
       RestApiId: !Ref RestApiId
 Outputs:
   ApiURL:
