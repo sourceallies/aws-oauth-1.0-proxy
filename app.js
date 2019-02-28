@@ -5,6 +5,7 @@ const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSig
 require('dotenv').config();
 
 exports.firstLegHandler = (event, context, callback) => {
+  console.log(event);
   const tokenlessOauthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
@@ -43,6 +44,7 @@ exports.firstLegHandler = (event, context, callback) => {
 };
 
 exports.thirdLegHandler = (event, context, callback) => {
+  console.log(event);
   const receivedBody = JSON.parse(event.body);
 
   const {
@@ -108,6 +110,7 @@ const sendError = error => ({
 });
 
 exports.oAuthSignRequestGet = async (event) => {
+  console.log(event);
   const receivedData = JSON.parse(JSON.stringify(event));
 
   const {
@@ -124,6 +127,7 @@ exports.oAuthSignRequestGet = async (event) => {
 };
 
 exports.oAuthSignRequestPost = async (event) => {
+  console.log(event);
   const receivedBody = JSON.parse(event.body);
 
   const {
@@ -147,6 +151,7 @@ exports.oAuthSignRequestPost = async (event) => {
 };
 
 exports.oAuthSignRequestDelete = async (event) => {
+  console.log(event);
   const receivedData = JSON.parse(JSON.stringify(event));
 
   const {
