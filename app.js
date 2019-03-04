@@ -6,7 +6,7 @@ require('dotenv').config();
 
 exports.firstLegHandler = (event, context, callback) => {
 
-  console.log('metadata ' + JSON.stringify(event.headers.metadata[0]));
+  console.log('metadata ' + JSON.stringify(event.headers.metadata));
 
   const tokenlessOauthSession = new OAuth(
     config.firstLegUri,
@@ -46,7 +46,7 @@ exports.firstLegHandler = (event, context, callback) => {
 };
 
 exports.thirdLegHandler = (event, context, callback) => {
-  console.log('metadata ' + JSON.stringify(event.headers.metadata[0]));
+  console.log('metadata ' + JSON.stringify(event.headers.metadata));
   const receivedBody = JSON.parse(event.body);
 
   const {
@@ -113,7 +113,7 @@ const sendError = error => ({
 
 exports.oAuthSignRequestGet = async (event) => {
   const receivedData = JSON.parse(JSON.stringify(event));
-  console.log('metadata ' + JSON.stringify(event.headers.metadata[0]));
+  console.log('metadata ' + JSON.stringify(event.headers.metadata));
 
   const {
     url,
@@ -130,7 +130,7 @@ exports.oAuthSignRequestGet = async (event) => {
 
 exports.oAuthSignRequestPost = async (event) => {
   const receivedBody = JSON.parse(event.body);
-  console.log('metadata ' + JSON.stringify(event.headers.metadata[0]));
+  console.log('metadata ' + JSON.stringify(event.headers.metadata));
 
   const {
     url,
