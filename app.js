@@ -5,9 +5,10 @@ const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSig
 require('dotenv').config();
 
 exports.firstLegHandler = (event, context, callback) => {
-  console.log(event);
-  console.log('metadata label', event.headers.metadata[0].label);
-  console.log('metadata value', event.headers.metadata[0].value);
+  console.log(JSON.parse(event.headers.metadata));
+  console.log(event.headers.metadata[0]);
+  console.log('metadata label', JSON.parse(event.headers.metadata[0].label));
+  console.log('metadata value', JSON.parse(event.headers.metadata[0].value));
   const tokenlessOauthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
@@ -157,7 +158,7 @@ exports.oAuthSignRequestPost = async (event) => {
 };
 
 exports.oAuthSignRequestDelete = async (event) => {
-  console.log(event);
+  console.log(JSON.parse(event));
   console.log('metadata label', event.headers.metadata[0].label);
   console.log('metadata value', event.headers.metadata[0].value);
   const receivedData = JSON.parse(JSON.stringify(event));

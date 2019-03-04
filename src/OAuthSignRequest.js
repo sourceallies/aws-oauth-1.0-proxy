@@ -96,7 +96,7 @@ const doSignAndPost = (
       postBody,
       postBodyContentType,
       (error, responseData, result) => {
-        console.log("Post Response From Deere", {
+        console.log('Post Response From Deere', {
           error,
           responseData,
           result,
