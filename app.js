@@ -114,7 +114,7 @@ const sendError = error => ({
 });
 
 exports.oAuthSignRequestGet = async (event) => {
-  console.log(event);
+  console.log(JSON.stringify(event));
   const receivedData = JSON.parse(JSON.stringify(event));
   console.log('metadata label', event.headers.metadata[0].label);
   console.log('metadata value', event.headers.metadata[0].value);
@@ -132,7 +132,7 @@ exports.oAuthSignRequestGet = async (event) => {
 };
 
 exports.oAuthSignRequestPost = async (event) => {
-  console.log(event);
+  console.log(JSON.stringify(event));
   const receivedBody = JSON.parse(event.body);
   console.log('metadata label', event.headers.metadata[0].label);
   console.log('metadata value', event.headers.metadata[0].value);
