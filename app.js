@@ -5,7 +5,8 @@ const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSig
 require('dotenv').config();
 
 exports.firstLegHandler = (event, context, callback) => {
-  console.log(JSON.stringify(event));
+  console.log(event);
+  console.log('metadata', event.headers.metadata);
   const tokenlessOauthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
@@ -44,7 +45,8 @@ exports.firstLegHandler = (event, context, callback) => {
 };
 
 exports.thirdLegHandler = (event, context, callback) => {
-  console.log(JSON.stringify(event));
+  console.log(event);
+  console.log('metadata', event.headers.metadata);
   const receivedBody = JSON.parse(event.body);
 
   const {
@@ -112,7 +114,7 @@ const sendError = error => ({
 exports.oAuthSignRequestGet = async (event) => {
   console.log(JSON.stringify(event));
   const receivedData = JSON.parse(JSON.stringify(event));
-
+  console.log('metadata', event.headers.metadata);
   const {
     url,
     accessToken,
@@ -129,7 +131,7 @@ exports.oAuthSignRequestGet = async (event) => {
 exports.oAuthSignRequestPost = async (event) => {
   console.log(JSON.stringify(event));
   const receivedBody = JSON.parse(event.body);
-
+  console.log('metadata', event.headers.metadata);
   const {
     url,
     accessToken,
@@ -151,7 +153,8 @@ exports.oAuthSignRequestPost = async (event) => {
 };
 
 exports.oAuthSignRequestDelete = async (event) => {
-  console.log(JSON.stringify(event));
+  console.log(event);
+  console.log('metadata', event.headers.metadata);
   const receivedData = JSON.parse(JSON.stringify(event));
 
   const {
