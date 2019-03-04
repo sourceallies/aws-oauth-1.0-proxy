@@ -6,7 +6,8 @@ require('dotenv').config();
 
 exports.firstLegHandler = (event, context, callback) => {
   console.log(event);
-  console.log('metadata', event.headers.metadata);
+  console.log('metadata label', event.headers.metadata[0].label);
+  console.log('metadata value', event.headers.metadata[0].value);
   const tokenlessOauthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
@@ -46,7 +47,8 @@ exports.firstLegHandler = (event, context, callback) => {
 
 exports.thirdLegHandler = (event, context, callback) => {
   console.log(event);
-  console.log('metadata', event.headers.metadata);
+  console.log('metadata label', event.headers.metadata[0].label);
+  console.log('metadata value', event.headers.metadata[0].value);
   const receivedBody = JSON.parse(event.body);
 
   const {
@@ -114,7 +116,8 @@ const sendError = error => ({
 exports.oAuthSignRequestGet = async (event) => {
   console.log(event);
   const receivedData = JSON.parse(JSON.stringify(event));
-  console.log('metadata', event.headers.metadata);
+  console.log('metadata label', event.headers.metadata[0].label);
+  console.log('metadata value', event.headers.metadata[0].value);
   const {
     url,
     accessToken,
@@ -131,7 +134,8 @@ exports.oAuthSignRequestGet = async (event) => {
 exports.oAuthSignRequestPost = async (event) => {
   console.log(event);
   const receivedBody = JSON.parse(event.body);
-  console.log('metadata', event.headers.metadata);
+  console.log('metadata label', event.headers.metadata[0].label);
+  console.log('metadata value', event.headers.metadata[0].value);
   const {
     url,
     accessToken,
@@ -154,7 +158,8 @@ exports.oAuthSignRequestPost = async (event) => {
 
 exports.oAuthSignRequestDelete = async (event) => {
   console.log(event);
-  console.log('metadata', event.headers.metadata);
+  console.log('metadata label', event.headers.metadata[0].label);
+  console.log('metadata value', event.headers.metadata[0].value);
   const receivedData = JSON.parse(JSON.stringify(event));
 
   const {
