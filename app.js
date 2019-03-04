@@ -153,7 +153,7 @@ exports.oAuthSignRequestPost = async (event) => {
 };
 
 exports.oAuthSignRequestDelete = async (event) => {
-  console.log('metadata ' + JSON.stringify(event.headers.metadata[0]));
+  console.log('metadata ' + JSON.stringify(event.headers.metadata));
 
   const receivedData = JSON.parse(JSON.stringify(event));
 
