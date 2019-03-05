@@ -261,15 +261,15 @@
     "SuccessTopic": {
     "Type" : "AWS::SNS::Topic",
       "Properties" : {
-        "DisplayName" : "aws-auth-topic",
-        "TopicName" : "SuccessTopic"
+        "DisplayName" : "aws-auth-success-topic",
+        "TopicName" : "aws-auth-success-topic"
       },
     },
     "FailTopic": {
     "Type" : "AWS::SNS::Topic",
       "Properties" : {
-        "DisplayName" : "aws-auth-topic",
-        "TopicName" : "FailedTopic"
+        "DisplayName" : "aws-auth-failed-topic",
+        "TopicName" : "aws-auth-failed-topic"
       },
     }
   },
