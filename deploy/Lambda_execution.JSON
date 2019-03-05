@@ -7,11 +7,6 @@
         "Service": "lambda.amazonaws.com"
       },
       "Action": "sts:AssumeRole"
-    },
-    {
-      "Effect": "Allow",
-      "Action": "sns:Publish",
-      "Resource": "*"
     }
   ]
 }
