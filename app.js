@@ -8,7 +8,8 @@ require('dotenv').config();
 AWS.config.update({ region: 'us-east-1' });
 
 exports.firstLegHandler = (event, context, callback) => {
-  console.log('metadata ' + JSON.stringify(event.headers.metadata));
+
+  console.log('metadata ' + JSON.stringify(event));
 
   const tokenlessOauthSession = new OAuth(
     config.firstLegUri,
@@ -69,7 +70,7 @@ exports.firstLegHandler = (event, context, callback) => {
 };
 
 exports.thirdLegHandler = (event, context, callback) => {
-  console.log('metadata ' + JSON.stringify(event.headers.metadata));
+  console.log('metadata ' + JSON.stringify(event));
   const receivedBody = JSON.parse(event.body);
 
   const {
@@ -136,7 +137,7 @@ const sendError = error => ({
 
 exports.oAuthSignRequestGet = async (event) => {
   const receivedData = JSON.parse(JSON.stringify(event));
-  console.log('metadata ' + JSON.stringify(event.headers.metadata));
+  console.log('metadata ' + JSON.stringify(event));
 
   const {
     url,
@@ -153,7 +154,7 @@ exports.oAuthSignRequestGet = async (event) => {
 
 exports.oAuthSignRequestPost = async (event) => {
   const receivedBody = JSON.parse(event.body);
-  console.log('metadata ' + JSON.stringify(event.headers.metadata));
+  console.log('metadata ' + JSON.stringify(event));
 
   const {
     url,
@@ -177,10 +178,10 @@ exports.oAuthSignRequestPost = async (event) => {
 
 exports.oAuthSignRequestDelete = async (event) => {
 
-  console.log('metadata ' + event.headers.metadata);
-  console.log('metadata ' + JSON.stringify(event.headers.metadata));
-  console.log('metadata ' + event.headers.metadata[0]);
-  console.log('metadata ' + JSON.stringify(event.headers.metadata[0]));
+  console.log('metadata ' + event);
+  console.log('metadata ' + JSON.stringify(event));
+  console.log('metadata ' + event[0]);
+  console.log('metadata ' + JSON.stringify(event[0]));
 
   const receivedData = JSON.parse(JSON.stringify(event));
 
