@@ -5,10 +5,9 @@ const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSig
 
 require('dotenv').config();
 
-AWS.config.update({ region: 'REGION' });
+AWS.config.update({ region: 'us-east-1' });
 
 exports.firstLegHandler = (event, context, callback) => {
-
   console.log('metadata ' + JSON.stringify(event.headers.metadata));
 
   const tokenlessOauthSession = new OAuth(
