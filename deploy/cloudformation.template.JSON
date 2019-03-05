@@ -257,6 +257,20 @@
           }
         }
       }
+    },
+    "SuccessTopic": {
+    "Type" : "AWS::SNS::Topic",
+      "Properties" : {
+        "DisplayName" : "aws-auth-topic",
+        "TopicName" : "SuccessTopic"
+      },
+    },
+    "FailTopic": {
+    "Type" : "AWS::SNS::Topic",
+      "Properties" : {
+        "DisplayName" : "aws-auth-topic",
+        "TopicName" : "FailedTopic"
+      },
     }
   },
   "Outputs" : {
