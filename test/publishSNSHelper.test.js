@@ -101,7 +101,7 @@ describe('publish to SNS helper', () => {
       };
 
       let config = require('../config.js')
-      config.snsSuccessArn = fakePublishedData.TopicArn;
+      config.snsNonSuccessArn = fakePublishedData.TopicArn;
 
       publishToSNSUnsuccessfull(fakePublishedData.Message);
 
