@@ -136,6 +136,36 @@ describe('Lambda handlers', () => {
 
       expect(callback).toBeCalledWith(null, response);
     });
+
+    it.only('Should Send a Successful Response To SNS Channel',() => {
+      const OAuth = require('oauth');
+
+      const fakeError = chance.string();
+      const fakeRequestToken = chance.string();
+      const fakeRequestTokenSecret = chance.string();
+
+      const fakeGetOAuthRequestToken = jest.fn().mockImplementation((responseCallback) => {
+        responseCallback(fakeError, fakeRequestToken, fakeRequestTokenSecret);
+      });
+
+      OAuth.OAuth = jest.fn().mockImplementation(() => ({
+        getOAuthRequestToken: fakeGetOAuthRequestToken,
+      }));
+
+      const { firstLegHandler } = require('../app');
+
+      const event = chance.string();
+      const context = chance.string();
+      const callback = jest.fn();
+
+      jest.mock('../src/publishSNSHelper');
+
+      const { publishToSNSSuccess } = require('../src/publishSNSHelper');
+
+      firstLegHandler(event, context, callback);
+
+      expect(publishToSNSSuccess).toHaveBeenCalled();
+    });
   });
 
   describe('OAuth Third Leg Handler', () => {
