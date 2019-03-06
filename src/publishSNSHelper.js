@@ -5,6 +5,10 @@ const publishToSNSSuccess = async (message) => {
   await publishToSNS(message, config.snsSuccessArn);
 };
 
+const publishToSNSUnsuccessfull = async (message) => {
+  await publishToSNS(message, config.snsNonSuccessArn);
+}
+
 const publishToSNS = async (message, arn) => {
   const params = {
      Message: message,
@@ -16,5 +20,7 @@ const publishToSNS = async (message, arn) => {
 }
 
 module.exports = {
+  publishToSNS,
   publishToSNSSuccess,
+  publishToSNSUnsuccessfull,
 };
