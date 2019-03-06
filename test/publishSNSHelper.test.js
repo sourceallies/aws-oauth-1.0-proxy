@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 const Chance = require('chance');
-const { publishToSNSSuccess } = require('../src/publishSNSHelper');
+const { publishToSNSSuccess, publishToSNS } = require('../src/publishSNSHelper');
 
 describe('publish to SNS helper', () => {
   let chance;
@@ -10,14 +10,15 @@ describe('publish to SNS helper', () => {
     jest.restoreAllMocks();
   });
 
-  describe('Successful response publish', () => {
-    it('should have a publishSuccess function', () => {
-      expect(publishToSNSSuccess).toEqual(expect.any(Function));
+  describe('publishToSNS', () => {
+
+    it('should have a publishToSNS function', () => {
+      expect(publishToSNS).toEqual(expect.any(Function));
     });
 
     it('should configure the right aws region', () => {
       AWS.config.update = jest.fn();
-      publishToSNSSuccess();
+      publishToSNS();
 
       expect(AWS.config.update).toHaveBeenCalledWith({ region: 'us-east-1' });
     });
@@ -25,7 +26,7 @@ describe('publish to SNS helper', () => {
     it('should call AWS.SNS with api version', () => {
       const testObject = { publish: jest.fn() };
       AWS.SNS = jest.fn().mockImplementation(() => testObject);
-      publishToSNSSuccess();
+      publishToSNS();
 
       expect(AWS.SNS).toHaveBeenCalledWith({ apiVersion: '2010-03-31' });
     });
@@ -47,9 +48,16 @@ describe('publish to SNS helper', () => {
       let config = require('../config.js')
       config.snsSuccessArn = fakePublishedData.TopicArn;
 
-      publishToSNSSuccess(fakeData);
+      publishToSNS(fakePublishedData.Message, fakePublishedData.TopicArn);
 
       expect(testObject.publish).toHaveBeenCalledWith(fakePublishedData);
+    });
+  });
+
+  describe('Successful response publish', () => {
+
+    it('should have a publishSuccess function', () => {
+      expect(publishToSNSSuccess).toEqual(expect.any(Function));
     });
 
   });
