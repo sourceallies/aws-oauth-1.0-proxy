@@ -1,13 +1,15 @@
 const { OAuth } = require('oauth');
 const config = require('./config');
+const { publishToSNSSuccess } = require('./src/publishSNSHelper');
 const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSignRequest');
 
 require('dotenv').config();
 
-
 exports.firstLegHandler = (event, context, callback) => {
 
   console.log('metadata ' + JSON.stringify(event));
+
+  publishToSNSSuccess(event);
 
   const tokenlessOauthSession = new OAuth(
     config.firstLegUri,
@@ -94,17 +96,21 @@ exports.thirdLegHandler = (event, context, callback) => {
   oAuthSession.getOAuthAccessToken(requestToken, requestTokenSecret, verifier, responseCallback);
 };
 
-const sendResponse = responseData => ({
-  statusCode: responseData.status,
-  headers: {
-    'Access-Control-Allow-Origin': '*',
-    'location': responseData.headers ? responseData.headers.location : undefined,
-  },
-  body: JSON.stringify(responseData.body ? responseData.body : responseData),
-  isBase64Encoded: false,
-});
+const sendResponse = responseData => {
+  // should use publishSNSHelper to send a request with the topic type associated to success
+  return {
+    statusCode: responseData.status,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'location': responseData.headers ? responseData.headers.location : undefined,
+    },
+    body: JSON.stringify(responseData.body ? responseData.body : responseData),
+    isBase64Encoded: false,
+  }
+};
 
 const sendError = error => ({
+  // should use publishSNSHelper to send a request with the topic type associated to failure
   statusCode: 502,
   headers: {
     'Access-Control-Allow-Origin': '*',
