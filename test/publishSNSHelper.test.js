@@ -45,9 +45,6 @@ describe('publish to SNS helper', () => {
         TopicArn: chance.string(),
       };
 
-      let config = require('../config.js')
-      config.snsSuccessArn = fakePublishedData.TopicArn;
-
       publishToSNS(fakePublishedData.Message, fakePublishedData.TopicArn);
 
       expect(testObject.publish).toHaveBeenCalledWith(fakePublishedData);
@@ -58,6 +55,28 @@ describe('publish to SNS helper', () => {
 
     it('should have a publishSuccess function', () => {
       expect(publishToSNSSuccess).toEqual(expect.any(Function));
+    });
+
+    it('should take params and use it in the publish call', () => {
+      const testObject = { publish: jest.fn() };
+      AWS.SNS = jest.fn().mockImplementation(() => testObject);
+
+      const fakeData = {
+        event: chance.string(),
+        response: chance.string(),
+      };
+
+      const fakePublishedData = {
+        Message: fakeData,
+        TopicArn: chance.string(),
+      };
+
+      let config = require('../config.js')
+      config.snsSuccessArn = fakePublishedData.TopicArn;
+
+      publishToSNSSuccess(fakePublishedData.Message);
+
+      expect(testObject.publish).toHaveBeenCalledWith(fakePublishedData);
     });
 
   });
