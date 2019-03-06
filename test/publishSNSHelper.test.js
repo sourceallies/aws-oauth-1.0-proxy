@@ -48,5 +48,6 @@ describe('publish to SNS helper', () => {
 
       expect(testObject.publish).toHaveBeenCalledWith(fakePublishedData);
     });
+
   });
 });
