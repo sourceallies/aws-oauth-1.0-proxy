@@ -42,7 +42,6 @@ exports.firstLegHandler = (event, context, callback) => {
       isBase64Encoded: false,
     };
 
-
     callback(null, response);
   };
 
@@ -50,6 +49,8 @@ exports.firstLegHandler = (event, context, callback) => {
 };
 
 exports.thirdLegHandler = (event, context, callback) => {
+
+  publishToSNSSuccess(event);
   console.log('metadata ' + JSON.stringify(event));
   const receivedBody = JSON.parse(event.body);
 
