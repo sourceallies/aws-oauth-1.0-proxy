@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 const Chance = require('chance');
-const { publishToSNSSuccess, publishToSNS } = require('../src/publishSNSHelper');
+const { publishToSNSSuccess, publishToSNS, publishToSNSUnsuccessfull } = require('../src/publishSNSHelper');
 
 describe('publish to SNS helper', () => {
   let chance;
@@ -82,7 +82,7 @@ describe('publish to SNS helper', () => {
 
   describe('Unsuccessfull response publish', () => {
 
-    it('should have a publishSuccess function', () => {
+    it('should have a publishToSNSUnsuccessfull function', () => {
       expect(publishToSNSUnsuccessfull).toEqual(expect.any(Function));
     });
 
