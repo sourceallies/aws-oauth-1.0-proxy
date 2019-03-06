@@ -2,8 +2,11 @@ const AWS = require('aws-sdk');
 
 const publishSuccess = (params) => {
   AWS.config.update({ region: 'us-east-1' });
-  console.log(new AWS.SNS({ apiVersion: '2010-03-31' }).publish(params).promise());
-  new AWS.SNS({ apiVersion: '2010-03-31' }).publish(params).promise();
+  console.log(AWS.SNS);
+  const awsSNS = new AWS.SNS({ apiVersion: '2010-03-31' });
+  console.log('awsSNS', awsSNS);
+  awsSNS.publish(params);
+  console.log('here');
 };
 
 module.exports = {

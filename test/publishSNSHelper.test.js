@@ -2,14 +2,12 @@ const AWS = require('aws-sdk');
 const Chance = require('chance');
 const { publishSuccess } = require('../src/publishSNSHelper');
 
-jest.mock('aws-sdk');
 describe('publish to SNS helper', () => {
   let chance;
 
   beforeEach(() => {
     chance = Chance();
     jest.restoreAllMocks();
-    AWS.SNS = jest.fn().mockReturnValue({ publish: jest.fn() });
   });
 
   describe('Successful response publish', () => {
@@ -25,12 +23,17 @@ describe('publish to SNS helper', () => {
     });
 
     it('should call AWS.SNS with api version', () => {
+      const testObject = { publish: jest.fn() };
+      AWS.SNS = jest.fn().mockImplementation(() => testObject);
       publishSuccess();
 
       expect(AWS.SNS).toHaveBeenCalledWith({ apiVersion: '2010-03-31' });
     });
 
-    it.only('should take params and use it in the publish call', () => {
+    it('should take params and use it in the publish call', () => {
+      const testObject = { publish: jest.fn() };
+      AWS.SNS = jest.fn().mockImplementation(() => testObject);
+
       const fakeData = {
         event: chance.string(),
         response: chance.string(),
@@ -41,9 +44,9 @@ describe('publish to SNS helper', () => {
         TopicArn: chance.string(),
       };
 
-      publishSuccess(fakeData);
+      publishSuccess(fakePublishedData);
 
-      expect(AWS.Request.publish).toHaveBeenCalledWith(fakePublishedData);
+      expect(testObject.publish).toHaveBeenCalledWith(fakePublishedData);
     });
   });
 });
