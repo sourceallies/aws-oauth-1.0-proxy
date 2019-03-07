@@ -12,6 +12,7 @@ const config = {
   firstLegUri: `${process.env.API_URL}/oauth/request_token`,
   thirdLegUri: `${process.env.API_URL}/oauth/access_token`,
   authorizeCallbackUri: process.env.AUTHORIZE_CALLBACK_URI,
+  snsSuccessArn: process.env.SNS_SUCCESS_ARN
 };
 
 module.exports = config;

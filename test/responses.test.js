@@ -7,7 +7,10 @@ describe('Responses To Network Requests', () => {
 
   beforeEach(() => {
     chance = Chance();
-    jest.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    jest.resetModules();
   });
 
   describe('Send Response', () => {
@@ -16,6 +19,8 @@ describe('Responses To Network Requests', () => {
       jest.mock('../src/publishSNSHelper');
 
       const { publishToSNSSuccess } = require('../src/publishSNSHelper');
+
+      console.log(publishToSNSSuccess);
 
       const testObject = {
         headers: {

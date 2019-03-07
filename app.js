@@ -2,6 +2,32 @@ const { OAuth } = require('oauth');
 const config = require('./config');
 const { publishToSNSSuccess } = require('./src/publishSNSHelper');
 const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSignRequest');
+//const { sendResponse, sendError } = require('./src/responsesToNetworkRequests');
+
+const sendResponse = responseData => {
+  // publishToSNSSuccess(responseData);
+  return {
+    statusCode: responseData.status,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'location': responseData.headers ? responseData.headers.location : undefined,
+    },
+    body: JSON.stringify(responseData.body ? responseData.body : responseData),
+    isBase64Encoded: false,
+  }
+}
+
+const sendError = error => {
+  return {
+    // publishToSNSUnsuccessfull(error)
+    statusCode: 502,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
+    body: JSON.stringify(error),
+    isBase64Encoded: false,
+  }
+}
 
 require('dotenv').config();
 
@@ -96,29 +122,6 @@ exports.thirdLegHandler = (event, context, callback) => {
 
   oAuthSession.getOAuthAccessToken(requestToken, requestTokenSecret, verifier, responseCallback);
 };
-
-const sendResponse = responseData => {
-  // should use publishSNSHelper to send a request with the topic type associated to success
-  return {
-    statusCode: responseData.status,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'location': responseData.headers ? responseData.headers.location : undefined,
-    },
-    body: JSON.stringify(responseData.body ? responseData.body : responseData),
-    isBase64Encoded: false,
-  }
-};
-
-const sendError = error => ({
-  // should use publishSNSHelper to send a request with the topic type associated to failure
-  statusCode: 502,
-  headers: {
-    'Access-Control-Allow-Origin': '*',
-  },
-  body: JSON.stringify(error),
-  isBase64Encoded: false,
-});
 
 exports.oAuthSignRequestGet = async (event) => {
   const receivedData = JSON.parse(JSON.stringify(event));
