@@ -11,7 +11,6 @@ describe('publish to SNS helper', () => {
   });
 
   describe('publishToSNS', () => {
-
     it('should have a publishToSNS function', () => {
       expect(publishToSNS).toEqual(expect.any(Function));
     });
@@ -52,12 +51,11 @@ describe('publish to SNS helper', () => {
   });
 
   describe('Successful response publish', () => {
-
     it('should have a publishSuccess function', () => {
       expect(publishToSNSSuccess).toEqual(expect.any(Function));
     });
 
-    it('should take params and use it in the publish call', () => {
+    it('should take params and use it in the success publish call', () => {
       const testObject = { publish: jest.fn() };
       AWS.SNS = jest.fn().mockImplementation(() => testObject);
 
@@ -71,8 +69,8 @@ describe('publish to SNS helper', () => {
         TopicArn: chance.string(),
       };
 
-      let config = require('../config.js')
-      config.snsSuccessArn = fakePublishedData.TopicArn;
+      const config = require('../config.js');
+      config.SNS_SUCCESS_ARN = fakePublishedData.TopicArn;
 
       publishToSNSSuccess(fakePublishedData.Message);
 
@@ -81,12 +79,11 @@ describe('publish to SNS helper', () => {
   });
 
   describe('Unsuccessfull response publish', () => {
-
     it('should have a publishToSNSUnsuccessfull function', () => {
       expect(publishToSNSUnsuccessfull).toEqual(expect.any(Function));
     });
 
-    it('should take params and use it in the publish call', () => {
+    it('should take params and use it in the unsuccessfull publish call', () => {
       const testObject = { publish: jest.fn() };
       AWS.SNS = jest.fn().mockImplementation(() => testObject);
 
@@ -100,8 +97,8 @@ describe('publish to SNS helper', () => {
         TopicArn: chance.string(),
       };
 
-      let config = require('../config.js')
-      config.snsNonSuccessArn = fakePublishedData.TopicArn;
+      const config = require('../config.js');
+      config.SNS_NONSUCCESS_ARN = fakePublishedData.TopicArn;
 
       publishToSNSUnsuccessfull(fakePublishedData.Message);
 

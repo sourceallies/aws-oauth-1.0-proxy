@@ -14,25 +14,24 @@ const sendResponse = responseData => {
     },
     body: JSON.stringify(responseData.body ? responseData.body : responseData),
     isBase64Encoded: false,
-  }
-}
+  };
+};
 
 const sendError = error => {
-  return {
     // publishToSNSUnsuccessfull(error)
+  return {
     statusCode: 502,
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
     body: JSON.stringify(error),
     isBase64Encoded: false,
-  }
-}
+  };
+};
 
 require('dotenv').config();
 
 exports.firstLegHandler = (event, context, callback) => {
-
   console.log('metadata ' + JSON.stringify(event));
 
   publishToSNSSuccess(event);
@@ -75,7 +74,6 @@ exports.firstLegHandler = (event, context, callback) => {
 };
 
 exports.thirdLegHandler = (event, context, callback) => {
-
   publishToSNSSuccess(event);
   console.log('metadata ' + JSON.stringify(event));
   const receivedBody = JSON.parse(event.body);

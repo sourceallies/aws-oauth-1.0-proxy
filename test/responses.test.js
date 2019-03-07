@@ -1,8 +1,8 @@
+const Chance = require('chance');
 const { sendResponse, sendError } = require('../src/responses');
 const { publishToSNSSuccess, publishToSNSUnsuccessfull } = require('../src/publishSNSHelper');
 
 describe('Responses To Network Requests', () => {
-
   let chance;
 
   beforeEach(() => {
@@ -15,44 +15,37 @@ describe('Responses To Network Requests', () => {
 
   describe('Send Response', () => {
     it('Should send a successful SNS topic', () => {
-
       jest.mock('../src/publishSNSHelper');
-
-      const { publishToSNSSuccess } = require('../src/publishSNSHelper');
 
       console.log(publishToSNSSuccess);
 
       const testObject = {
         headers: {
-          location: chance.string()
+          location: chance.string(),
         },
-        body: chance.string()
+        body: chance.string(),
       };
 
       sendResponse(testObject);
 
       expect(publishToSNSSuccess).toHaveBeenCalledWith(testObject);
-    })
+    });
   });
 
   describe('Send Error', () => {
     it('Should send a un-successful SNS topic', () => {
-
       jest.mock('../src/publishSNSHelper');
-
-      const { publishToSNSUnsuccessfull } = require('../src/publishSNSHelper');
 
       const testObject = {
         headers: {
-          location: chance.string()
+          location: chance.string(),
         },
-        body: chance.string()
+        body: chance.string(),
       };
 
       sendError(testObject);
 
       expect(publishToSNSUnsuccessfull).toHaveBeenCalledWith(testObject);
-
-    })
+    });
   });
 });
