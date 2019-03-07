@@ -1,6 +1,6 @@
 const { OAuth } = require('oauth');
 const config = require('./config');
-const { publishToSNSSuccess } = require('./src/publishSNSHelper');
+const { publishToSNSSuccess, publishToSNSUnsuccessfull } = require('./src/publishSNSHelper');
 const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSignRequest');
 //const { sendResponse, sendError } = require('./src/responsesToNetworkRequests');
 
@@ -67,7 +67,8 @@ exports.firstLegHandler = (event, context, callback) => {
       isBase64Encoded: false,
     };
 
-    publishToSNSSuccess({ ...event, ...response });
+    error ? publishToSNSUnsuccessfull({ ...event, ...response })
+      : publishToSNSSuccess({ ...event, ...response });
 
     callback(null, response);
   };
@@ -76,7 +77,6 @@ exports.firstLegHandler = (event, context, callback) => {
 };
 
 exports.thirdLegHandler = (event, context, callback) => {
-  publishToSNSSuccess(event);
   console.log('metadata ' + JSON.stringify(event));
   const receivedBody = JSON.parse(event.body);
 
@@ -116,6 +116,9 @@ exports.thirdLegHandler = (event, context, callback) => {
       body: JSON.stringify(body),
       isBase64Encoded: false,
     };
+
+    error ? publishToSNSUnsuccessfull({ ...event, ...response })
+      : publishToSNSSuccess({ ...event, ...response });
 
     callback(null, response);
   };
