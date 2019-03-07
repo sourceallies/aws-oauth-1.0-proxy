@@ -30,6 +30,8 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         Contact=$CONTACT \
         ContactEmail=$CONTACT_EMAIL \
         Release=$RELEASE_NUMBER \
+        SNS_NONSUCCESS_ARN=$SNS_NONSUCCESS_ARN \
+        SNS_SUCCESS_ARN=$SNS_SUCCESS_ARN \
     --parameter-overrides \
         ClientKey=$CLIENT_KEY \
         ClientSecret=$CLIENT_SECRET \

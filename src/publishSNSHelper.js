@@ -26,6 +26,7 @@ const publishToSNS = async (message, arn) => {
 const publishToSNSSuccess = async (message) => {
   console.log('message', message);
   console.log('ARN', config);
+  console.log(config.snsSuccessArn);
   await publishToSNS(JSON.stringify(message), config.snsSuccessArn);
 };
 
