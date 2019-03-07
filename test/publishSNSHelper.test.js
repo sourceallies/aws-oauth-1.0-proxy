@@ -40,9 +40,12 @@ describe('publish to SNS helper', () => {
       };
 
       const fakePublishedData = {
-        Message: fakeData,
+        Message: JSON.stringify(fakeData),
         TopicArn: chance.string(),
       };
+
+      const config = require('../config.js');
+      config.SNS_SUCCESS_ARN = fakePublishedData.TopicArn;
 
       publishToSNS(fakePublishedData.Message, fakePublishedData.TopicArn);
 
@@ -65,14 +68,14 @@ describe('publish to SNS helper', () => {
       };
 
       const fakePublishedData = {
-        Message: fakeData,
+        Message: JSON.stringify(fakeData),
         TopicArn: chance.string(),
       };
 
       const config = require('../config.js');
       config.SNS_SUCCESS_ARN = fakePublishedData.TopicArn;
 
-      publishToSNSSuccess(fakePublishedData.Message);
+      publishToSNSSuccess(fakeData);
 
       expect(testObject.publish).toHaveBeenCalledWith(fakePublishedData);
     });
@@ -93,14 +96,14 @@ describe('publish to SNS helper', () => {
       };
 
       const fakePublishedData = {
-        Message: fakeData,
+        Message: JSON.stringify(fakeData),
         TopicArn: chance.string(),
       };
 
       const config = require('../config.js');
       config.SNS_NONSUCCESS_ARN = fakePublishedData.TopicArn;
 
-      publishToSNSUnsuccessfull(fakePublishedData.Message);
+      publishToSNSUnsuccessfull(fakeData);
 
       expect(testObject.publish).toHaveBeenCalledWith(fakePublishedData);
     });

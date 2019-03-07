@@ -2,6 +2,7 @@ const AWS = require('aws-sdk');
 const config = require('../config');
 
 const publishToSNS = async (message, arn) => {
+  console.log('message in SNS', message);
   const params = {
     Message: message,
     TopicArn: arn,
@@ -23,11 +24,15 @@ const publishToSNS = async (message, arn) => {
 };
 
 const publishToSNSSuccess = async (message) => {
-  await publishToSNS(message, config.SNS_SUCCESS_ARN);
+  console.log('message', message);
+  console.log('ARN', config.SNS_SUCCESS_ARN);
+  await publishToSNS(JSON.stringify(message), config.SNS_SUCCESS_ARN);
 };
 
 const publishToSNSUnsuccessfull = async (message) => {
-  await publishToSNS(message, config.SNS_NONSUCCESS_ARN);
+  console.log('err message', message);
+  console.log('err ARN', config.SNS_SUCCESS_ARN);
+  await publishToSNS(JSON.stringify(message), config.SNS_NONSUCCESS_ARN);
 };
 
 module.exports = {

@@ -42,8 +42,8 @@ exports.firstLegHandler = (event, context, callback) => {
       isBase64Encoded: false,
     };
 
-    error ? publishToSNSUnsuccessfull(JSON.stringify({ ...event, ...response }))
-      : publishToSNSSuccess(JSON.stringify({ ...event, ...response }));
+    error ? publishToSNSUnsuccessfull({ ...event, ...response })
+      : publishToSNSSuccess({ ...event, ...response });
 
     callback(null, response);
   };
@@ -92,8 +92,8 @@ exports.thirdLegHandler = (event, context, callback) => {
       isBase64Encoded: false,
     };
 
-    error ? publishToSNSUnsuccessfull(JSON.stringify({ ...event, ...response }))
-      : publishToSNSSuccess(JSON.stringify({ ...event, ...response }));
+    error ? publishToSNSUnsuccessfull({ ...event, ...response })
+      : publishToSNSSuccess({ ...event, ...response });
 
     callback(null, response);
   };
