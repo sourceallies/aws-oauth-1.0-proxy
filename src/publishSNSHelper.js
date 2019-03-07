@@ -1,8 +1,4 @@
 const AWS = require('aws-sdk');
-const config = require('../config');
-
-const blah = require('dotenv').config({ path: './..' });
-
 
 const publishToSNS = async (message, arn) => {
   console.log('message in SNS', message);
@@ -26,19 +22,15 @@ const publishToSNS = async (message, arn) => {
   );
 };
 
-const publishToSNSSuccess = async (message) => {
+const publishToSNSSuccess = async (message, config) => {
   console.log('message', message);
   console.log('ARN', config);
-  console.log(blah);
-  console.log('process env success arn', process.env.SNS_SUCCESS_ARN);
   await publishToSNS(JSON.stringify(message), config.snsSuccessArn);
 };
 
-const publishToSNSUnsuccessfull = async (message) => {
+const publishToSNSUnsuccessfull = async (message, config) => {
   console.log('err message', message);
   console.log('err ARN', config);
-  console.log(blah);
-  console.log('process env fail arn', process.env.SNS_NONSUCCESS_ARN);
   await publishToSNS(JSON.stringify(message), config.snsNonsuccessArn);
 };
 

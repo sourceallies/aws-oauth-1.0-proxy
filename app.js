@@ -40,8 +40,8 @@ exports.firstLegHandler = (event, context, callback) => {
       isBase64Encoded: false,
     };
 
-    error ? publishToSNSUnsuccessfull({ ...event, ...response })
-      : publishToSNSSuccess({ ...event, ...response });
+    error ? publishToSNSUnsuccessfull({ ...event, ...response }, config)
+      : publishToSNSSuccess({ ...event, ...response }, config);
 
     callback(null, response);
   };
@@ -90,8 +90,8 @@ exports.thirdLegHandler = (event, context, callback) => {
       isBase64Encoded: false,
     };
 
-    error ? publishToSNSUnsuccessfull({ ...event, ...response })
-      : publishToSNSSuccess({ ...event, ...response });
+    error ? publishToSNSUnsuccessfull({ ...event, ...response }, config)
+      : publishToSNSSuccess({ ...event, ...response }, config);
 
     callback(null, response);
   };
@@ -110,8 +110,8 @@ exports.oAuthSignRequestGet = async (event) => {
   } = receivedData.queryStringParameters;
 
   const response = await doSignAndGet(url, accessToken, accessTokenSecret)
-    .then(responseData => sendResponse(event, responseData))
-    .catch(error => sendError(event, error));
+    .then(responseData => sendResponse(event, responseData, config))
+    .catch(error => sendError(event, error, config));
 
   return response;
 };
@@ -134,8 +134,8 @@ exports.oAuthSignRequestPost = async (event) => {
     JSON.stringify(data),
     config.oAuthCustomContentType,
   )
-    .then(responseData => sendResponse(event, responseData))
-    .catch(error => sendError(event, error));
+    .then(responseData => sendResponse(event, responseData, config))
+    .catch(error => sendError(event, error, config));
 
   return response;
 };
@@ -155,8 +155,8 @@ exports.oAuthSignRequestDelete = async (event) => {
   } = receivedData.queryStringParameters;
 
   const response = await doSignAndDelete(url, accessToken, accessTokenSecret)
-    .then(responseData => sendResponse(event, responseData))
-    .catch(error => sendError(event, error));
+    .then(responseData => sendResponse(event, responseData, config))
+    .catch(error => sendError(event, error, config));
 
   return response;
 };
