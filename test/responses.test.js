@@ -27,7 +27,7 @@ describe('Responses To Network Requests', () => {
 
       const recivedData = await sendResponse(event, testObject);
 
-      expect(publishToSNSSuccess).toHaveBeenCalledWith({ ...event, ...testObject });
+      expect(publishToSNSSuccess).toHaveBeenCalledWith(JSON.stringify({ ...event, ...testObject }));
 
       expect(recivedData).toEqual(
         {
@@ -61,7 +61,8 @@ describe('Responses To Network Requests', () => {
 
       const recivedData = await sendError(event, testObject);
 
-      expect(publishToSNSUnsuccessfull).toHaveBeenCalledWith({ ...event, ...testObject });
+      expect(publishToSNSUnsuccessfull)
+        .toHaveBeenCalledWith(JSON.stringify({ ...event, ...testObject }));
 
       expect(recivedData).toEqual(
         {
