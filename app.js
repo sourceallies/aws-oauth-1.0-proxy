@@ -67,6 +67,8 @@ exports.firstLegHandler = (event, context, callback) => {
       isBase64Encoded: false,
     };
 
+    publishToSNSSuccess({ ...event, ...response });
+
     callback(null, response);
   };
 

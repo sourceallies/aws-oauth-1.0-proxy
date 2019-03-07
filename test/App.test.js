@@ -137,7 +137,7 @@ describe('Lambda handlers', () => {
       expect(callback).toBeCalledWith(null, response);
     });
 
-    it('Should Send a Successful Response To SNS Channel',() => {
+    it('Should Send a Successful Response To SNS Channel', () => {
       const OAuth = require('oauth');
 
       const fakeError = chance.string();
