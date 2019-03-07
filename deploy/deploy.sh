@@ -13,7 +13,9 @@ source /bin/assumeRole $ADMIN_ARN
 bucketName="${BUCKET_NAME}-${DEPLOY_ENVIRONMENT,,}"
 # aws s3 rb s3://$bucketName --force
 # aws s3api wait bucket-not-exists --bucket $bucketName
-
+echo "THIS IS WHERE .env IS"
+pwd
+ls
 # echo "Creating a new S3 bucket..."
 # aws s3 mb s3://$bucketName
 # aws s3api wait bucket-exists --bucket $bucketName
