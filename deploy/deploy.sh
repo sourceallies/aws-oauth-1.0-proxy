@@ -6,6 +6,8 @@ set -o allexport
 source .env
 set +o allexport
 
+cat .env
+
 echo "Assuming IAM Admin Role..."
 source /bin/assumeRole $ADMIN_ARN
 

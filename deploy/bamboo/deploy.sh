@@ -6,6 +6,8 @@ DEPLOY_ENVIRONMENT=$bamboo_deploy_environment
 RELEASE_NUMBER=$bamboo_deploy_release
 
 # Extract environment variables
+SNS_NONSUCCESS_ARN=$bamboo_SNS_NONSUCCESS_ARN
+SNS_SUCCESS_ARN=$bamboo_SNS_SUCCESS_ARN
 CUSTOMER=$bamboo_CUSTOMER
 NAME=$bamboo_NAME
 CONTACT=$bamboo_CONTACT
@@ -17,10 +19,8 @@ CLIENT_SECRET=$bamboo_CLIENT_SECRET
 API_URL=$bamboo_API_URL
 AUTHORIZE_CALLBACK_URI=$bamboo_AUTHORIZE_CALLBACK_URI
 OAUTH_CUSTOM_HEADERS=$bamboo_OAUTH_CUSTOM_HEADERS
-SNS_NONSUCCESS_ARN=$bamboo_SNS_NONSUCCESS_ARN
-SNS_SUCCESS_ARN=$bamboo_SNS_SUCCESS_ARN
 
-
+echo "I GOT THE ARN IT IS ${SNS_SUCCESS_ARN} & ${SNS_NONSUCCESS_ARN}"
 # Look up the IAM admin role ARN for the environment we are deploying into
 ADMIN_ARN="$(printenv bamboo_SAI_${DEPLOY_ENVIRONMENT}_ADMIN_ARN )"
 
