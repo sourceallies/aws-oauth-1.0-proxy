@@ -9,8 +9,6 @@ require('dotenv').config();
 exports.firstLegHandler = (event, context, callback) => {
   console.log('metadata ' + JSON.stringify(event));
 
-  publishToSNSSuccess(event);
-
   const tokenlessOauthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
