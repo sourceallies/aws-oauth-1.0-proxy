@@ -4,21 +4,21 @@ const { publishToSNSSuccess } = require('./src/publishSNSHelper');
 const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSignRequest');
 //const { sendResponse, sendError } = require('./src/responsesToNetworkRequests');
 
-const sendResponse = responseData => {
+const sendResponse = (responseData) => {
   // publishToSNSSuccess(responseData);
   return {
     statusCode: responseData.status,
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'location': responseData.headers ? responseData.headers.location : undefined,
+      location: responseData.headers ? responseData.headers.location : undefined,
     },
     body: JSON.stringify(responseData.body ? responseData.body : responseData),
     isBase64Encoded: false,
   };
 };
 
-const sendError = error => {
-    // publishToSNSUnsuccessfull(error)
+const sendError = (error) => {
+  // publishToSNSUnsuccessfull(error)
   return {
     statusCode: 502,
     headers: {
@@ -163,7 +163,6 @@ exports.oAuthSignRequestPost = async (event) => {
 };
 
 exports.oAuthSignRequestDelete = async (event) => {
-
   console.log('metadata ' + event);
   console.log('metadata ' + JSON.stringify(event));
   console.log('metadata ' + event[0]);
