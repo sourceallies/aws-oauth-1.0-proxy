@@ -26,13 +26,13 @@ const publishToSNS = async (message, arn) => {
 const publishToSNSSuccess = async (message) => {
   console.log('message', message);
   console.log('ARN', config.SNS_SUCCESS_ARN);
-  await publishToSNS(JSON.stringify(message), config.SNS_SUCCESS_ARN);
+  await publishToSNS(JSON.stringify(message), config.snsSuccessArn);
 };
 
 const publishToSNSUnsuccessfull = async (message) => {
   console.log('err message', message);
   console.log('err ARN', config.SNS_SUCCESS_ARN);
-  await publishToSNS(JSON.stringify(message), config.SNS_NONSUCCESS_ARN);
+  await publishToSNS(JSON.stringify(message), config.snsNonsuccessArn);
 };
 
 module.exports = {

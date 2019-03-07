@@ -45,7 +45,7 @@ describe('publish to SNS helper', () => {
       };
 
       const config = require('../config.js');
-      config.SNS_SUCCESS_ARN = fakePublishedData.TopicArn;
+      config.snsSuccessArn = fakePublishedData.TopicArn;
 
       publishToSNS(fakePublishedData.Message, fakePublishedData.TopicArn);
 
@@ -73,7 +73,7 @@ describe('publish to SNS helper', () => {
       };
 
       const config = require('../config.js');
-      config.SNS_SUCCESS_ARN = fakePublishedData.TopicArn;
+      config.snsSuccessArn = fakePublishedData.TopicArn;
 
       publishToSNSSuccess(fakeData);
 
@@ -101,7 +101,7 @@ describe('publish to SNS helper', () => {
       };
 
       const config = require('../config.js');
-      config.SNS_NONSUCCESS_ARN = fakePublishedData.TopicArn;
+      config.snsNonsuccessArn = fakePublishedData.TopicArn;
 
       publishToSNSUnsuccessfull(fakeData);
 
