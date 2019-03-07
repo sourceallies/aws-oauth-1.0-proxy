@@ -1,9 +1,6 @@
 const AWS = require('aws-sdk');
 const config = require('../config');
 
-require('dotenv').config();
-
-
 const publishToSNS = async (message, arn) => {
   console.log('message in SNS', message);
   const params = {

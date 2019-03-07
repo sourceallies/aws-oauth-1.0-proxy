@@ -4,10 +4,13 @@ const config = require('./config');
 const { publishToSNSSuccess, publishToSNSUnsuccessfull } = require('./src/publishSNSHelper');
 const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSignRequest');
 
-require('dotenv').config();
+const parsedEnv = require('dotenv').config();
+
+console.log('parsedEnv');
+console.log(parsedEnv);
 
 exports.firstLegHandler = (event, context, callback) => {
-  console.log('metadata ' + JSON.stringify(event));
+  console.log(`metadata ${JSON.stringify(event)}`);
 
   const tokenlessOauthSession = new OAuth(
     config.firstLegUri,
@@ -50,7 +53,7 @@ exports.firstLegHandler = (event, context, callback) => {
 };
 
 exports.thirdLegHandler = (event, context, callback) => {
-  console.log('metadata ' + JSON.stringify(event));
+  console.log(`metadata ${JSON.stringify(event)}`);
   const receivedBody = JSON.parse(event.body);
 
   const {
@@ -101,7 +104,7 @@ exports.thirdLegHandler = (event, context, callback) => {
 
 exports.oAuthSignRequestGet = async (event) => {
   const receivedData = JSON.parse(JSON.stringify(event));
-  console.log('metadata ' + JSON.stringify(event));
+  console.log(`metadata ${JSON.stringify(event)}`);
 
   const {
     url,
@@ -118,7 +121,7 @@ exports.oAuthSignRequestGet = async (event) => {
 
 exports.oAuthSignRequestPost = async (event) => {
   const receivedBody = JSON.parse(event.body);
-  console.log('metadata ' + JSON.stringify(event));
+  console.log(`metadata ${JSON.stringify(event)}`);
 
   const {
     url,
@@ -141,10 +144,10 @@ exports.oAuthSignRequestPost = async (event) => {
 };
 
 exports.oAuthSignRequestDelete = async (event) => {
-  console.log('metadata ' + event);
-  console.log('metadata ' + JSON.stringify(event));
-  console.log('metadata ' + event[0]);
-  console.log('metadata ' + JSON.stringify(event[0]));
+  console.log(`metadata ${event}`);
+  console.log(`metadata ${JSON.stringify(event)}`);
+  console.log(`metadata ${event[0]}`);
+  console.log(`metadata ${JSON.stringify(event[0])}`);
 
   const receivedData = JSON.parse(JSON.stringify(event));
 
