@@ -177,7 +177,7 @@ describe('Lambda handlers', () => {
         isBase64Encoded: false,
       };
 
-      expect(publishToSNSSuccess).toHaveBeenCalledWith({ ...event, ...response });
+      expect(publishToSNSSuccess).toHaveBeenCalledWith(JSON.stringify({ ...event, ...response }));
     });
 
     it('Should Send an unSuccessful Response To SNS Channel', () => {
@@ -216,7 +216,8 @@ describe('Lambda handlers', () => {
 
       firstLegHandler(event, context, callback);
 
-      expect(publishToSNSUnsuccessfull).toHaveBeenCalledWith({ ...event, ...response });
+      expect(publishToSNSUnsuccessfull)
+        .toHaveBeenCalledWith(JSON.stringify({ ...event, ...response }));
     });
   });
 
@@ -365,7 +366,8 @@ describe('Lambda handlers', () => {
         isBase64Encoded: false,
       };
 
-      expect(publishToSNSSuccess).toHaveBeenCalledWith({ ...fakeEvent, ...expectedResponse });
+      expect(publishToSNSSuccess)
+        .toHaveBeenCalledWith(JSON.stringify({ ...fakeEvent, ...expectedResponse }));
     });
 
     it('Should Send a unSuccessful Response To SNS Channel', () => {
@@ -403,7 +405,8 @@ describe('Lambda handlers', () => {
         isBase64Encoded: false,
       };
 
-      expect(publishToSNSUnsuccessfull).toHaveBeenCalledWith({ ...fakeEvent, ...expectedResponse });
+      expect(publishToSNSUnsuccessfull)
+        .toHaveBeenCalledWith(JSON.stringify({ ...fakeEvent, ...expectedResponse }));
     });
   });
 
