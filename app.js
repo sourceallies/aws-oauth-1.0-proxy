@@ -4,8 +4,8 @@ const config = require('./config');
 const { publishToSNSSuccess, publishToSNSUnsuccessfull } = require('./src/publishSNSHelper');
 const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSignRequest');
 
-require('dotenv').config();
-
+const b = require('dotenv').config();
+console.log('b is this cool value', b);
 exports.firstLegHandler = (event, context, callback) => {
   console.log('metadata ' + JSON.stringify(event));
   console.log('HERE IS MY RAAAAAAD CONFIG', config);
