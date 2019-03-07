@@ -16,4 +16,7 @@ const config = {
   snsNonsuccessArn: process.env.SNS_NONSUCCESS_ARN,
 };
 
-module.exports = config;
+module.exports = (() => {
+  console.log(process.env);
+  return config;
+})();
