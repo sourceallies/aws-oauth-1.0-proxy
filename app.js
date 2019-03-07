@@ -4,11 +4,11 @@ const config = require('./config');
 const { publishToSNSSuccess, publishToSNSUnsuccessfull } = require('./src/publishSNSHelper');
 const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSignRequest');
 
-const b = require('dotenv').config();
-console.log('b is this cool value', b);
+require('dotenv').config();
+
 exports.firstLegHandler = (event, context, callback) => {
   console.log('metadata ' + JSON.stringify(event));
-  console.log('HERE IS MY RAAAAAAD CONFIG', config);
+
   const tokenlessOauthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
@@ -40,8 +40,8 @@ exports.firstLegHandler = (event, context, callback) => {
       isBase64Encoded: false,
     };
 
-    error ? publishToSNSUnsuccessfull({ ...event, ...response }, config)
-      : publishToSNSSuccess({ ...event, ...response }, config);
+    error ? publishToSNSUnsuccessfull({ ...event, ...response })
+      : publishToSNSSuccess({ ...event, ...response });
 
     callback(null, response);
   };
@@ -90,8 +90,8 @@ exports.thirdLegHandler = (event, context, callback) => {
       isBase64Encoded: false,
     };
 
-    error ? publishToSNSUnsuccessfull({ ...event, ...response }, config)
-      : publishToSNSSuccess({ ...event, ...response }, config);
+    error ? publishToSNSUnsuccessfull({ ...event, ...response })
+      : publishToSNSSuccess({ ...event, ...response });
 
     callback(null, response);
   };
@@ -110,8 +110,8 @@ exports.oAuthSignRequestGet = async (event) => {
   } = receivedData.queryStringParameters;
 
   const response = await doSignAndGet(url, accessToken, accessTokenSecret)
-    .then(responseData => sendResponse(event, responseData, config))
-    .catch(error => sendError(event, error, config));
+    .then(responseData => sendResponse(event, responseData))
+    .catch(error => sendError(event, error));
 
   return response;
 };
@@ -134,8 +134,8 @@ exports.oAuthSignRequestPost = async (event) => {
     JSON.stringify(data),
     config.oAuthCustomContentType,
   )
-    .then(responseData => sendResponse(event, responseData, config))
-    .catch(error => sendError(event, error, config));
+    .then(responseData => sendResponse(event, responseData))
+    .catch(error => sendError(event, error));
 
   return response;
 };
@@ -155,8 +155,8 @@ exports.oAuthSignRequestDelete = async (event) => {
   } = receivedData.queryStringParameters;
 
   const response = await doSignAndDelete(url, accessToken, accessTokenSecret)
-    .then(responseData => sendResponse(event, responseData, config))
-    .catch(error => sendError(event, error, config));
+    .then(responseData => sendResponse(event, responseData))
+    .catch(error => sendError(event, error));
 
   return response;
 };

@@ -39,6 +39,8 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         ApiUrl=$API_URL \
         OAuthCustomHeaders=$OAUTH_CUSTOM_HEADERS \
         AuthorizeCallbackUri=$AUTHORIZE_CALLBACK_URI \
+        SnsSuccessArn=$SNS_SUCCESS_ARN \
+        SnsNonsuccessArn=$SNS_NONSUCCESS_ARN \
     --no-fail-on-empty-changeset \
 
 echo "Describing stack events..."

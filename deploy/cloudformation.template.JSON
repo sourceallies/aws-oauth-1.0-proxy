@@ -19,7 +19,13 @@
     },
     "AuthorizeCallbackUri": {
       "Type": "String"
-    }
+    },
+    "SnsSuccessArn" : {
+      "Type" : "String"
+    },
+    "SnsNonsuccessArn" : {
+      "Type" : "String"
+    },
   },
   "Resources" : {
     "OAuthFirstLegLambda": {

@@ -1,7 +1,7 @@
 const { publishToSNSSuccess, publishToSNSUnsuccessfull } = require('./publishSNSHelper');
 
-const sendResponse = async (event, responseData, config) => {
-  await publishToSNSSuccess({ ...event, ...responseData }, config);
+const sendResponse = async (event, responseData) => {
+  await publishToSNSSuccess({ ...event, ...responseData });
   return {
     statusCode: responseData.status,
     headers: {
@@ -13,8 +13,8 @@ const sendResponse = async (event, responseData, config) => {
   };
 };
 
-const sendError = async (event, error, config) => {
-  await publishToSNSUnsuccessfull({ ...event, ...error }, config);
+const sendError = async (event, error) => {
+  await publishToSNSUnsuccessfull({ ...event, ...error });
   return {
     statusCode: 502,
     headers: {
