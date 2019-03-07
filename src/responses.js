@@ -1,21 +1,20 @@
 const { publishToSNSSuccess, publishToSNSUnsuccessfull } = require('./publishSNSHelper');
 
-const sendResponse = (responseData) => {
-  console.log(publishToSNSSuccess);
-  publishToSNSSuccess(responseData);
+const sendResponse = async (event, responseData) => {
+  await publishToSNSSuccess({ ...event, ...responseData });
   return {
     statusCode: responseData.status,
     headers: {
       'Access-Control-Allow-Origin': '*',
       location: responseData.headers ? responseData.headers.location : undefined,
     },
-    body: JSON.stringify(responseData.bodry ? responseData.body : responseData),
+    body: JSON.stringify(responseData.body ? responseData.body : responseData),
     isBase64Encoded: false,
   };
 };
 
-const sendError = (error) => {
-  publishToSNSUnsuccessfull(error);
+const sendError = async (event, error) => {
+  await publishToSNSUnsuccessfull({ ...event, ...error });
   return {
     statusCode: 502,
     headers: {
