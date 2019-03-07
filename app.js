@@ -1,33 +1,8 @@
 const { OAuth } = require('oauth');
+const { sendResponse, sendError } = require('./src/responses');
 const config = require('./config');
 const { publishToSNSSuccess, publishToSNSUnsuccessfull } = require('./src/publishSNSHelper');
 const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSignRequest');
-//const { sendResponse, sendError } = require('./src/responsesToNetworkRequests');
-
-const sendResponse = (responseData) => {
-  // publishToSNSSuccess(responseData);
-  return {
-    statusCode: responseData.status,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      location: responseData.headers ? responseData.headers.location : undefined,
-    },
-    body: JSON.stringify(responseData.body ? responseData.body : responseData),
-    isBase64Encoded: false,
-  };
-};
-
-const sendError = (error) => {
-  // publishToSNSUnsuccessfull(error)
-  return {
-    statusCode: 502,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-    },
-    body: JSON.stringify(error),
-    isBase64Encoded: false,
-  };
-};
 
 require('dotenv').config();
 
@@ -137,8 +112,8 @@ exports.oAuthSignRequestGet = async (event) => {
   } = receivedData.queryStringParameters;
 
   const response = await doSignAndGet(url, accessToken, accessTokenSecret)
-    .then(sendResponse)
-    .catch(sendError);
+    .then(responseData => sendResponse(event, responseData))
+    .catch(error => sendError(event, error));
 
   return response;
 };
@@ -161,8 +136,8 @@ exports.oAuthSignRequestPost = async (event) => {
     JSON.stringify(data),
     config.oAuthCustomContentType,
   )
-    .then(sendResponse)
-    .catch(sendError);
+    .then(responseData => sendResponse(event, responseData))
+    .catch(error => sendError(event, error));
 
   return response;
 };
@@ -182,8 +157,8 @@ exports.oAuthSignRequestDelete = async (event) => {
   } = receivedData.queryStringParameters;
 
   const response = await doSignAndDelete(url, accessToken, accessTokenSecret)
-    .then(sendResponse)
-    .catch(sendError);
+    .then(responseData => sendResponse(event, responseData))
+    .catch(error => sendError(event, error));
 
   return response;
 };
