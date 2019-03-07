@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const config = require('../config');
 
-const blah = require('dotenv').config();
+const blah = require('dotenv').config({ path: './..' });
 
 
 const publishToSNS = async (message, arn) => {
