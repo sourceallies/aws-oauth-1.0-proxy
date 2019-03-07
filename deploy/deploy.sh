@@ -17,6 +17,7 @@ bucketName="${BUCKET_NAME}-${DEPLOY_ENVIRONMENT,,}"
 # echo "Creating a new S3 bucket..."
 # aws s3 mb s3://$bucketName
 # aws s3api wait bucket-exists --bucket $bucketName
+cat .env
 
 echo "Putting the zipped code into the S3 bucket..."
 aws s3api put-object --bucket $bucketName --key artifact.zip --body artifact.zip
