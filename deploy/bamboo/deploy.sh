@@ -20,7 +20,6 @@ API_URL=$bamboo_API_URL
 AUTHORIZE_CALLBACK_URI=$bamboo_AUTHORIZE_CALLBACK_URI
 OAUTH_CUSTOM_HEADERS=$bamboo_OAUTH_CUSTOM_HEADERS
 
-echo "I GOT THE ARN IT IS ${SNS_SUCCESS_ARN} & ${SNS_NONSUCCESS_ARN}"
 # Look up the IAM admin role ARN for the environment we are deploying into
 ADMIN_ARN="$(printenv bamboo_SAI_${DEPLOY_ENVIRONMENT}_ADMIN_ARN )"
 
