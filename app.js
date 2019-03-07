@@ -8,7 +8,7 @@ require('dotenv').config();
 
 exports.firstLegHandler = (event, context, callback) => {
   console.log('metadata ' + JSON.stringify(event));
-
+  console.log('HERE IS MY RAAAAAAD CONFIG', config);
   const tokenlessOauthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
