@@ -6,9 +6,13 @@ const publishToSNS = async (message, arn) => {
     Message: message,
     TopicArn: arn,
   };
+  console.log('params', params);
   AWS.config.update({ region: 'us-east-1' });
+  console.log('line 1');
   const awsSNS = new AWS.SNS({ apiVersion: '2010-03-31' });
+  console.log('line 2');
   await awsSNS.publish(params).promise();
+  console.log('line 3');
 
   awsSNS.then(
     (data) => {
@@ -17,6 +21,7 @@ const publishToSNS = async (message, arn) => {
     },
   ).catch(
     (err) => {
+      console.log('error caught');
       console.error(err, err.stack);
     },
   );
