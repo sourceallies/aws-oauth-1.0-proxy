@@ -22,18 +22,17 @@ const publishToSNS = async (message, arn) => {
   );
 };
 
-const publishToSNSSuccess = async (message, config) => {
+const publishToSNSSuccess = async (message) => {
   console.log('message', message);
-  console.log('ARN', config);
   console.log('process env success arn', process.env.SNS_SUCCESS_ARN);
-  await publishToSNS(JSON.stringify(message), config.snsSuccessArn);
+  await publishToSNS(JSON.stringify(message), process.env.SNS_SUCCESS_ARN);
 };
 
-const publishToSNSUnsuccessfull = async (message,config) => {
+const publishToSNSUnsuccessfull = async (message) => {
   console.log('err message', message);
   console.log('err ARN', config);
   console.log('process env fail arn', process.env.SNS_NONSUCCESS_ARN);
-  await publishToSNS(JSON.stringify(message), config.snsNonsuccessArn);
+  await publishToSNS(JSON.stringify(message), process.env.SNS_NONSUCCESS_ARN);
 };
 
 module.exports = {
