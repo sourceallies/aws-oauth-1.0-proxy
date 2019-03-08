@@ -90,6 +90,8 @@ describe('publish to SNS helper', () => {
       const testObject = { publish: jest.fn() };
       AWS.SNS = jest.fn().mockImplementation(() => testObject);
 
+      const parsedEnv = require('dotenv').config();
+
       const fakeData = {
         event: chance.string(),
         response: chance.string(),
@@ -97,11 +99,8 @@ describe('publish to SNS helper', () => {
 
       const fakePublishedData = {
         Message: JSON.stringify(fakeData),
-        TopicArn: chance.string(),
+        TopicArn: parsedEnv.SNS_NONSUCCESS_ARN,
       };
-
-      const config = require('../config.js');
-      config.snsNonsuccessArn = fakePublishedData.TopicArn;
 
       publishToSNSUnsuccessfull(fakeData);
 

@@ -165,6 +165,8 @@ describe('Lambda handlers', () => {
 
       firstLegHandler(event, context, callback);
 
+      const parsedEnv = require('dotenv').config();
+
       const response = {
         statusCode: 200,
         headers: {
@@ -177,7 +179,7 @@ describe('Lambda handlers', () => {
         isBase64Encoded: false,
       };
 
-      expect(publishToSNSSuccess).toHaveBeenCalledWith({ ...event, ...response });
+      expect(publishToSNSSuccess).toHaveBeenCalledWith({ ...event, ...response }, parsedEnv);
     });
 
     it('Should Send an unSuccessful Response To SNS Channel', () => {
@@ -216,8 +218,10 @@ describe('Lambda handlers', () => {
 
       firstLegHandler(event, context, callback);
 
+      const parsedEnv = require('dotenv').config();
+
       expect(publishToSNSUnsuccessfull)
-        .toHaveBeenCalledWith({ ...event, ...response });
+        .toHaveBeenCalledWith({ ...event, ...response }, parsedEnv);
     });
   });
 
@@ -354,6 +358,8 @@ describe('Lambda handlers', () => {
       const { publishToSNSSuccess } = require('../src/publishSNSHelper');
 
       thirdLegHandler(fakeEvent, context, fakeCallback);
+      const parsedEnv = require('dotenv').config();
+
       const expectedResponse = {
         statusCode: 200,
         headers: {
@@ -367,7 +373,7 @@ describe('Lambda handlers', () => {
       };
 
       expect(publishToSNSSuccess)
-        .toHaveBeenCalledWith({ ...fakeEvent, ...expectedResponse });
+        .toHaveBeenCalledWith({ ...fakeEvent, ...expectedResponse }, parsedEnv);
     });
 
     it('Should Send a unSuccessful Response To SNS Channel', () => {
@@ -394,6 +400,8 @@ describe('Lambda handlers', () => {
 
       const { publishToSNSUnsuccessfull } = require('../src/publishSNSHelper');
 
+      const parsedEnv = require('dotenv').config();
+
       thirdLegHandler(fakeEvent, context, fakeCallback);
 
       const expectedResponse = {
@@ -406,7 +414,7 @@ describe('Lambda handlers', () => {
       };
 
       expect(publishToSNSUnsuccessfull)
-        .toHaveBeenCalledWith({ ...fakeEvent, ...expectedResponse });
+        .toHaveBeenCalledWith({ ...fakeEvent, ...expectedResponse }, parsedEnv);
     });
   });
 
