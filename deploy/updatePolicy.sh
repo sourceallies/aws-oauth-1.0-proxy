@@ -13,4 +13,4 @@ echo "Policy assignment"
 policyARN=$bamboo_Policy_ARN
 
 echo "Update start"
-aws iam create-policy-version --policy-arn $policyARN --policy-document deploy/policy.JSON
+aws iam create-policy-version --policy-arn $policyARN --policy-document file://deploy/policy.JSON --set-as-default
