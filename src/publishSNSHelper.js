@@ -11,10 +11,7 @@ const publishToSNS = async (message, arn) => {
   console.log('line 1');
   const awsSNS = new AWS.SNS({ apiVersion: '2010-03-31' });
   console.log('line 2');
-  await awsSNS.publish(params).promise();
-  console.log('line 3');
-
-  awsSNS.then(
+  awsSNS.publish(params).promise().then(
     (data) => {
       console.log(`Message ${params.Message} send sent to the topic ${params.TopicArn}`);
       console.log(`MessageID is ${data.MessageID}`);
