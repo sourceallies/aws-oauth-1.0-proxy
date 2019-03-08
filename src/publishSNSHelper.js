@@ -6,15 +6,11 @@ const publishToSNS = async (message, arn) => {
     Message: message,
     TopicArn: arn,
   };
-  console.log('params', params);
   AWS.config.update({ region: 'us-east-1' });
-  console.log('line 1');
   const awsSNS = new AWS.SNS({ apiVersion: '2010-03-31' });
-  console.log('line 2');
   awsSNS.publish(params).promise().then(
-    (data) => {
+    () => {
       console.log(`Message ${params.Message} send sent to the topic ${params.TopicArn}`);
-      console.log(`MessageID is ${data.MessageID}`);
     },
   ).catch(
     (err) => {
@@ -25,15 +21,10 @@ const publishToSNS = async (message, arn) => {
 };
 
 const publishToSNSSuccess = async (message) => {
-  console.log('message', message);
-  console.log('process env success arn', process.env.SNS_SUCCESS_ARN);
   await publishToSNS(JSON.stringify(message), process.env.SNS_SUCCESS_ARN);
 };
 
 const publishToSNSUnsuccessfull = async (message) => {
-  console.log('err message', message);
-  console.log('err ARN', config);
-  console.log('process env fail arn', process.env.SNS_NONSUCCESS_ARN);
   await publishToSNS(JSON.stringify(message), process.env.SNS_NONSUCCESS_ARN);
 };
 

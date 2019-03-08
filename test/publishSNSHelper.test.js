@@ -69,7 +69,7 @@ describe('publish to SNS helper', () => {
 
       const fakePublishedData = {
         Message: JSON.stringify(fakeData),
-        TopicArn: chance.string(),
+        TopicArn: process.env.SNS_SUCCESS_ARN,
       };
 
       const config = require('../config.js');
@@ -97,7 +97,7 @@ describe('publish to SNS helper', () => {
 
       const fakePublishedData = {
         Message: JSON.stringify(fakeData),
-        TopicArn: chance.string(),
+        TopicArn: process.env.SNS_NONSUCCESS_ARN,
       };
 
       const config = require('../config.js');
