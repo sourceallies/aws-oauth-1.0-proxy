@@ -43,8 +43,8 @@ exports.firstLegHandler = (event, context, callback) => {
       isBase64Encoded: false,
     };
 
-    error ? publishToSNSUnsuccessfull({ ...event, ...response }, parsedEnv)
-      : publishToSNSSuccess({ ...event, ...response }, parsedEnv);
+    error ? publishToSNSUnsuccessfull({ ...event, ...response }, parsedEnv.parsed)
+      : publishToSNSSuccess({ ...event, ...response }, parsedEnv.parsed);
 
     callback(null, response);
   };
