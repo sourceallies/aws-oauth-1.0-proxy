@@ -18,7 +18,7 @@ const publishToSNS = async (message, arn) => {
     },
   ).catch(
     (err) => {
-      console.lerror(err, err.stack);
+      console.error(err, err.stack);
     },
   );
 };
