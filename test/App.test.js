@@ -136,6 +136,89 @@ describe('Lambda handlers', () => {
 
       expect(callback).toBeCalledWith(null, response);
     });
+
+    it('Should Send a Successful Response To SNS Channel', () => {
+      const OAuth = require('oauth');
+
+      const fakeError = null;
+      const fakeRequestToken = chance.string();
+      const fakeRequestTokenSecret = chance.string();
+
+      const fakeGetOAuthRequestToken = jest.fn().mockImplementation((responseCallback) => {
+        responseCallback(fakeError, fakeRequestToken, fakeRequestTokenSecret);
+      });
+
+      OAuth.OAuth = jest.fn().mockImplementation(() => ({
+        getOAuthRequestToken: fakeGetOAuthRequestToken,
+      }));
+
+      const { firstLegHandler } = require('../app');
+
+      const event = chance.string();
+      const context = chance.string();
+      const callback = jest.fn();
+
+      jest.mock('../src/publishSNSHelper');
+
+      const { publishToSNSSuccess } = require('../src/publishSNSHelper');
+
+
+      firstLegHandler(event, context, callback);
+
+      const response = {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({
+          requestToken: fakeRequestToken,
+          requestTokenSecret: fakeRequestTokenSecret,
+        }),
+        isBase64Encoded: false,
+      };
+
+      expect(publishToSNSSuccess).toHaveBeenCalledWith({ ...event, ...response });
+    });
+
+    it('Should Send an unSuccessful Response To SNS Channel', () => {
+      const OAuth = require('oauth');
+
+      const fakeError = chance.string();
+      const fakeRequestToken = chance.string();
+      const fakeRequestTokenSecret = chance.string();
+
+      const fakeGetOAuthRequestToken = jest.fn().mockImplementation((responseCallback) => {
+        responseCallback(fakeError, fakeRequestToken, fakeRequestTokenSecret);
+      });
+
+      OAuth.OAuth = jest.fn().mockImplementation(() => ({
+        getOAuthRequestToken: fakeGetOAuthRequestToken,
+      }));
+
+      const { firstLegHandler } = require('../app');
+
+      const event = chance.string();
+      const context = chance.string();
+      const callback = jest.fn();
+      const response = {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify(fakeError),
+        isBase64Encoded: false,
+      };
+
+
+      jest.mock('../src/publishSNSHelper');
+
+      const { publishToSNSUnsuccessfull } = require('../src/publishSNSHelper');
+
+      firstLegHandler(event, context, callback);
+
+      expect(publishToSNSUnsuccessfull)
+        .toHaveBeenCalledWith({ ...event, ...response });
+    });
   });
 
   describe('OAuth Third Leg Handler', () => {
@@ -243,6 +326,88 @@ describe('Lambda handlers', () => {
       };
 
       expect(fakeCallback).toBeCalledWith(null, expectedResponse);
+    });
+
+    it('Should Send a Successful Response To SNS Channel', () => {
+      const OAuth = require('oauth');
+
+      const fakeAccessToken = chance.string();
+      const fakeAccessTokenSecret = chance.string();
+      const fakeEvent = generateFakeEvent();
+
+      const mockGetOAuthAccessToken = jest.fn()
+        .mockImplementation((token, secret, verifier, callback) => {
+          callback(undefined, fakeAccessToken, fakeAccessTokenSecret);
+        });
+
+      OAuth.OAuth = jest.fn().mockImplementation(() => ({
+        getOAuthAccessToken: mockGetOAuthAccessToken,
+      }));
+
+      const context = undefined;
+      const fakeCallback = jest.fn();
+
+      const { thirdLegHandler } = require('../app');
+
+      jest.mock('../src/publishSNSHelper');
+
+      const { publishToSNSSuccess } = require('../src/publishSNSHelper');
+
+      thirdLegHandler(fakeEvent, context, fakeCallback);
+
+      const expectedResponse = {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({
+          accessToken: fakeAccessToken,
+          accessTokenSecret: fakeAccessTokenSecret,
+        }),
+        isBase64Encoded: false,
+      };
+
+      expect(publishToSNSSuccess)
+        .toHaveBeenCalledWith({ ...fakeEvent, ...expectedResponse });
+    });
+
+    it('Should Send a unSuccessful Response To SNS Channel', () => {
+      const OAuth = require('oauth');
+
+      const fakeError = new Error(chance.sentence());
+      const fakeEvent = generateFakeEvent();
+
+      const mockGetOAuthAccessToken = jest.fn()
+        .mockImplementation((token, secret, verifier, callback) => {
+          callback(fakeError);
+        });
+
+      OAuth.OAuth = jest.fn().mockImplementation(() => ({
+        getOAuthAccessToken: mockGetOAuthAccessToken,
+      }));
+
+      const context = undefined;
+      const fakeCallback = jest.fn();
+
+      const { thirdLegHandler } = require('../app');
+
+      jest.mock('../src/publishSNSHelper');
+
+      const { publishToSNSUnsuccessfull } = require('../src/publishSNSHelper');
+
+      thirdLegHandler(fakeEvent, context, fakeCallback);
+
+      const expectedResponse = {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify(fakeError),
+        isBase64Encoded: false,
+      };
+
+      expect(publishToSNSUnsuccessfull)
+        .toHaveBeenCalledWith({ ...fakeEvent, ...expectedResponse });
     });
   });
 

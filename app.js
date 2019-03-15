@@ -1,13 +1,12 @@
 const { OAuth } = require('oauth');
+const { sendResponse, sendError } = require('./src/responses');
 const config = require('./config');
+const { publishToSNSSuccess, publishToSNSUnsuccessfull } = require('./src/publishSNSHelper');
 const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSignRequest');
 
-require('dotenv').config();
+const parsedEnv = require('dotenv').config();
 
 exports.firstLegHandler = (event, context, callback) => {
-
-  console.log('metadata ' + JSON.stringify(event.headers.metadata));
-
   const tokenlessOauthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
@@ -39,6 +38,9 @@ exports.firstLegHandler = (event, context, callback) => {
       isBase64Encoded: false,
     };
 
+    error ? publishToSNSUnsuccessfull({ ...event, ...response })
+      : publishToSNSSuccess({ ...event, ...response });
+
     callback(null, response);
   };
 
@@ -46,7 +48,6 @@ exports.firstLegHandler = (event, context, callback) => {
 };
 
 exports.thirdLegHandler = (event, context, callback) => {
-  console.log('metadata ' + JSON.stringify(event.headers.metadata));
   const receivedBody = JSON.parse(event.body);
 
   const {
@@ -86,34 +87,17 @@ exports.thirdLegHandler = (event, context, callback) => {
       isBase64Encoded: false,
     };
 
+    error ? publishToSNSUnsuccessfull({ ...event, ...response })
+      : publishToSNSSuccess({ ...event, ...response });
+
     callback(null, response);
   };
 
   oAuthSession.getOAuthAccessToken(requestToken, requestTokenSecret, verifier, responseCallback);
 };
 
-const sendResponse = responseData => ({
-  statusCode: responseData.status,
-  headers: {
-    'Access-Control-Allow-Origin': '*',
-    'location': responseData.headers ? responseData.headers.location : undefined,
-  },
-  body: JSON.stringify(responseData.body ? responseData.body : responseData),
-  isBase64Encoded: false,
-});
-
-const sendError = error => ({
-  statusCode: 502,
-  headers: {
-    'Access-Control-Allow-Origin': '*',
-  },
-  body: JSON.stringify(error),
-  isBase64Encoded: false,
-});
-
 exports.oAuthSignRequestGet = async (event) => {
   const receivedData = JSON.parse(JSON.stringify(event));
-  console.log('metadata ' + JSON.stringify(event.headers.metadata));
 
   const {
     url,
@@ -122,15 +106,14 @@ exports.oAuthSignRequestGet = async (event) => {
   } = receivedData.queryStringParameters;
 
   const response = await doSignAndGet(url, accessToken, accessTokenSecret)
-    .then(sendResponse)
-    .catch(sendError);
+    .then(responseData => sendResponse(event, responseData))
+    .catch(error => sendError(event, error));
 
   return response;
 };
 
 exports.oAuthSignRequestPost = async (event) => {
   const receivedBody = JSON.parse(event.body);
-  console.log('metadata ' + JSON.stringify(event.headers.metadata));
 
   const {
     url,
@@ -146,19 +129,13 @@ exports.oAuthSignRequestPost = async (event) => {
     JSON.stringify(data),
     config.oAuthCustomContentType,
   )
-    .then(sendResponse)
-    .catch(sendError);
+    .then(responseData => sendResponse(event, responseData))
+    .catch(error => sendError(event, error));
 
   return response;
 };
 
 exports.oAuthSignRequestDelete = async (event) => {
-
-  console.log('metadata ' + event.headers.metadata);
-  console.log('metadata ' + JSON.stringify(event.headers.metadata));
-  console.log('metadata ' + event.headers.metadata[0]);
-  console.log('metadata ' + JSON.stringify(event.headers.metadata[0]));
-
   const receivedData = JSON.parse(JSON.stringify(event));
 
   const {
@@ -168,8 +145,8 @@ exports.oAuthSignRequestDelete = async (event) => {
   } = receivedData.queryStringParameters;
 
   const response = await doSignAndDelete(url, accessToken, accessTokenSecret)
-    .then(sendResponse)
-    .catch(sendError);
+    .then(responseData => sendResponse(event, responseData))
+    .catch(error => sendError(event, error));
 
   return response;
 };

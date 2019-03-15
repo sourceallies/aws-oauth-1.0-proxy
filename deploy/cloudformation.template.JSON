@@ -19,7 +19,13 @@
     },
     "AuthorizeCallbackUri": {
       "Type": "String"
-    }
+    },
+    "SnsSuccessArn" : {
+      "Type" : "String"
+    },
+    "SnsNonsuccessArn" : {
+      "Type" : "String"
+    },
   },
   "Resources" : {
     "OAuthFirstLegLambda": {
@@ -257,6 +263,20 @@
           }
         }
       }
+    },
+    "SuccessTopic": {
+    "Type" : "AWS::SNS::Topic",
+      "Properties" : {
+        "DisplayName" : "aws-auth-success-topic",
+        "TopicName" : "aws-auth-success-topic"
+      },
+    },
+    "FailTopic": {
+    "Type" : "AWS::SNS::Topic",
+      "Properties" : {
+        "DisplayName" : "aws-auth-failed-topic",
+        "TopicName" : "aws-auth-failed-topic"
+      },
     }
   },
   "Outputs" : {

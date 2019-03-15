@@ -13,13 +13,14 @@ source /bin/assumeRole $ADMIN_ARN
 bucketName="${BUCKET_NAME}-${DEPLOY_ENVIRONMENT,,}"
 # aws s3 rb s3://$bucketName --force
 # aws s3api wait bucket-not-exists --bucket $bucketName
-
 # echo "Creating a new S3 bucket..."
 # aws s3 mb s3://$bucketName
 # aws s3api wait bucket-exists --bucket $bucketName
 
 echo "Putting the zipped code into the S3 bucket..."
+zip -ur artifact.zip .env
 aws s3api put-object --bucket $bucketName --key artifact.zip --body artifact.zip
+
 
 echo "Creating the lambdas..."
 aws cloudformation deploy --stack-name $STACK_NAME \
@@ -37,6 +38,8 @@ aws cloudformation deploy --stack-name $STACK_NAME \
         ApiUrl=$API_URL \
         OAuthCustomHeaders=$OAUTH_CUSTOM_HEADERS \
         AuthorizeCallbackUri=$AUTHORIZE_CALLBACK_URI \
+        SnsSuccessArn=$SNS_SUCCESS_ARN \
+        SnsNonsuccessArn=$SNS_NONSUCCESS_ARN \
     --no-fail-on-empty-changeset \
 
 echo "Describing stack events..."

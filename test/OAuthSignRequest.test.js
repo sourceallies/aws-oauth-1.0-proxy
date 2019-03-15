@@ -163,7 +163,7 @@ describe('OAuth Sign Request', () => {
         linkToOpen,
         accessToken,
         accessTokenSecret,
-        expect.any(Function)
+        expect.any(Function),
       );
     });
 

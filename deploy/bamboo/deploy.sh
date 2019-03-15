@@ -6,6 +6,8 @@ DEPLOY_ENVIRONMENT=$bamboo_deploy_environment
 RELEASE_NUMBER=$bamboo_deploy_release
 
 # Extract environment variables
+SNS_NONSUCCESS_ARN=$bamboo_SNS_NONSUCCESS_ARN
+SNS_SUCCESS_ARN=$bamboo_SNS_SUCCESS_ARN
 CUSTOMER=$bamboo_CUSTOMER
 NAME=$bamboo_NAME
 CONTACT=$bamboo_CONTACT
@@ -36,6 +38,8 @@ echo "API_URL=${API_URL}" >> .env
 echo "AUTHORIZE_CALLBACK_URI=${AUTHORIZE_CALLBACK_URI}" >> .env
 echo "OAUTH_CUSTOM_HEADERS=${OAUTH_CUSTOM_HEADERS}" >> .env
 echo "ADMIN_ARN=${ADMIN_ARN}" >> .env
+echo "SNS_SUCCESS_ARN=${SNS_SUCCESS_ARN}" >> .env
+echo "SNS_NONSUCCESS_ARN=${SNS_NONSUCCESS_ARN}" >> .env
 
 # Run deploy script
 bash deploy/deploy.sh
