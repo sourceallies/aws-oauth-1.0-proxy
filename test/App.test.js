@@ -1,8 +1,14 @@
-const config = require('../config');
-
 describe('Lambda handlers', () => {
   afterEach(() => {
     jest.resetModules();
+
+    jest.mock("../src/publishSNSHelper");
+
+    const { publishToSNSSuccess, publishToSNSUnsuccessfull } = require("../src/publishSNSHelper");
+    
+    // these are supposed to return promises
+    publishToSNSSuccess.mockResolvedValue(undefined);
+    publishToSNSUnsuccessfull.mockResolvedValue(undefined);  
   });
 
   describe('OAuth First Leg Handler', () => {
@@ -12,10 +18,10 @@ describe('Lambda handlers', () => {
       expect(firstLegHandler).toEqual(expect.any(Function));
     });
 
-    it('should initialize oAuth with the correct parameters', () => {
+    it('should initialize oAuth with the correct parameters', async () => {
       const OAuth = require('oauth');
-
-      const fakeGetOAuthRequestToken = jest.fn();
+      const config = await require("../config")();
+      const fakeGetOAuthRequestToken = jest.fn().mockImplementation(callback => callback());
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         getOAuthRequestToken: fakeGetOAuthRequestToken,
@@ -27,7 +33,7 @@ describe('Lambda handlers', () => {
       const context = chance.string();
       const callback = jest.fn();
 
-      firstLegHandler(event, context, callback);
+      await firstLegHandler(event, context, callback);
 
       const oAuthFirstCallParameters = OAuth.OAuth.mock.calls[0];
 
@@ -44,10 +50,10 @@ describe('Lambda handlers', () => {
       ]);
     });
 
-    it('should get the request tokens', () => {
+    it('should get the request tokens', async () => {
       const OAuth = require('oauth');
 
-      const fakeGetOAuthRequestToken = jest.fn();
+      const fakeGetOAuthRequestToken = jest.fn().mockImplementation(callback => callback());
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         getOAuthRequestToken: fakeGetOAuthRequestToken,
@@ -59,12 +65,12 @@ describe('Lambda handlers', () => {
       const context = chance.string();
       const callback = jest.fn();
 
-      firstLegHandler(event, context, callback);
+      await firstLegHandler(event, context, callback);
 
       expect(fakeGetOAuthRequestToken).toBeCalledWith(expect.any(Function));
     });
 
-    it('should return the request tokens if the response is successful', () => {
+    it('should return the request tokens if the response is successful', async () => {
       const OAuth = require('oauth');
 
       const fakeError = null;
@@ -83,11 +89,7 @@ describe('Lambda handlers', () => {
 
       const event = chance.string();
       const context = chance.string();
-      const callback = jest.fn();
-
-      firstLegHandler(event, context, callback);
-
-      const response = {
+      const expectedResponse = {
         statusCode: 200,
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -99,10 +101,10 @@ describe('Lambda handlers', () => {
         isBase64Encoded: false,
       };
 
-      expect(callback).toBeCalledWith(null, response);
+      expect(await firstLegHandler(event, context)).toMatchObject(expectedResponse);
     });
 
-    it('should return an error if the response is unsuccessful', () => {
+    it('should return an error if the response is unsuccessful', async () => {
       const OAuth = require('oauth');
 
       const fakeError = chance.string();
@@ -122,10 +124,7 @@ describe('Lambda handlers', () => {
       const event = chance.string();
       const context = chance.string();
       const callback = jest.fn();
-
-      firstLegHandler(event, context, callback);
-
-      const response = {
+      const expectedResponse = {
         statusCode: 200,
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -134,10 +133,10 @@ describe('Lambda handlers', () => {
         isBase64Encoded: false,
       };
 
-      expect(callback).toBeCalledWith(null, response);
+      expect(await firstLegHandler(event, context, callback)).toMatchObject(expectedResponse);
     });
 
-    it('Should Send a Successful Response To SNS Channel', () => {
+    it('Should Send a Successful Response To SNS Channel', async () => {
       const OAuth = require('oauth');
 
       const fakeError = null;
@@ -163,7 +162,7 @@ describe('Lambda handlers', () => {
       const { publishToSNSSuccess } = require('../src/publishSNSHelper');
 
 
-      firstLegHandler(event, context, callback);
+      await firstLegHandler(event, context, callback);
 
       const response = {
         statusCode: 200,
@@ -180,7 +179,7 @@ describe('Lambda handlers', () => {
       expect(publishToSNSSuccess).toHaveBeenCalledWith({ ...event, ...response });
     });
 
-    it('Should Send an unSuccessful Response To SNS Channel', () => {
+    it('Should Send an unSuccessful Response To SNS Channel', async () => {
       const OAuth = require('oauth');
 
       const fakeError = chance.string();
@@ -214,7 +213,7 @@ describe('Lambda handlers', () => {
 
       const { publishToSNSUnsuccessfull } = require('../src/publishSNSHelper');
 
-      firstLegHandler(event, context, callback);
+      await firstLegHandler(event, context, callback);
 
       expect(publishToSNSUnsuccessfull)
         .toHaveBeenCalledWith({ ...event, ...response });
@@ -236,10 +235,10 @@ describe('Lambda handlers', () => {
       expect(thirdLegHandler).toEqual(expect.any(Function));
     });
 
-    it('gets the oauth token', () => {
+    it('gets the oauth token', async () => {
       const OAuth = require('oauth');
 
-      const mockGetOAuthAccessToken = jest.fn();
+      const mockGetOAuthAccessToken = jest.fn().mockImplementation((p1, p2, p3, callback) => callback());
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         getOAuthAccessToken: mockGetOAuthAccessToken,
@@ -254,15 +253,14 @@ describe('Lambda handlers', () => {
         verifier,
       } = JSON.parse(event.body);
 
-      thirdLegHandler(event);
+      await thirdLegHandler(event);
 
       expect(mockGetOAuthAccessToken)
         .toBeCalledWith(requestToken, requestTokenSecret, verifier, expect.any(Function));
     });
 
-    it('sends back the correct response when there is an error', () => {
+    it('sends back the correct response when there is an error', async () => {
       const OAuth = require('oauth');
-
       const fakeError = new Error(chance.sentence());
 
       const mockGetOAuthAccessToken = jest.fn()
@@ -275,11 +273,7 @@ describe('Lambda handlers', () => {
       }));
 
       const context = undefined;
-      const fakeCallback = jest.fn();
-
       const { thirdLegHandler } = require('../app');
-
-      thirdLegHandler(generateFakeEvent(), context, fakeCallback);
       const expectedResponse = {
         statusCode: 200,
         headers: {
@@ -289,10 +283,10 @@ describe('Lambda handlers', () => {
         isBase64Encoded: false,
       };
 
-      expect(fakeCallback).toBeCalledWith(null, expectedResponse);
+      expect(await thirdLegHandler(generateFakeEvent(), context)).toMatchObject(expectedResponse);
     });
 
-    it('sends back the correct response when the request is successful', () => {
+    it('sends back the correct response when the request is successful', async () => {
       const OAuth = require('oauth');
 
       const fakeAccessToken = chance.string();
@@ -308,11 +302,7 @@ describe('Lambda handlers', () => {
       }));
 
       const context = undefined;
-      const fakeCallback = jest.fn();
-
-      const { thirdLegHandler } = require('../app');
-
-      thirdLegHandler(generateFakeEvent(), context, fakeCallback);
+      const { thirdLegHandler } = require('../app');      
       const expectedResponse = {
         statusCode: 200,
         headers: {
@@ -325,10 +315,10 @@ describe('Lambda handlers', () => {
         isBase64Encoded: false,
       };
 
-      expect(fakeCallback).toBeCalledWith(null, expectedResponse);
+      expect(await thirdLegHandler(generateFakeEvent(), context)).toMatchObject(expectedResponse);
     });
 
-    it('Should Send a Successful Response To SNS Channel', () => {
+    it('Should Send a Successful Response To SNS Channel', async () => {
       const OAuth = require('oauth');
 
       const fakeAccessToken = chance.string();
@@ -345,15 +335,10 @@ describe('Lambda handlers', () => {
       }));
 
       const context = undefined;
-      const fakeCallback = jest.fn();
-
       const { thirdLegHandler } = require('../app');
-
-      jest.mock('../src/publishSNSHelper');
-
       const { publishToSNSSuccess } = require('../src/publishSNSHelper');
 
-      thirdLegHandler(fakeEvent, context, fakeCallback);
+      await thirdLegHandler(fakeEvent, context);
 
       const expectedResponse = {
         statusCode: 200,
@@ -371,7 +356,7 @@ describe('Lambda handlers', () => {
         .toHaveBeenCalledWith({ ...fakeEvent, ...expectedResponse });
     });
 
-    it('Should Send a unSuccessful Response To SNS Channel', () => {
+    it('Should Send a unSuccessful Response To SNS Channel', async () => {
       const OAuth = require('oauth');
 
       const fakeError = new Error(chance.sentence());
@@ -394,8 +379,9 @@ describe('Lambda handlers', () => {
       jest.mock('../src/publishSNSHelper');
 
       const { publishToSNSUnsuccessfull } = require('../src/publishSNSHelper');
+      publishToSNSUnsuccessfull.mockResolvedValue(undefined);
 
-      thirdLegHandler(fakeEvent, context, fakeCallback);
+      await thirdLegHandler(fakeEvent, context, fakeCallback);
 
       const expectedResponse = {
         statusCode: 200,
@@ -599,7 +585,7 @@ describe('Lambda handlers', () => {
       expect(response instanceof Promise).toEqual(true);
     });
 
-    it('calls doSignAndPost correctly', () => {
+    it('calls doSignAndPost correctly', async () => {
       jest.resetModules();
 
       const OAuthSignRequest = require('../src/OAuthSignRequest');
@@ -620,7 +606,7 @@ describe('Lambda handlers', () => {
         data,
       });
 
-      oAuthSignRequestPost(fakeEvent);
+      await oAuthSignRequestPost(fakeEvent);
 
       expect(OAuthSignRequest.doSignAndPost)
         .toBeCalledWith(url, accessToken, accessTokenSecret,

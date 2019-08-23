@@ -1,0 +1,7 @@
+{
+    "ApiUrl": "https://partnerapi.deere.com/platform",
+    "AuthorizeCallbackUri": "saimyjd://oauth",
+    "ClientKey": "AQICAHj0rd9+A15pncr1JrWCjeFtR4hrNnZnqKAX0mW97lZXPAE6o0at3ULxGiN3GrKACL8UAAAAgDB+BgkqhkiG9w0BBwagcTBvAgEAMGoGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMDZqGx3TbForOTXHcAgEQgD2Wl/N89f6yierD8jk24N1oJ8JDtNkDZ1O1qaSPUJf1w2Y5nLvfKycxDPki1ftLAGMxJAQhJR6OqYH+B5F5",
+    "ClientSecret": "AQICAHj0rd9+A15pncr1JrWCjeFtR4hrNnZnqKAX0mW97lZXPAH9KxSFrrSmitMosE62ffPYAAAAojCBnwYJKoZIhvcNAQcGoIGRMIGOAgEAMIGIBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDOKjMSRVlbnbIlo/mAIBEIBb1G5xV/g9FGSQ/Qk4MfqESGia2nYnKnCjuLYbOyJhw56ODrT6cH8nQ0oxEoj/nELeGtj5nKcv1nNB7k+Kx+GX5/PcQsFRUveaxPwVzECS6MpMpyiCmOtEvlI8Vw==",
+    "OAuthCustomHeaders": "application/vnd.deere.axiom.v3+json"
+}

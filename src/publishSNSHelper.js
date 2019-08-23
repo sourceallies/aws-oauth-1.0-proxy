@@ -8,7 +8,7 @@ const publishToSNS = async (message, arn) => {
   };
   AWS.config.update({ region: 'us-east-1' });
   const awsSNS = new AWS.SNS({ apiVersion: '2010-03-31' });
-  awsSNS.publish(params).promise().then(
+  return awsSNS.publish(params).promise().then(
     () => {
       console.log(`Message ${params.Message} send sent to the topic ${params.TopicArn}`);
     },
@@ -21,11 +21,11 @@ const publishToSNS = async (message, arn) => {
 };
 
 const publishToSNSSuccess = async (message) => {
-  await publishToSNS(JSON.stringify(message), process.env.SNS_SUCCESS_ARN);
+  return await publishToSNS(JSON.stringify(message), process.env.SNS_SUCCESS_ARN);
 };
 
 const publishToSNSUnsuccessfull = async (message) => {
-  await publishToSNS(JSON.stringify(message), process.env.SNS_NONSUCCESS_ARN);
+  return await publishToSNS(JSON.stringify(message), process.env.SNS_NONSUCCESS_ARN);
 };
 
 module.exports = {
