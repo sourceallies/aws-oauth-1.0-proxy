@@ -15,7 +15,7 @@ Parameters:
   GithubBranch:
     Type: String
     Description: Github branch to track
-    Default: SAIINF-1224-again
+    Default: master
 Resources:
   ArtifactStore:
     Type: AWS::S3::Bucket
