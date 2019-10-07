@@ -14,28 +14,20 @@ This project serves as a proxy for OAuth 1.0a requests. We leverage Lambdas crea
 
 The deploy scripts are configured to read environment variables from a `.env` file. Thus, a `.env` file should be created based on `.env.example`. See [Environment Configuration](../../wiki/Environment-Configuration) for more details about environment variables and how they are used.
 
-We've also included example scripts for deployment via CI in `deploy/bamboo`. These scripts read environment variables from the CI and write them to a `.env` file. Then they run the general deployment scripts.
+We've also included example scripts for deployment via CI in `deploy/bamboo` (they were removed and migrated to use codepipeline). These scripts read environment variables from the CI and write them to a `.env` file. Then they run the general deployment scripts.
 
-Note that the deploy script will fail if there are no AWS keys with valid IAM permissions. An [example policy](/deploy/policy.JSON) has been included for the Lambdas. For your CI service (in our case, bamboo), Admin permissions must be granted for API Gateway, Cloudformation and Lambdas.
+Note that the deploy script will fail if there are no AWS keys with valid IAM permissions. An [example policy](/deploy/policy.JSON) has been included for the Lambdas. For your CI service (in our case, codepipeline), Admin permissions must be granted for API Gateway, Cloudformation and Lambdas.
 
 A more detailed explanation of what the deploy script is doing can be found in the wiki under [Deploy Steps](../../wiki/Deploy-Steps).
 
-#### Build
-
-```
-./build/build.sh
-```
+#### Build (codepipeline)
 
 1. Installs dependencies
 2. Runs tests
 3. Webpacks the project
 4. Zips deploy files into artifact.zip
 
-#### Deploy
-
-```
-./deploy/deploy.sh
-```
+#### Deploy (cloudformation)
 
 1. Load environment variables from `.env`
 2. Assume IAM admin role
@@ -160,6 +152,11 @@ Run the [Jest](https://github.com/facebook/jest) test runner:
 Lint repo using [ES Lint](https://github.com/eslint/eslint):
 
 `npm run lint`
+
+## Deploying
+The project is built and deployed with CodePipeline and CodeBuild. For deploying to production, manual approval in CodePipeline/Slack (#cicd-notifications) is required.
+
+You can view the pipeline here (log into aws shared account first): https://console.aws.amazon.com/codesuite/codepipeline/pipelines/aws-oauth-1-0-proxy/view
 
 ## Contribution
 

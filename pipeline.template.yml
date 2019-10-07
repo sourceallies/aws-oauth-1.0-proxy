@@ -1,0 +1,235 @@
+Description: aws-oauth-1.0-proxy pipeline
+Parameters: 
+  GithubAccessToken:
+    Type: String
+    NoEcho: true
+    Description: OAuth token for GitHub
+  GithubUsername:
+    Type: String
+    Description: Github username containing the project's repository
+    Default: sourceallies
+  GithubRepository:
+    Type: String
+    Description: Github repository where the project is located
+    Default: aws-oauth-1.0-proxy
+  GithubBranch:
+    Type: String
+    Description: Github branch to track
+    Default: master
+Resources:
+  ArtifactStore:
+    Type: AWS::S3::Bucket
+  ArtifactStorePolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ArtifactStore
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: s3:*
+            Resource:
+              - !Sub arn:aws:s3:::${ArtifactStore}
+              - !Sub arn:aws:s3:::${ArtifactStore}/*
+            Principal:
+              AWS:
+                - !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/sharedAccountId:1}}:role/Pipeline'
+                - !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/devAccountId:1}}:role/Deployer'
+                - !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/qualAccountId:1}}:role/Deployer'
+                - !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/prodAccountId:1}}:role/Deployer'
+  ArtifactKey: #Needed to allow Dev/Qual/Prod to decrypt artifacts in the Shared account's ArtifactStore
+    Type: AWS::KMS::Key
+    Properties:
+      Description: Key used for encrypting artifacts
+      KeyPolicy:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - kms:*
+            Resource: "*"
+            Principal:
+              AWS:
+                - !Sub '{{resolve:ssm:/pipelines/sharedAccountId:1}}'
+                - !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/devAccountId:1}}:role/Deployer'
+                - !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/qualAccountId:1}}:role/Deployer'
+                - !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/prodAccountId:1}}:role/Deployer'
+  
+  BranchedBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub ${AWS::StackName}-branched-build
+      ServiceRole: !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/sharedAccountId:1}}:role/Pipeline'
+      EncryptionKey: !GetAtt ArtifactKey.Arn
+      BadgeEnabled: true
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: !ImportValue aws-shared-services-pipeline-BuildEnvImage
+        PrivilegedMode: true
+        EnvironmentVariables:
+          - Name: ARTIFACT_STORE
+            Value: !Ref ArtifactStore
+      Cache:
+        Type: LOCAL
+        Modes:
+          - LOCAL_CUSTOM_CACHE
+          - LOCAL_DOCKER_LAYER_CACHE
+      Source:
+        Type: GITHUB
+        Location: !Sub https://github.com/${GithubUsername}/${GithubRepository}.git
+        ReportBuildStatus: true
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Triggers:
+        Webhook: true
+        FilterGroups:
+          - - Pattern: ^refs/heads/master$
+              ExcludeMatchedPattern: true
+              Type: HEAD_REF
+            - Pattern: PUSH,PULL_REQUEST_CREATED,PULL_REQUEST_UPDATED,PULL_REQUEST_REOPENED
+              Type: EVENT
+  BuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub ${AWS::StackName}-build
+      ServiceRole: !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/sharedAccountId:1}}:role/Pipeline'
+      EncryptionKey: !GetAtt ArtifactKey.Arn
+      Cache:
+        Type: LOCAL
+        Modes:
+          - LOCAL_CUSTOM_CACHE
+          - LOCAL_DOCKER_LAYER_CACHE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: !ImportValue aws-shared-services-pipeline-BuildEnvImage
+        PrivilegedMode: true
+        EnvironmentVariables:
+          - Name: ARTIFACT_STORE
+            Value: !Ref ArtifactStore
+      Source:
+        Type: CODEPIPELINE
+      Artifacts:
+        Type: CODEPIPELINE
+  PipelineWebhook:
+    Type: AWS::CodePipeline::Webhook
+    Properties:
+      Authentication: GITHUB_HMAC
+      AuthenticationConfiguration:
+        SecretToken: !Ref GithubAccessToken
+      Filters:
+        - JsonPath: $.ref
+          MatchEquals: "refs/heads/{Branch}"
+      TargetPipeline: !Ref Pipeline
+      TargetAction: Source
+      TargetPipelineVersion: !GetAtt Pipeline.Version
+      RegisterWithThirdParty: true
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Ref AWS::StackName
+      ArtifactStore:
+        Type: S3
+        Location: !Ref ArtifactStore
+        EncryptionKey:
+          Id: !GetAtt ArtifactKey.Arn
+          Type: KMS
+      RoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/Pipeline
+      RestartExecutionOnUpdate: true
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: Source
+              ActionTypeId:
+                Category: Source
+                Provider: GitHub
+                Owner: ThirdParty
+                Version: 1
+              OutputArtifacts:
+                - Name: sourceCode
+              Configuration:
+                Owner: !Ref GithubUsername
+                Repo: !Ref GithubRepository
+                Branch: !Ref GithubBranch
+                OAuthToken: !Ref GithubAccessToken
+                PollForSourceChanges: false
+        - Name: Build
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: 1
+              InputArtifacts:
+                - Name: sourceCode
+              OutputArtifacts:
+                - Name: buildResults
+              Configuration:
+                ProjectName: !Ref BuildProject
+        - Name: Deploy_Dev
+          Actions:
+            - Name: Deploy
+              RoleArn: !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/devAccountId:1}}:role/Deployer'
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              InputArtifacts:
+                - Name: buildResults
+              Configuration:
+                StackName: aws-oauth-proxy
+                ActionMode: CREATE_UPDATE
+                TemplatePath: buildResults::cloudformation.template.yml
+                TemplateConfiguration: buildResults::dev.config.json
+                RoleArn: !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/devAccountId:1}}:role/Deployer'
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND,CAPABILITY_NAMED_IAM
+              RunOrder: 1
+        - Name: Deploy_Qual
+          Actions:
+            - Name: Deploy
+              RoleArn: !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/qualAccountId:1}}:role/Deployer'
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              InputArtifacts:
+                - Name: buildResults
+              Configuration:
+                StackName: aws-oauth-proxy
+                ActionMode: CREATE_UPDATE
+                TemplatePath: buildResults::cloudformation.template.yml
+                TemplateConfiguration: buildResults::qual.config.json
+                RoleArn: !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/qualAccountId:1}}:role/Deployer'
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND,CAPABILITY_NAMED_IAM
+              RunOrder: 1
+        - Name: Deploy_Prod
+          Actions:
+            - Name: Approve
+              ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Provider: Manual
+                Version: 1
+              InputArtifacts: []
+              OutputArtifacts: []
+              RunOrder: 1
+            - Name: Deploy
+              RoleArn: !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/prodAccountId:1}}:role/Deployer'
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              InputArtifacts:
+                - Name: buildResults
+              Configuration:
+                StackName: aws-oauth-proxy
+                ActionMode: CREATE_UPDATE
+                TemplatePath: buildResults::cloudformation.template.yml
+                TemplateConfiguration: buildResults::prod.config.json
+                RoleArn: !Sub 'arn:aws:iam::{{resolve:ssm:/pipelines/prodAccountId:1}}:role/Deployer'
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND,CAPABILITY_NAMED_IAM
+              RunOrder: 2

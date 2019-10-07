@@ -1,0 +1,31 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 10
+    commands:
+      - npm install
+      - apt-get install -y zip
+  build:
+    commands:
+      - npm run test
+      - npm run build
+      - zip -r deploy/artifact.zip index.js node_modules
+
+      
+      - ./deploy/create-config-files.sh
+      - cfn-lint deploy/cloudformation.template.yml
+      - aws cloudformation validate-template --template-body file://deploy/cloudformation.template.yml
+      - mv deploy/cloudformation.template.yml deploy/cloudformation.template.yml.bak
+      - |
+        aws cloudformation package \
+          --template-file deploy/cloudformation.template.yml.bak \
+          --s3-bucket $ARTIFACT_STORE \
+          --s3-prefix cf-package \
+          --output-template-file cloudformation.template.yml
+
+artifacts:
+  discard-paths: yes
+  files:
+    - "**/*.template.yml"
+    - "**/*.config.json"

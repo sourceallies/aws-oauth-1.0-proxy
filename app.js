@@ -1,12 +1,13 @@
 const { OAuth } = require('oauth');
 const { sendResponse, sendError } = require('./src/responses');
-const config = require('./config');
+const getConfig = require('./config');
 const { publishToSNSSuccess, publishToSNSUnsuccessfull } = require('./src/publishSNSHelper');
 const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSignRequest');
 
 const parsedEnv = require('dotenv').config();
 
-exports.firstLegHandler = (event, context, callback) => {
+exports.firstLegHandler = async (event, context, callback) => {
+  let config = await getConfig();
   const tokenlessOauthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
@@ -19,35 +20,37 @@ exports.firstLegHandler = (event, context, callback) => {
     config.oAuthCustomHeaders,
   );
 
-  const responseCallback = (error, requestToken, requestTokenSecret) => {
-    let body = {
-      requestToken,
-      requestTokenSecret,
+  return await new Promise((resolve, reject) => {
+    const responseCallback = (error, requestToken, requestTokenSecret) => {
+      let body = {
+        requestToken,
+        requestTokenSecret,
+      };
+  
+      if (error) {
+        body = error;
+      }
+  
+      const response = {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify(body),
+        isBase64Encoded: false,
+      };
+  
+      let publish = error ? publishToSNSUnsuccessfull : publishToSNSSuccess;
+      publish({ ...event, ...response })
+      .then(() => resolve(response));
     };
-
-    if (error) {
-      body = error;
-    }
-
-    const response = {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      },
-      body: JSON.stringify(body),
-      isBase64Encoded: false,
-    };
-
-    error ? publishToSNSUnsuccessfull({ ...event, ...response })
-      : publishToSNSSuccess({ ...event, ...response });
-
-    callback(null, response);
-  };
-
-  tokenlessOauthSession.getOAuthRequestToken(responseCallback);
+  
+    tokenlessOauthSession.getOAuthRequestToken(responseCallback);
+  });
 };
 
-exports.thirdLegHandler = (event, context, callback) => {
+exports.thirdLegHandler = async (event, context, callback) => {
+  let config = await getConfig();
   const receivedBody = JSON.parse(event.body);
 
   const {
@@ -68,32 +71,33 @@ exports.thirdLegHandler = (event, context, callback) => {
     config.oAuthCustomHeaders,
   );
 
-  const responseCallback = (error, accessToken, accessTokenSecret) => {
-    let body = {
-      accessToken,
-      accessTokenSecret,
+  return await new Promise((resolve, reject) => {
+    const responseCallback = (error, accessToken, accessTokenSecret) => {
+      let body = {
+        accessToken,
+        accessTokenSecret,
+      };
+  
+      if (error) {
+        body = error;
+      }
+  
+      const response = {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify(body),
+        isBase64Encoded: false,
+      };
+      
+      let publish = error ? publishToSNSUnsuccessfull : publishToSNSSuccess;
+      publish({ ...event, ...response})
+      .then(() => resolve(response));
     };
-
-    if (error) {
-      body = error;
-    }
-
-    const response = {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      },
-      body: JSON.stringify(body),
-      isBase64Encoded: false,
-    };
-
-    error ? publishToSNSUnsuccessfull({ ...event, ...response })
-      : publishToSNSSuccess({ ...event, ...response });
-
-    callback(null, response);
-  };
-
-  oAuthSession.getOAuthAccessToken(requestToken, requestTokenSecret, verifier, responseCallback);
+  
+    oAuthSession.getOAuthAccessToken(requestToken, requestTokenSecret, verifier, responseCallback);
+  });
 };
 
 exports.oAuthSignRequestGet = async (event) => {
@@ -113,6 +117,7 @@ exports.oAuthSignRequestGet = async (event) => {
 };
 
 exports.oAuthSignRequestPost = async (event) => {
+  let config = await getConfig();
   const receivedBody = JSON.parse(event.body);
 
   const {

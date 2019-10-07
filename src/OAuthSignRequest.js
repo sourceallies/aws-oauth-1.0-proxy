@@ -1,8 +1,9 @@
 const { OAuth } = require('oauth');
-const config = require('../config');
+const getConfig = require('../config');
 const { getStatusText } = require('../src/HttpResponses');
 
-const doSignAndGet = (linkToOpen, accessToken, accessTokenSecret) => {
+const doSignAndGet = async (linkToOpen, accessToken, accessTokenSecret) => {
+  const config = await getConfig();
   const oAuthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
@@ -15,7 +16,7 @@ const doSignAndGet = (linkToOpen, accessToken, accessTokenSecret) => {
     config.oAuthCustomHeaders,
   );
 
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     oAuthSession.get(
       linkToOpen,
       accessToken,
@@ -33,7 +34,8 @@ const doSignAndGet = (linkToOpen, accessToken, accessTokenSecret) => {
   });
 };
 
-const doSignAndDelete = (linkToOpen, accessToken, accessTokenSecret) => {
+const doSignAndDelete = async (linkToOpen, accessToken, accessTokenSecret) => {
+  const config = await getConfig();
   const oAuthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
@@ -46,7 +48,8 @@ const doSignAndDelete = (linkToOpen, accessToken, accessTokenSecret) => {
     config.oAuthCustomHeaders,
   );
 
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
+    console.log(oAuthSession);
     oAuthSession.delete(
       linkToOpen,
       accessToken,
@@ -69,13 +72,14 @@ const doSignAndDelete = (linkToOpen, accessToken, accessTokenSecret) => {
   });
 };
 
-const doSignAndPost = (
+const doSignAndPost = async (
   linkToOpen,
   accessToken,
   accessTokenSecret,
   postBody,
   postBodyContentType,
 ) => {
+  const config = await getConfig();
   const oAuthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
@@ -88,7 +92,7 @@ const doSignAndPost = (
     config.oAuthCustomHeaders,
   );
 
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     oAuthSession.post(
       linkToOpen,
       accessToken,
