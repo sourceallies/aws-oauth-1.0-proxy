@@ -1,10 +1,19 @@
-const { OAuth } = require('oauth');
-const { sendResponse, sendError } = require('./src/responses');
+const {OAuth} = require('oauth');
+const {sendResponse, sendError} = require('./src/responses');
 const getConfig = require('./config');
-const { publishToSNSSuccess, publishToSNSUnsuccessfull } = require('./src/publishSNSHelper');
-const { doSignAndGet, doSignAndPost, doSignAndDelete } = require('./src/OAuthSignRequest');
+const {publishToSNSSuccess, publishToSNSUnsuccessfull} = require('./src/publishSNSHelper');
+const {doSignAndGet, doSignAndPost, doSignAndDelete} = require('./src/OAuthSignRequest');
 
 const parsedEnv = require('dotenv').config();
+
+const getOptionalAuthorizeCallbackUri = (event) => {
+  return event.queryStringParameters && event.queryStringParameters.oauth_callback;
+};
+
+const getAuthorizeCallbackUri = (event, config) => {
+  const optionalAuthorizeCallbackUri = getOptionalAuthorizeCallbackUri(event);
+  return optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
+};
 
 exports.firstLegHandler = async (event, context, callback) => {
   let config = await getConfig();
@@ -14,37 +23,37 @@ exports.firstLegHandler = async (event, context, callback) => {
     config.clientKey,
     config.clientSecret,
     config.oAuthVersion,
-    config.authorizeCallbackUri,
+    getAuthorizeCallbackUri(event, config),
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
-    config.oAuthCustomHeaders,
+    config.oAuthCustomHeaders
   );
 
   return await new Promise((resolve, reject) => {
     const responseCallback = (error, requestToken, requestTokenSecret) => {
       let body = {
         requestToken,
-        requestTokenSecret,
+        requestTokenSecret
       };
-  
+
       if (error) {
         body = error;
       }
-  
+
       const response = {
         statusCode: 200,
         headers: {
-          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Origin': '*'
         },
         body: JSON.stringify(body),
-        isBase64Encoded: false,
+        isBase64Encoded: false
       };
-  
+
       let publish = error ? publishToSNSUnsuccessfull : publishToSNSSuccess;
-      publish({ ...event, ...response })
-      .then(() => resolve(response));
+      publish({...event, ...response})
+        .then(() => resolve(response));
     };
-  
+
     tokenlessOauthSession.getOAuthRequestToken(responseCallback);
   });
 };
@@ -56,7 +65,7 @@ exports.thirdLegHandler = async (event, context, callback) => {
   const {
     requestToken,
     requestTokenSecret,
-    verifier,
+    verifier
   } = receivedBody;
 
   const oAuthSession = new OAuth(
@@ -65,37 +74,37 @@ exports.thirdLegHandler = async (event, context, callback) => {
     config.clientKey,
     config.clientSecret,
     config.oAuthVersion,
-    config.authorizeCallbackUri,
+    getAuthorizeCallbackUri(event, config),
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
-    config.oAuthCustomHeaders,
+    config.oAuthCustomHeaders
   );
 
   return await new Promise((resolve, reject) => {
     const responseCallback = (error, accessToken, accessTokenSecret) => {
       let body = {
         accessToken,
-        accessTokenSecret,
+        accessTokenSecret
       };
-  
+
       if (error) {
         body = error;
       }
-  
+
       const response = {
         statusCode: 200,
         headers: {
-          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Origin': '*'
         },
         body: JSON.stringify(body),
-        isBase64Encoded: false,
+        isBase64Encoded: false
       };
-      
+
       let publish = error ? publishToSNSUnsuccessfull : publishToSNSSuccess;
-      publish({ ...event, ...response})
-      .then(() => resolve(response));
+      publish({...event, ...response})
+        .then(() => resolve(response));
     };
-  
+
     oAuthSession.getOAuthAccessToken(requestToken, requestTokenSecret, verifier, responseCallback);
   });
 };
@@ -106,10 +115,10 @@ exports.oAuthSignRequestGet = async (event) => {
   const {
     url,
     accessToken,
-    accessTokenSecret,
+    accessTokenSecret
   } = receivedData.queryStringParameters;
 
-  const response = await doSignAndGet(url, accessToken, accessTokenSecret)
+  const response = await doSignAndGet(url, accessToken, accessTokenSecret, getOptionalAuthorizeCallbackUri(event))
     .then(responseData => sendResponse(event, responseData))
     .catch(error => sendError(event, error));
 
@@ -124,7 +133,7 @@ exports.oAuthSignRequestPost = async (event) => {
     url,
     accessToken,
     accessTokenSecret,
-    data,
+    data
   } = receivedBody;
 
   const response = await doSignAndPost(
@@ -133,6 +142,7 @@ exports.oAuthSignRequestPost = async (event) => {
     accessTokenSecret,
     JSON.stringify(data),
     config.oAuthCustomContentType,
+    getOptionalAuthorizeCallbackUri(event)
   )
     .then(responseData => sendResponse(event, responseData))
     .catch(error => sendError(event, error));
@@ -146,10 +156,10 @@ exports.oAuthSignRequestDelete = async (event) => {
   const {
     url,
     accessToken,
-    accessTokenSecret,
+    accessTokenSecret
   } = receivedData.queryStringParameters;
 
-  const response = await doSignAndDelete(url, accessToken, accessTokenSecret)
+  const response = await doSignAndDelete(url, accessToken, accessTokenSecret, getOptionalAuthorizeCallbackUri(event))
     .then(responseData => sendResponse(event, responseData))
     .catch(error => sendError(event, error));
 

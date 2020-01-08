@@ -2,15 +2,17 @@ const { OAuth } = require('oauth');
 const getConfig = require('../config');
 const { getStatusText } = require('../src/HttpResponses');
 
-const doSignAndGet = async (linkToOpen, accessToken, accessTokenSecret) => {
+const doSignAndGet = async (linkToOpen, accessToken, accessTokenSecret, optionalAuthorizeCallbackUri) => {
   const config = await getConfig();
+  const authorizeCallbackUri = optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
+
   const oAuthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
     config.clientKey,
     config.clientSecret,
     config.oAuthVersion,
-    config.authorizeCallbackUri,
+    authorizeCallbackUri,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
     config.oAuthCustomHeaders,
@@ -34,15 +36,17 @@ const doSignAndGet = async (linkToOpen, accessToken, accessTokenSecret) => {
   });
 };
 
-const doSignAndDelete = async (linkToOpen, accessToken, accessTokenSecret) => {
+const doSignAndDelete = async (linkToOpen, accessToken, accessTokenSecret, optionalAuthorizeCallbackUri) => {
   const config = await getConfig();
+  const authorizeCallbackUri = optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
+
   const oAuthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
     config.clientKey,
     config.clientSecret,
     config.oAuthVersion,
-    config.authorizeCallbackUri,
+    authorizeCallbackUri,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
     config.oAuthCustomHeaders,
@@ -78,15 +82,18 @@ const doSignAndPost = async (
   accessTokenSecret,
   postBody,
   postBodyContentType,
+  optionalAuthorizeCallbackUri
 ) => {
   const config = await getConfig();
+  const authorizeCallbackUri = optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
+
   const oAuthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
     config.clientKey,
     config.clientSecret,
     config.oAuthVersion,
-    config.authorizeCallbackUri,
+    authorizeCallbackUri,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
     config.oAuthCustomHeaders,
