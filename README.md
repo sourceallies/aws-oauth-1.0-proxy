@@ -138,6 +138,30 @@ Response will be the same as what you expect from the url that is being proxied.
 
 If there is an error connecting to the url that is being proxied, the response status code will be 502.
 
+### Gotchas:
+* Be sure to url encode your url query parameters to make sure the value comes across correctly.  (this can be a headache to trouble shoot and ensuring the query params are html safe will save you time later)
+Here is a snippet used by an application to talk to this aws-proxy.  This snippet uses javascript to make a "fetch" call to the aws proxy.
+##### Sample code:
+```
+import { OauthToken } from "../../types";
+
+export const backendGet = (
+  path: string,
+  oAuthToken: OauthToken,
+  apiBaseUrl: string
+): Promise<any> => {
+  return fetch(
+    apiBaseUrl +
+      path +
+      "?accessToken=" +
+      encodeURIComponent(oAuthToken.accessToken) +
+      "&accessTokenSecret=" +
+      encodeURIComponent(oAuthToken.accessTokenSecret),
+    { method: "GET" }
+  ).then(res => res.json());
+};
+```
+
 ## Testing
 
 #### Unit Tests
