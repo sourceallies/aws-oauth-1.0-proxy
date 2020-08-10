@@ -6,6 +6,7 @@ phases:
     commands:
       - npm install
       - apt-get install -y zip
+      - pip install cfn-lint
   build:
     commands:
       - npm run test
