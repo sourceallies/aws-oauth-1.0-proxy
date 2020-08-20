@@ -2,14 +2,16 @@ const { KMS } = require("aws-sdk");
 const kms = new KMS();
 
 async function decrypt(value) {
-  if(typeof value === "undefined") {
+  if (typeof value === "undefined") {
     return;
   }
 
   try {
-    const kmsResponse = await kms.decrypt({ CiphertextBlob: Buffer.from(value, "base64") }).promise();
+    const kmsResponse = await kms
+      .decrypt({ CiphertextBlob: Buffer.from(value, "base64") })
+      .promise();
     return kmsResponse.Plaintext.toString();
-  } catch(error) {
+  } catch (error) {
     console.log("failed to decrypt value. got error: ", error);
     return value;
   }
@@ -17,11 +19,11 @@ async function decrypt(value) {
 
 var config;
 
-module.exports = async function() {
-  if(typeof config === 'undefined') {
+module.exports = async function () {
+  if (typeof config === "undefined") {
     config = {
-      oAuthVersion: '1.0',
-      oAuthSignatureMethod: 'HMAC-SHA1',
+      oAuthVersion: "1.0",
+      oAuthSignatureMethod: "HMAC-SHA1",
       oAuthNonceSize: undefined,
       oAuthCustomHeaders: {
         Accept: process.env.OAUTH_CUSTOM_HEADERS,
@@ -39,4 +41,4 @@ module.exports = async function() {
   }
 
   return config;
-}
+};

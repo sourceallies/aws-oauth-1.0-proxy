@@ -20,6 +20,8 @@ Build the aws-oauth-1.0-proxy project locally using `sam build`. Invoke your fun
 [sam documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-invoke.html) for
 more options in the local call.
 
+NOTE: Local setup for the `oauth-third-leg` lambda is not included in the provided `template.yml`.
+
 ## Build and Deploy
 
 The deploy scripts are configured to read environment variables from a `.env` file. Thus, a `.env` file should be created based on `.env.example`. See [Environment Configuration](../../wiki/Environment-Configuration) for more details about environment variables and how they are used.
