@@ -1,0 +1,12 @@
+{
+  "name": "token-generator",
+  "version": "1.0.0",
+  "description": "Helper to obtain 3-Legged Auth Tokens for running AWS-OAuth-1.0-Proxy Lamba Functions Locally",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^9.2.1",
+    "node-fetch": "^1.7.3"
+  }
+}
