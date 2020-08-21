@@ -65,7 +65,6 @@ const doSignAndDelete = async (
   );
 
   return await new Promise((resolve, reject) => {
-    console.log(oAuthSession);
     oAuthSession.delete(
       linkToOpen,
       accessToken,
@@ -93,7 +92,6 @@ const doSignAndPost = async (
   accessToken,
   accessTokenSecret,
   postBody,
-  postBodyContentType,
   postCustomHeaders,
   optionalAuthorizeCallbackUri
 ) => {
@@ -110,7 +108,7 @@ const doSignAndPost = async (
     authorizeCallbackUri,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
-    config.oAuthCustomHeaders
+    postCustomHeaders
   );
 
   return await new Promise((resolve, reject) => {
@@ -119,8 +117,7 @@ const doSignAndPost = async (
       accessToken,
       accessTokenSecret,
       postBody,
-      postBodyContentType,
-      postCustomHeaders,
+      config.postContentType,
       (error, responseData, result) => {
         console.log("Post Response From Deere", {
           error,

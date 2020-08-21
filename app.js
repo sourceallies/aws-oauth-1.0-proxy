@@ -139,8 +139,8 @@ exports.oAuthSignRequestGet = async (event) => {
 };
 
 exports.oAuthSignRequestPost = async (event) => {
-  let config = await getConfig();
   const receivedBody = JSON.parse(event.body);
+  const customHeaders = event.customHeaders;
 
   const { url, accessToken, accessTokenSecret, data } = receivedBody;
 
@@ -149,7 +149,7 @@ exports.oAuthSignRequestPost = async (event) => {
     accessToken,
     accessTokenSecret,
     JSON.stringify(data),
-    config.oAuthCustomContentType,
+    customHeaders,
     getOptionalAuthorizeCallbackUri(event)
   )
     .then((responseData) => sendResponse(event, responseData))

@@ -81,7 +81,8 @@ Resources:
           AUTHORIZE_CALLBACK_URI:
           SNS_SUCCESS_ARN:
           SNS_NONSUCCESS_ARN:
-  OAuthSignRequestGetLambda:
+          POST_CONTENT_TYPE:
+OAuthSignRequestGetLambda:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri:

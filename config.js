@@ -25,9 +25,8 @@ module.exports = async function () {
       oAuthVersion: "1.0",
       oAuthSignatureMethod: "HMAC-SHA1",
       oAuthNonceSize: undefined,
-      oAuthCustomHeaders: {
-        Accept: process.env.OAUTH_CUSTOM_HEADERS,
-      },
+      oAuthCustomHeaders: process.env.OAUTH_CUSTOM_HEADERS,
+      postContentType: process.env.POST_CONTENT_TYPE,
       oAuthCustomContentType: process.env.OAUTH_CUSTOM_HEADERS,
       clientKey: await decrypt(process.env.CLIENT_KEY),
       clientSecret: await decrypt(process.env.CLIENT_SECRET),
