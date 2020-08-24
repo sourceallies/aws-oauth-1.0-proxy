@@ -30,28 +30,44 @@ describe("OAuth Sign Request", () => {
   });
 
   describe("Do Sign and Get", () => {
-    it("gets a set of temporary OAuth tokens", async () => {
-      const fakeLink = chance.url();
-      const fakeAccessToken = chance.string();
-      const fakeAccessTokenSecret = chance.string();
+    let config;
 
-      const fakeResponseData = chance.string();
+    beforeEach(async () => {
+      config = await require("../config")();
+      config.oAuthCustomHeaders = { [chance.string()]: chance.string() };
+      config.authorizeCallbackUri = chance.string();
+    });
 
+    it("throws error if no oAuthCustomHeaders in config", async () => {
+      config.oAuthCustomHeaders = undefined;
+
+      expect(() =>
+        doSignAndGet(
+          chance.url(),
+          chance.string(),
+          chance.string(),
+          allDataFlag
+        )
+      ).toThrow(Error);
+    });
+
+    it("creates OAuth config with correct values when allDataFlag is true", async () => {
+      const allDataFlag = true;
       const OAuth = require("oauth");
-      const config = await require("../config")();
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         get: (link, accessToken, accessTokenSecret, callback) => {
-          callback(null, fakeResponseData, { statusCode: 200 });
+          callback(null, null, { statusCode: 200 });
         },
       }));
 
       const { doSignAndGet } = require("../src/OAuthSignRequest");
 
-      const response = await doSignAndGet(
-        fakeLink,
-        fakeAccessToken,
-        fakeAccessTokenSecret
+      await doSignAndGet(
+        chance.url(),
+        chance.string(),
+        chance.string(),
+        allDataFlag
       );
 
       expect(OAuth.OAuth).toBeCalledWith(
@@ -63,8 +79,88 @@ describe("OAuth Sign Request", () => {
         config.authorizeCallbackUri,
         config.oAuthSignatureMethod,
         config.oAuthNonceSize,
-        config.oAuthCustomHeaders
+        {
+          ...config.oAuthCustomHeaders,
+          No_Paging: true,
+        }
       );
+    });
+
+    it("returns correct response when allDataFlag is true", async () => {
+      const allDataFlag = true;
+      const fakeResponseData = chance.string();
+      const OAuth = require("oauth");
+      OAuth.OAuth = jest.fn().mockImplementation(() => ({
+        get: (link, accessToken, accessTokenSecret, callback) => {
+          callback(null, fakeResponseData, { statusCode: 200 });
+        },
+      }));
+
+      const { doSignAndGet } = require("../src/OAuthSignRequest");
+
+      const response = await doSignAndGet(
+        chance.url(),
+        chance.string(),
+        chance.string(),
+        allDataFlag
+      );
+
+      expect(response).toEqual(fakeResponseData);
+    });
+
+    it("creates OAuth config with correct values when allDataFlag is false and there are preexisting custom headers", async () => {
+      const allDataFlag = false;
+      const OAuth = require("oauth");
+
+      OAuth.OAuth = jest.fn().mockImplementation(() => ({
+        get: (link, accessToken, accessTokenSecret, callback) => {
+          callback(null, null, { statusCode: 200 });
+        },
+      }));
+
+      const { doSignAndGet } = require("../src/OAuthSignRequest");
+
+      await doSignAndGet(
+        chance.url(),
+        chance.string(),
+        chance.string(),
+        allDataFlag
+      );
+
+      expect(OAuth.OAuth).toBeCalledWith(
+        config.firstLegUri,
+        config.thirdLegUri,
+        config.clientKey,
+        config.clientSecret,
+        config.oAuthVersion,
+        config.authorizeCallbackUri,
+        config.oAuthSignatureMethod,
+        config.oAuthNonceSize,
+        {
+          ...config.oAuthCustomHeaders,
+        }
+      );
+    });
+
+    it("returns correct response when allDataFlag is false", async () => {
+      const allDataFlag = false;
+      const fakeResponseData = chance.string();
+      const OAuth = require("oauth");
+      OAuth.OAuth = jest.fn().mockImplementation(() => ({
+        get: (link, accessToken, accessTokenSecret, callback) => {
+          callback(null, fakeResponseData, { statusCode: 200 });
+        },
+      }));
+
+      const { doSignAndGet } = require("../src/OAuthSignRequest");
+
+      const response = await doSignAndGet(
+        chance.url(),
+        chance.string(),
+        chance.string(),
+        allDataFlag
+      );
+
       expect(response).toEqual(fakeResponseData);
     });
 
