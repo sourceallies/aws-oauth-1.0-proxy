@@ -387,13 +387,16 @@ describe("OAuth Sign Request", () => {
         post: mockPost,
       }));
 
+      const config = await require("../config")();
+      const expectedContentType = chance.string();
+      config.postContentType = expectedContentType;
+
       const { doSignAndPost } = require("../src/OAuthSignRequest");
 
       const fakeLink = chance.url();
       const fakeAccessToken = chance.string();
       const fakeAccessTokenSecret = chance.string();
       const fakePostBody = chance.string();
-      const fakePostBodyContentType = chance.string();
       const fakePostCustomHeaders = { [chance.string()]: chance.string() };
 
       await doSignAndPost(
@@ -409,7 +412,7 @@ describe("OAuth Sign Request", () => {
         fakeAccessToken,
         fakeAccessTokenSecret,
         fakePostBody,
-        fakePostBodyContentType,
+        expectedContentType,
         expect.any(Function)
       );
     });
