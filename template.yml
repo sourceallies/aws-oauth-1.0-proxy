@@ -77,10 +77,10 @@ Resources:
           CLIENT_KEY:
           CLIENT_SECRET:
           API_URL:
-          OAUTH_CUSTOM_HEADERS:
           AUTHORIZE_CALLBACK_URI:
           SNS_SUCCESS_ARN:
           SNS_NONSUCCESS_ARN:
+          POST_CONTENT_TYPE:
   OAuthSignRequestGetLambda:
     Type: AWS::Serverless::Function
     Properties:
@@ -133,7 +133,6 @@ Resources:
           CLIENT_KEY:
           CLIENT_SECRET:
           API_URL:
-          OAUTH_CUSTOM_HEADERS:
           AUTHORIZE_CALLBACK_URI:
           SNS_SUCCESS_ARN:
           SNS_NONSUCCESS_ARN:

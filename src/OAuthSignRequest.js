@@ -103,7 +103,6 @@ const doSignAndPost = async (
   accessToken,
   accessTokenSecret,
   postBody,
-  postCustomHeaders,
   optionalAuthorizeCallbackUri
 ) => {
   const config = await getConfig();
@@ -119,7 +118,7 @@ const doSignAndPost = async (
     authorizeCallbackUri,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
-    postCustomHeaders
+    config.oAuthCustomHeaders
   );
 
   return await new Promise((resolve, reject) => {
