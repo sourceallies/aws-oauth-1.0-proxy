@@ -10,6 +10,16 @@ This project serves as a proxy for OAuth 1.0a requests. We leverage Lambdas crea
 2. cd to the git repository
 3. `npm install`
 
+## Running locally
+
+Follow the instructions [here](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) to install Docker and aws-sam-cli. Ignore Steps 1-2.
+
+Clone and follow the README for [sai-aws-auth](https://github.com/sourceallies/sai-aws-auth) to obtain the AWS authentication credentials using your account.
+
+Build the aws-oauth-1.0-proxy project locally using `sam build`. Invoke your function using `sam local invoke [your-lambda-here] [OPTIONS]`. Refer to the
+[sam documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-invoke.html) for
+more options in the local call.
+
 ## Build and Deploy
 
 The deploy scripts are configured to read environment variables from a `.env` file. Thus, a `.env` file should be created based on `.env.example`. See [Environment Configuration](../../wiki/Environment-Configuration) for more details about environment variables and how they are used.
@@ -46,7 +56,7 @@ Get the temporary oAuth tokens needed for the second leg.
 
 Example Request:
 
-``` json
+```json
 POST /Prod/firstLegAuth HTTP/1.1
 Host: **.execute-api.us-east-1.amazonaws.com
 Cache-Control: no-cache
@@ -54,10 +64,10 @@ Cache-Control: no-cache
 
 Example Response:
 
-``` json
+```json
 {
-    "requestToken": "$tempToken",
-    "requestTokenSecret": "$tempSecret"
+  "requestToken": "$tempToken",
+  "requestTokenSecret": "$tempSecret"
 }
 ```
 
@@ -69,7 +79,7 @@ Use the temporary oAuth tokens and verifier from the second leg to get the acces
 
 Example Request:
 
-``` json
+```json
 POST /Prod/thirdLegAuth HTTP/1.1
 Host: **.execute-api.us-east-1.amazonaws.com
 Content-Type: application/json
@@ -84,10 +94,10 @@ Cache-Control: no-cache
 
 Example Response:
 
-``` json
+```json
 {
-    "accessToken": "$accessToken",
-    "accessTokenSecret": "$accessTokenSecret"
+  "accessToken": "$accessToken",
+  "accessTokenSecret": "$accessTokenSecret"
 }
 ```
 
@@ -99,7 +109,7 @@ Signs the GET request with the app ID and app secret. Provide access tokens and 
 
 Example Request:
 
-``` json
+```json
 GET /Prod/oAuthSignRequest?accessToken=<access_token>&accessTokenSecret=<access_token_secret>&url=<url_to_proxy> HTTP/1.1
 Host: **.execute-api.us-east-1.amazonaws.com
 Accept: application/json
@@ -119,7 +129,7 @@ Signs the POST request with the app ID and app secret. Provide access tokens and
 
 Example Request:
 
-``` json
+```json
 POST /Prod/oAuthSignRequest HTTP/1.1
 Host: **.execute-api.us-east-1.amazonaws.com
 Accept: application/json
@@ -139,9 +149,12 @@ Response will be the same as what you expect from the url that is being proxied.
 If there is an error connecting to the url that is being proxied, the response status code will be 502.
 
 ### Gotchas:
-* Be sure to url encode your url query parameters to make sure the value comes across correctly.  (this can be a headache to trouble shoot and ensuring the query params are html safe will save you time later)
-Here is a snippet used by an application to talk to this aws-proxy.  This snippet uses javascript to make a "fetch" call to the aws proxy.
+
+- Be sure to url encode your url query parameters to make sure the value comes across correctly. (this can be a headache to trouble shoot and ensuring the query params are html safe will save you time later)
+  Here is a snippet used by an application to talk to this aws-proxy. This snippet uses javascript to make a "fetch" call to the aws proxy.
+
 ##### Sample code:
+
 ```
 import { OauthToken } from "../../types";
 
@@ -170,7 +183,6 @@ Run the [Jest](https://github.com/facebook/jest) test runner:
 
 `npm run test`
 
-
 #### Linting
 
 Lint repo using [ES Lint](https://github.com/eslint/eslint):
@@ -178,6 +190,7 @@ Lint repo using [ES Lint](https://github.com/eslint/eslint):
 `npm run lint`
 
 ## Deploying
+
 The project is built and deployed with CodePipeline and CodeBuild. For deploying to production, manual approval in CodePipeline/Slack (#cicd-notifications) is required.
 
 You can view the pipeline here (log into aws shared account first): https://console.aws.amazon.com/codesuite/codepipeline/pipelines/aws-oauth-1-0-proxy/view
@@ -187,11 +200,13 @@ You can view the pipeline here (log into aws shared account first): https://cons
 Fork the repo and create a pull request describing your contribution.
 
 ## License
+
 This project is licensed under the terms of the [Apache 2.0](APACHE_LICENSE.md) license or alternatively under the terms of the [MIT](MIT_LICENSE.md).
 You may use aws-oauth-1.0-proxy according to either of these licenses as is most appropriate
 for your project on a case-by-case basis..
 
 ## About Source Allies
+
 Source Allies is an IT Consultancy based in Urbandale, Iowa. Learn more [here](https://www.sourceallies.com/what-we-do/) and get in touch with us [here](https://www.sourceallies.com/contact-us/).
 
 ![Source Allies Logo](assets/sai-logo.png)
