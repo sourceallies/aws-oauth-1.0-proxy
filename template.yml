@@ -82,7 +82,7 @@ Resources:
           SNS_SUCCESS_ARN:
           SNS_NONSUCCESS_ARN:
           POST_CONTENT_TYPE:
-OAuthSignRequestGetLambda:
+  OAuthSignRequestGetLambda:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri:
