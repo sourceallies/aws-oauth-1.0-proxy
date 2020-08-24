@@ -1,7 +1,0 @@
-{
-  "body": "{ \"accessToken\": \"1860d412-8cde-4833-a880-f917077f4ef5\", \"accessTokenSecret\": \"EElpURKK/y4Fsry6HUaLWRzsSx26zApBi2IVdEDqEGr63nCiFsHDMNTLIBN7MaGMvtHCKYkvfDNzd9L5gUynThptz/XZBFwE/mEP8kmaDP4=\", \"url\": \"https://partnerapi.deere.com/platform/organizations/455839/assets\", \"data\": { \"title\":\"Local SAM Added Device\", \"assetCategory\":\"DEVICE\", \"assetType\":\"SENSOR\", \"assetSubType\":\"OTHER\", \"links\":[ { \"@type\": \"Link\", \"rel\": \"contributionDefinition\", \"uri\": \"/contributionDefinitions/45bac5c9-9385-4dfa-82b1-b55e602f946c\" } ] }}",
-  "customHeaders": {
-    "Content-Type": "application/vnd.deere.axiom.v3+json",
-    "Accept": "application/vnd.deere.axiom.v3+json"
-  }
-}
