@@ -7,7 +7,7 @@ describe("Lambda handlers", () => {
     const {
       publishToSNSSuccess,
       publishToSNSUnsuccessfull,
-    } = require("../src/publishSNSHelper");
+    } = require("../src/PublishSNSHelper");
 
     // these are supposed to return promises
     publishToSNSSuccess.mockResolvedValue(undefined);
@@ -16,7 +16,7 @@ describe("Lambda handlers", () => {
 
   describe("OAuth First Leg Handler", () => {
     it("should be a function", () => {
-      const { firstLegHandler } = require("../app");
+      const { firstLegHandler } = require("../App");
 
       expect(firstLegHandler).toEqual(expect.any(Function));
     });
@@ -32,7 +32,7 @@ describe("Lambda handlers", () => {
         getOAuthRequestToken: fakeGetOAuthRequestToken,
       }));
 
-      const { firstLegHandler } = require("../app");
+      const { firstLegHandler } = require("../App");
 
       const event = chance.string();
       const context = chance.string();
@@ -66,7 +66,7 @@ describe("Lambda handlers", () => {
         getOAuthRequestToken: fakeGetOAuthRequestToken,
       }));
 
-      const { firstLegHandler } = require("../app");
+      const { firstLegHandler } = require("../App");
 
       const event = chance.string();
       const context = chance.string();
@@ -94,7 +94,7 @@ describe("Lambda handlers", () => {
         getOAuthRequestToken: fakeGetOAuthRequestToken,
       }));
 
-      const { firstLegHandler } = require("../app");
+      const { firstLegHandler } = require("../App");
 
       const event = chance.string();
       const context = chance.string();
@@ -132,7 +132,7 @@ describe("Lambda handlers", () => {
         getOAuthRequestToken: fakeGetOAuthRequestToken,
       }));
 
-      const { firstLegHandler } = require("../app");
+      const { firstLegHandler } = require("../App");
 
       const event = chance.string();
       const context = chance.string();
@@ -168,7 +168,7 @@ describe("Lambda handlers", () => {
         getOAuthRequestToken: fakeGetOAuthRequestToken,
       }));
 
-      const { firstLegHandler } = require("../app");
+      const { firstLegHandler } = require("../App");
 
       const event = chance.string();
       const context = chance.string();
@@ -176,7 +176,7 @@ describe("Lambda handlers", () => {
 
       jest.mock("../src/publishSNSHelper");
 
-      const { publishToSNSSuccess } = require("../src/publishSNSHelper");
+      const { publishToSNSSuccess } = require("../src/PublishSNSHelper");
 
       await firstLegHandler(event, context, callback);
 
@@ -215,7 +215,7 @@ describe("Lambda handlers", () => {
         getOAuthRequestToken: fakeGetOAuthRequestToken,
       }));
 
-      const { firstLegHandler } = require("../app");
+      const { firstLegHandler } = require("../App");
 
       const event = chance.string();
       const context = chance.string();
@@ -231,7 +231,7 @@ describe("Lambda handlers", () => {
 
       jest.mock("../src/publishSNSHelper");
 
-      const { publishToSNSUnsuccessfull } = require("../src/publishSNSHelper");
+      const { publishToSNSUnsuccessfull } = require("../src/PublishSNSHelper");
 
       await firstLegHandler(event, context, callback);
 
@@ -252,7 +252,7 @@ describe("Lambda handlers", () => {
     });
 
     it("should be a function", () => {
-      const { thirdLegHandler } = require("../app");
+      const { thirdLegHandler } = require("../App");
 
       expect(thirdLegHandler).toEqual(expect.any(Function));
     });
@@ -268,7 +268,7 @@ describe("Lambda handlers", () => {
         getOAuthAccessToken: mockGetOAuthAccessToken,
       }));
 
-      const { thirdLegHandler } = require("../app");
+      const { thirdLegHandler } = require("../App");
 
       const event = generateFakeEvent();
       const { requestToken, requestTokenSecret, verifier } = JSON.parse(
@@ -300,7 +300,7 @@ describe("Lambda handlers", () => {
       }));
 
       const context = undefined;
-      const { thirdLegHandler } = require("../app");
+      const { thirdLegHandler } = require("../App");
       const expectedResponse = {
         statusCode: 200,
         headers: {
@@ -332,7 +332,7 @@ describe("Lambda handlers", () => {
       }));
 
       const context = undefined;
-      const { thirdLegHandler } = require("../app");
+      const { thirdLegHandler } = require("../App");
       const expectedResponse = {
         statusCode: 200,
         headers: {
@@ -368,8 +368,8 @@ describe("Lambda handlers", () => {
       }));
 
       const context = undefined;
-      const { thirdLegHandler } = require("../app");
-      const { publishToSNSSuccess } = require("../src/publishSNSHelper");
+      const { thirdLegHandler } = require("../App");
+      const { publishToSNSSuccess } = require("../src/PublishSNSHelper");
 
       await thirdLegHandler(fakeEvent, context);
 
@@ -410,11 +410,11 @@ describe("Lambda handlers", () => {
       const context = undefined;
       const fakeCallback = jest.fn();
 
-      const { thirdLegHandler } = require("../app");
+      const { thirdLegHandler } = require("../App");
 
       jest.mock("../src/publishSNSHelper");
 
-      const { publishToSNSUnsuccessfull } = require("../src/publishSNSHelper");
+      const { publishToSNSUnsuccessfull } = require("../src/PublishSNSHelper");
       publishToSNSUnsuccessfull.mockResolvedValue(undefined);
 
       await thirdLegHandler(fakeEvent, context, fakeCallback);
@@ -436,111 +436,11 @@ describe("Lambda handlers", () => {
   });
 
   describe("OAuth Sign Request Get Handler", () => {
-    it("signs and gets the request, then returns the response", async () => {
+    it("when provided query parameters calls DoSignAndGet with same query parameters", async () => {
       const url = chance.url();
       const accessToken = chance.string();
       const accessTokenSecret = chance.string();
-
-      const event = {
-        queryStringParameters: {
-          url,
-          accessToken,
-          accessTokenSecret,
-        },
-      };
-
-      const OAuthSignRequest = require("../src/OAuthSignRequest");
-
-      const fakeResponseData = {};
-      const numberOfResponseDataKeys = chance.natural({ min: 2, max: 5 });
-
-      for (let i = 0; i < numberOfResponseDataKeys; i += 1) {
-        fakeResponseData[chance.string()] = chance.string();
-      }
-
-      fakeResponseData.status = chance.natural();
-
-      OAuthSignRequest.doSignAndGet = jest
-        .fn()
-        .mockResolvedValue(fakeResponseData);
-
-      const { oAuthSignRequestGet } = require("../app");
-
-      const responseData = await oAuthSignRequestGet(event);
-
-      expect(OAuthSignRequest.doSignAndGet).toBeCalledWith(
-        url,
-        accessToken,
-        accessTokenSecret,
-        undefined
-      );
-      const response = {
-        statusCode: fakeResponseData.status,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
-        body: JSON.stringify(fakeResponseData),
-        isBase64Encoded: false,
-      };
-
-      expect(responseData).toEqual(response);
-    });
-
-    // it("signs and gets the request, adding a No_Paging=true header when a no_paging queryStringParam is true, then returns the response", async () => {
-    //   const url = chance.url();
-    //   const accessToken = chance.string();
-    //   const accessTokenSecret = chance.string();
-
-    //   const event = {
-    //     queryStringParameters: {
-    //       url,
-    //       accessToken,
-    //       accessTokenSecret,
-    //       no_paging=true,
-    //     },
-    //   };
-
-    //   const OAuthSignRequest = require("../src/OAuthSignRequest");
-
-    //   const fakeResponseData = {};
-    //   const numberOfResponseDataKeys = chance.natural({ min: 2, max: 5 });
-
-    //   for (let i = 0; i < numberOfResponseDataKeys; i += 1) {
-    //     fakeResponseData[chance.string()] = chance.string();
-    //   }
-
-    //   fakeResponseData.status = chance.natural();
-
-    //   OAuthSignRequest.doSignAndGet = jest
-    //     .fn()
-    //     .mockResolvedValue(fakeResponseData);
-
-    //   const { oAuthSignRequestGet } = require("../app");
-
-    //   const responseData = await oAuthSignRequestGet(event);
-
-    //   expect(OAuthSignRequest.doSignAndGet).toBeCalledWith(
-    //     url,
-    //     accessToken,
-    //     accessTokenSecret,
-    //     undefined
-    //   );
-    //   const response = {
-    //     statusCode: fakeResponseData.status,
-    //     headers: {
-    //       "Access-Control-Allow-Origin": "*",
-    //     },
-    //     body: JSON.stringify(fakeResponseData),
-    //     isBase64Encoded: false,
-    //   };
-
-    //   expect(responseData).toEqual(response);
-    // });
-
-    it("signs and gets the request, then returns the response when an oauth_callback query param is present", async () => {
-      const url = chance.url();
-      const accessToken = chance.string();
-      const accessTokenSecret = chance.string();
+      const allData = chance.bool();
       const oauth_callback = chance.string();
 
       const event = {
@@ -548,6 +448,7 @@ describe("Lambda handlers", () => {
           url,
           accessToken,
           accessTokenSecret,
+          allData,
           oauth_callback,
         },
       };
@@ -567,7 +468,96 @@ describe("Lambda handlers", () => {
         .fn()
         .mockResolvedValue(fakeResponseData);
 
-      const { oAuthSignRequestGet } = require("../app");
+      const { oAuthSignRequestGet } = require("../App");
+
+      await oAuthSignRequestGet(event);
+
+      expect(OAuthSignRequest.doSignAndGet).toBeCalledWith(
+        event.queryStringParameters.url,
+        event.queryStringParameters.accessToken,
+        event.queryStringParameters.accessTokenSecret,
+        event.queryStringParameters.allData,
+        event.queryStringParameters.oauth_callback
+      );
+    });
+
+    it("signs and gets the request, then returns the response", async () => {
+      const url = chance.url();
+      const accessToken = chance.string();
+      const accessTokenSecret = chance.string();
+      const expectedAllDataValue = chance.bool();
+
+      const event = {
+        queryStringParameters: {
+          url,
+          accessToken,
+          accessTokenSecret,
+          allData: expectedAllDataValue,
+        },
+      };
+
+      const OAuthSignRequest = require("../src/OAuthSignRequest");
+
+      const fakeResponseData = {};
+      const numberOfResponseDataKeys = chance.natural({ min: 2, max: 5 });
+
+      for (let i = 0; i < numberOfResponseDataKeys; i += 1) {
+        fakeResponseData[chance.string()] = chance.string();
+      }
+
+      fakeResponseData.status = chance.natural();
+
+      OAuthSignRequest.doSignAndGet = jest
+        .fn()
+        .mockResolvedValue(fakeResponseData);
+
+      const { oAuthSignRequestGet } = require("../App");
+
+      const responseData = await oAuthSignRequestGet(event);
+      const response = {
+        statusCode: fakeResponseData.status,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify(fakeResponseData),
+        isBase64Encoded: false,
+      };
+
+      expect(responseData).toEqual(response);
+    });
+
+    it("signs and gets the request, then returns the response when an oauth_callback query param is present", async () => {
+      const url = chance.url();
+      const accessToken = chance.string();
+      const accessTokenSecret = chance.string();
+      const oauth_callback = chance.string();
+      const allData = chance.bool();
+
+      const event = {
+        queryStringParameters: {
+          url,
+          accessToken,
+          accessTokenSecret,
+          allData,
+          oauth_callback,
+        },
+      };
+
+      const OAuthSignRequest = require("../src/OAuthSignRequest");
+      const fakeResponseData = {};
+      const numberOfResponseDataKeys = chance.natural({ min: 2, max: 5 });
+
+      for (let i = 0; i < numberOfResponseDataKeys; i += 1) {
+        fakeResponseData[chance.string()] = chance.string();
+      }
+
+      fakeResponseData.status = chance.natural();
+
+      OAuthSignRequest.doSignAndGet = jest
+        .fn()
+        .mockResolvedValue(fakeResponseData);
+
+      const { oAuthSignRequestGet } = require("../App");
 
       const responseData = await oAuthSignRequestGet(event);
 
@@ -575,6 +565,7 @@ describe("Lambda handlers", () => {
         url,
         accessToken,
         accessTokenSecret,
+        allData,
         oauth_callback
       );
       const response = {
@@ -601,7 +592,7 @@ describe("Lambda handlers", () => {
 
       OAuthSignRequest.doSignAndGet = jest.fn().mockRejectedValue(fakeError);
 
-      const { oAuthSignRequestGet } = require("../app");
+      const { oAuthSignRequestGet } = require("../App");
 
       const url = chance.url();
       const accessToken = chance.string();
@@ -659,7 +650,7 @@ describe("Lambda handlers", () => {
         .fn()
         .mockResolvedValue(fakeResponseData);
 
-      const { oAuthSignRequestDelete } = require("../app");
+      const { oAuthSignRequestDelete } = require("../App");
 
       const responseData = await oAuthSignRequestDelete(event);
 
@@ -711,7 +702,7 @@ describe("Lambda handlers", () => {
         .fn()
         .mockResolvedValue(fakeResponseData);
 
-      const { oAuthSignRequestDelete } = require("../app");
+      const { oAuthSignRequestDelete } = require("../App");
 
       const responseData = await oAuthSignRequestDelete(event);
 
@@ -737,7 +728,7 @@ describe("Lambda handlers", () => {
       const OAuthSignRequest = require("../src/OAuthSignRequest");
       const fakeError = new Error(chance.string());
       OAuthSignRequest.doSignAndDelete = jest.fn().mockRejectedValue(fakeError);
-      const { oAuthSignRequestDelete } = require("../app");
+      const { oAuthSignRequestDelete } = require("../App");
 
       const fakeEvent = {
         queryStringParameters: {
@@ -781,7 +772,7 @@ describe("Lambda handlers", () => {
         .fn()
         .mockResolvedValue(chance.string());
 
-      ({ oAuthSignRequestPost } = require("../app"));
+      ({ oAuthSignRequestPost } = require("../App"));
     });
 
     it("should be a function", () => {
@@ -803,13 +794,12 @@ describe("Lambda handlers", () => {
         .fn()
         .mockResolvedValue(chance.string());
 
-      ({ oAuthSignRequestPost } = require("../app"));
+      ({ oAuthSignRequestPost } = require("../App"));
 
       const url = chance.url();
       const accessToken = chance.string();
       const accessTokenSecret = chance.string();
       const data = chance.string();
-      const expectedContentType = process.env.OAUTH_CUSTOM_HEADERS;
       const fakeEvent = createFakeEvent({
         url,
         accessToken,
@@ -824,7 +814,6 @@ describe("Lambda handlers", () => {
         accessToken,
         accessTokenSecret,
         JSON.stringify(data),
-        expectedContentType,
         undefined
       );
     });
@@ -838,14 +827,13 @@ describe("Lambda handlers", () => {
         .fn()
         .mockResolvedValue(chance.string());
 
-      ({ oAuthSignRequestPost } = require("../app"));
+      ({ oAuthSignRequestPost } = require("../App"));
 
       const url = chance.url();
       const accessToken = chance.string();
       const accessTokenSecret = chance.string();
       const oauth_callback = chance.string();
       const data = chance.string();
-      const expectedContentType = process.env.OAUTH_CUSTOM_HEADERS;
       const fakeEvent = createFakeEvent({
         url,
         accessToken,
@@ -863,7 +851,6 @@ describe("Lambda handlers", () => {
         accessToken,
         accessTokenSecret,
         JSON.stringify(data),
-        expectedContentType,
         oauth_callback
       );
     });
@@ -889,7 +876,7 @@ describe("Lambda handlers", () => {
         .fn()
         .mockResolvedValue(fakeResponse);
 
-      ({ oAuthSignRequestPost } = require("../app"));
+      ({ oAuthSignRequestPost } = require("../App"));
 
       const response = await oAuthSignRequestPost(createFakeEvent());
       const expectedResponse = {
@@ -928,7 +915,7 @@ describe("Lambda handlers", () => {
 
       OAuthSignRequest.doSignAndPost = jest.fn().mockRejectedValue(fakeError);
 
-      ({ oAuthSignRequestPost } = require("../app"));
+      ({ oAuthSignRequestPost } = require("../App"));
 
       expect.assertions(1);
 
