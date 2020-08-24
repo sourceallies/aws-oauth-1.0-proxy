@@ -12,7 +12,7 @@
   "scripts": {
     "start": "node -r dotenv/config app.js",
     "coverage": "jest --coverage --collectCoverageFrom=src/**/*.{js,jsx} --collectCoverageFrom=app.js",
-    "test": "jest",
+    "test": "jest --watchAll",
     "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls",
     "build": "webpack-cli --mode production --config ./webpack.config.js",
     "lint": "eslint ."
@@ -37,6 +37,9 @@
   "jest": {
     "setupFiles": [
       "./test/jestSetup.js"
+    ],
+    "modulePathIgnorePatterns": [
+      ".aws-sam"
     ]
   },
   "dependencies": {

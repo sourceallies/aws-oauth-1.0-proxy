@@ -372,14 +372,15 @@ describe("OAuth Sign Request", () => {
         .fn()
         .mockImplementation(
           (
-            linkToOpen,
-            accessToken,
-            accessTokenSecret,
-            postBody,
-            postBodyContentType,
-            postCustomHeaders,
+            fakeLink,
+            fakeAccessToken,
+            fakeAccessTokenSecret,
+            fakePostBody,
+            fakePostBodyContentType,
             callback
-          ) => callback(null, "", {})
+          ) => {
+            callback(null, "", {});
+          }
         );
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
@@ -393,15 +394,14 @@ describe("OAuth Sign Request", () => {
       const fakeAccessTokenSecret = chance.string();
       const fakePostBody = chance.string();
       const fakePostBodyContentType = chance.string();
-      const fakePostCustomHeaders = {[chance.string()]: chance.string()};
+      const fakePostCustomHeaders = { [chance.string()]: chance.string() };
 
       await doSignAndPost(
         fakeLink,
         fakeAccessToken,
         fakeAccessTokenSecret,
         fakePostBody,
-        fakePostBodyContentType,
-        fakePostCustomHeaders,
+        fakePostCustomHeaders
       );
 
       expect(mockPost).toBeCalledWith(
@@ -410,7 +410,6 @@ describe("OAuth Sign Request", () => {
         fakeAccessTokenSecret,
         fakePostBody,
         fakePostBodyContentType,
-        fakePostCustomHeaders,
         expect.any(Function)
       );
     });
