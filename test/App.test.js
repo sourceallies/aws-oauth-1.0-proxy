@@ -1,33 +1,38 @@
-describe('Lambda handlers', () => {
+describe("Lambda handlers", () => {
   afterEach(() => {
     jest.resetModules();
 
-    jest.mock('../src/publishSNSHelper');
+    jest.mock("../src/PublishSNSHelper");
 
-    const {publishToSNSSuccess, publishToSNSUnsuccessfull} = require('../src/publishSNSHelper');
+    const {
+      publishToSNSSuccess,
+      publishToSNSUnsuccessfull,
+    } = require("../src/PublishSNSHelper");
 
     // these are supposed to return promises
     publishToSNSSuccess.mockResolvedValue(undefined);
     publishToSNSUnsuccessfull.mockResolvedValue(undefined);
   });
 
-  describe('OAuth First Leg Handler', () => {
-    it('should be a function', () => {
-      const {firstLegHandler} = require('../app');
+  describe("OAuth First Leg Handler", () => {
+    it("should be a function", () => {
+      const { firstLegHandler } = require("../App");
 
       expect(firstLegHandler).toEqual(expect.any(Function));
     });
 
-    it('should initialize oAuth with the correct parameters', async () => {
-      const OAuth = require('oauth');
-      const config = await require('../config')();
-      const fakeGetOAuthRequestToken = jest.fn().mockImplementation(callback => callback());
+    it("should initialize oAuth with the correct parameters", async () => {
+      const OAuth = require("oauth");
+      const config = await require("../config")();
+      const fakeGetOAuthRequestToken = jest
+        .fn()
+        .mockImplementation((callback) => callback());
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        getOAuthRequestToken: fakeGetOAuthRequestToken
+        getOAuthRequestToken: fakeGetOAuthRequestToken,
       }));
 
-      const {firstLegHandler} = require('../app');
+      const { firstLegHandler } = require("../App");
 
       const event = chance.string();
       const context = chance.string();
@@ -46,20 +51,22 @@ describe('Lambda handlers', () => {
         config.authorizeCallbackUri,
         config.oAuthSignatureMethod,
         config.oAuthNonceSize,
-        config.oAuthCustomHeaders
+        config.oAuthCustomHeaders,
       ]);
     });
 
-    it('should get the request tokens', async () => {
-      const OAuth = require('oauth');
+    it("should get the request tokens", async () => {
+      const OAuth = require("oauth");
 
-      const fakeGetOAuthRequestToken = jest.fn().mockImplementation(callback => callback());
+      const fakeGetOAuthRequestToken = jest
+        .fn()
+        .mockImplementation((callback) => callback());
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        getOAuthRequestToken: fakeGetOAuthRequestToken
+        getOAuthRequestToken: fakeGetOAuthRequestToken,
       }));
 
-      const {firstLegHandler} = require('../app');
+      const { firstLegHandler } = require("../App");
 
       const event = chance.string();
       const context = chance.string();
@@ -70,56 +77,62 @@ describe('Lambda handlers', () => {
       expect(fakeGetOAuthRequestToken).toBeCalledWith(expect.any(Function));
     });
 
-    it('should return the request tokens if the response is successful', async () => {
-      const OAuth = require('oauth');
+    it("should return the request tokens if the response is successful", async () => {
+      const OAuth = require("oauth");
 
       const fakeError = null;
       const fakeRequestToken = chance.string();
       const fakeRequestTokenSecret = chance.string();
 
-      const fakeGetOAuthRequestToken = jest.fn().mockImplementation((responseCallback) => {
-        responseCallback(fakeError, fakeRequestToken, fakeRequestTokenSecret);
-      });
+      const fakeGetOAuthRequestToken = jest
+        .fn()
+        .mockImplementation((responseCallback) => {
+          responseCallback(fakeError, fakeRequestToken, fakeRequestTokenSecret);
+        });
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        getOAuthRequestToken: fakeGetOAuthRequestToken
+        getOAuthRequestToken: fakeGetOAuthRequestToken,
       }));
 
-      const {firstLegHandler} = require('../app');
+      const { firstLegHandler } = require("../App");
 
       const event = chance.string();
       const context = chance.string();
       const expectedResponse = {
         statusCode: 200,
         headers: {
-          'Access-Control-Allow-Origin': '*'
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
           requestToken: fakeRequestToken,
-          requestTokenSecret: fakeRequestTokenSecret
+          requestTokenSecret: fakeRequestTokenSecret,
         }),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
-      expect(await firstLegHandler(event, context)).toMatchObject(expectedResponse);
+      expect(await firstLegHandler(event, context)).toMatchObject(
+        expectedResponse
+      );
     });
 
-    it('should return an error if the response is unsuccessful', async () => {
-      const OAuth = require('oauth');
+    it("should return an error if the response is unsuccessful", async () => {
+      const OAuth = require("oauth");
 
       const fakeError = chance.string();
       const fakeRequestToken = chance.string();
       const fakeRequestTokenSecret = chance.string();
 
-      const fakeGetOAuthRequestToken = jest.fn().mockImplementation((responseCallback) => {
-        responseCallback(fakeError, fakeRequestToken, fakeRequestTokenSecret);
-      });
+      const fakeGetOAuthRequestToken = jest
+        .fn()
+        .mockImplementation((responseCallback) => {
+          responseCallback(fakeError, fakeRequestToken, fakeRequestTokenSecret);
+        });
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        getOAuthRequestToken: fakeGetOAuthRequestToken
+        getOAuthRequestToken: fakeGetOAuthRequestToken,
       }));
 
-      const {firstLegHandler} = require('../app');
+      const { firstLegHandler } = require("../App");
 
       const event = chance.string();
       const context = chance.string();
@@ -127,73 +140,82 @@ describe('Lambda handlers', () => {
       const expectedResponse = {
         statusCode: 200,
         headers: {
-          'Access-Control-Allow-Origin': '*'
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify(fakeError),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
-      expect(await firstLegHandler(event, context, callback)).toMatchObject(expectedResponse);
+      expect(await firstLegHandler(event, context, callback)).toMatchObject(
+        expectedResponse
+      );
     });
 
-    it('Should Send a Successful Response To SNS Channel', async () => {
-      const OAuth = require('oauth');
+    it("Should Send a Successful Response To SNS Channel", async () => {
+      const OAuth = require("oauth");
 
       const fakeError = null;
       const fakeRequestToken = chance.string();
       const fakeRequestTokenSecret = chance.string();
 
-      const fakeGetOAuthRequestToken = jest.fn().mockImplementation((responseCallback) => {
-        responseCallback(fakeError, fakeRequestToken, fakeRequestTokenSecret);
-      });
+      const fakeGetOAuthRequestToken = jest
+        .fn()
+        .mockImplementation((responseCallback) => {
+          responseCallback(fakeError, fakeRequestToken, fakeRequestTokenSecret);
+        });
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        getOAuthRequestToken: fakeGetOAuthRequestToken
+        getOAuthRequestToken: fakeGetOAuthRequestToken,
       }));
 
-      const {firstLegHandler} = require('../app');
+      const { firstLegHandler } = require("../App");
 
       const event = chance.string();
       const context = chance.string();
       const callback = jest.fn();
 
-      jest.mock('../src/publishSNSHelper');
+      jest.mock("../src/PublishSNSHelper");
 
-      const {publishToSNSSuccess} = require('../src/publishSNSHelper');
+      const { publishToSNSSuccess } = require("../src/PublishSNSHelper");
 
       await firstLegHandler(event, context, callback);
 
       const response = {
         statusCode: 200,
         headers: {
-          'Access-Control-Allow-Origin': '*'
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
           requestToken: fakeRequestToken,
-          requestTokenSecret: fakeRequestTokenSecret
+          requestTokenSecret: fakeRequestTokenSecret,
         }),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
-      expect(publishToSNSSuccess).toHaveBeenCalledWith({...event, ...response});
+      expect(publishToSNSSuccess).toHaveBeenCalledWith({
+        ...event,
+        ...response,
+      });
     });
 
-    it('Should Send an unSuccessful Response To SNS Channel', async () => {
-      const OAuth = require('oauth');
+    it("Should Send an unSuccessful Response To SNS Channel", async () => {
+      const OAuth = require("oauth");
 
       const fakeError = chance.string();
       const fakeRequestToken = chance.string();
       const fakeRequestTokenSecret = chance.string();
 
-      const fakeGetOAuthRequestToken = jest.fn().mockImplementation((responseCallback) => {
-        responseCallback(fakeError, fakeRequestToken, fakeRequestTokenSecret);
-      });
+      const fakeGetOAuthRequestToken = jest
+        .fn()
+        .mockImplementation((responseCallback) => {
+          responseCallback(fakeError, fakeRequestToken, fakeRequestTokenSecret);
+        });
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        getOAuthRequestToken: fakeGetOAuthRequestToken
+        getOAuthRequestToken: fakeGetOAuthRequestToken,
       }));
 
-      const {firstLegHandler} = require('../app');
+      const { firstLegHandler } = require("../App");
 
       const event = chance.string();
       const context = chance.string();
@@ -201,182 +223,198 @@ describe('Lambda handlers', () => {
       const response = {
         statusCode: 200,
         headers: {
-          'Access-Control-Allow-Origin': '*'
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify(fakeError),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
-      jest.mock('../src/publishSNSHelper');
+      jest.mock("../src/PublishSNSHelper");
 
-      const {publishToSNSUnsuccessfull} = require('../src/publishSNSHelper');
+      const { publishToSNSUnsuccessfull } = require("../src/PublishSNSHelper");
 
       await firstLegHandler(event, context, callback);
 
-      expect(publishToSNSUnsuccessfull)
-        .toHaveBeenCalledWith({...event, ...response});
+      expect(publishToSNSUnsuccessfull).toHaveBeenCalledWith({
+        ...event,
+        ...response,
+      });
     });
   });
 
-  describe('OAuth Third Leg Handler', () => {
+  describe("OAuth Third Leg Handler", () => {
     const generateFakeEvent = () => ({
       body: JSON.stringify({
         requestToken: chance.string(),
         requestTokenSecret: chance.string(),
-        verifier: chance.string()
-      })
+        verifier: chance.string(),
+      }),
     });
 
-    it('should be a function', () => {
-      const {thirdLegHandler} = require('../app');
+    it("should be a function", () => {
+      const { thirdLegHandler } = require("../App");
 
       expect(thirdLegHandler).toEqual(expect.any(Function));
     });
 
-    it('gets the oauth token', async () => {
-      const OAuth = require('oauth');
+    it("gets the oauth token", async () => {
+      const OAuth = require("oauth");
 
-      const mockGetOAuthAccessToken = jest.fn().mockImplementation((p1, p2, p3, callback) => callback());
+      const mockGetOAuthAccessToken = jest
+        .fn()
+        .mockImplementation((p1, p2, p3, callback) => callback());
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        getOAuthAccessToken: mockGetOAuthAccessToken
+        getOAuthAccessToken: mockGetOAuthAccessToken,
       }));
 
-      const {thirdLegHandler} = require('../app');
+      const { thirdLegHandler } = require("../App");
 
       const event = generateFakeEvent();
-      const {
-        requestToken,
-        requestTokenSecret,
-        verifier
-      } = JSON.parse(event.body);
+      const { requestToken, requestTokenSecret, verifier } = JSON.parse(
+        event.body
+      );
 
       await thirdLegHandler(event);
 
-      expect(mockGetOAuthAccessToken)
-        .toBeCalledWith(requestToken, requestTokenSecret, verifier, expect.any(Function));
+      expect(mockGetOAuthAccessToken).toBeCalledWith(
+        requestToken,
+        requestTokenSecret,
+        verifier,
+        expect.any(Function)
+      );
     });
 
-    it('sends back the correct response when there is an error', async () => {
-      const OAuth = require('oauth');
+    it("sends back the correct response when there is an error", async () => {
+      const OAuth = require("oauth");
       const fakeError = new Error(chance.sentence());
 
-      const mockGetOAuthAccessToken = jest.fn()
+      const mockGetOAuthAccessToken = jest
+        .fn()
         .mockImplementation((token, secret, verifier, callback) => {
           callback(fakeError);
         });
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        getOAuthAccessToken: mockGetOAuthAccessToken
+        getOAuthAccessToken: mockGetOAuthAccessToken,
       }));
 
       const context = undefined;
-      const {thirdLegHandler} = require('../app');
+      const { thirdLegHandler } = require("../App");
       const expectedResponse = {
         statusCode: 200,
         headers: {
-          'Access-Control-Allow-Origin': '*'
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify(fakeError),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
-      expect(await thirdLegHandler(generateFakeEvent(), context)).toMatchObject(expectedResponse);
+      expect(await thirdLegHandler(generateFakeEvent(), context)).toMatchObject(
+        expectedResponse
+      );
     });
 
-    it('sends back the correct response when the request is successful', async () => {
-      const OAuth = require('oauth');
+    it("sends back the correct response when the request is successful", async () => {
+      const OAuth = require("oauth");
 
       const fakeAccessToken = chance.string();
       const fakeAccessTokenSecret = chance.string();
 
-      const mockGetOAuthAccessToken = jest.fn()
+      const mockGetOAuthAccessToken = jest
+        .fn()
         .mockImplementation((token, secret, verifier, callback) => {
           callback(undefined, fakeAccessToken, fakeAccessTokenSecret);
         });
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        getOAuthAccessToken: mockGetOAuthAccessToken
+        getOAuthAccessToken: mockGetOAuthAccessToken,
       }));
 
       const context = undefined;
-      const {thirdLegHandler} = require('../app');
+      const { thirdLegHandler } = require("../App");
       const expectedResponse = {
         statusCode: 200,
         headers: {
-          'Access-Control-Allow-Origin': '*'
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
           accessToken: fakeAccessToken,
-          accessTokenSecret: fakeAccessTokenSecret
+          accessTokenSecret: fakeAccessTokenSecret,
         }),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
-      expect(await thirdLegHandler(generateFakeEvent(), context)).toMatchObject(expectedResponse);
+      expect(await thirdLegHandler(generateFakeEvent(), context)).toMatchObject(
+        expectedResponse
+      );
     });
 
-    it('Should Send a Successful Response To SNS Channel', async () => {
-      const OAuth = require('oauth');
+    it("Should Send a Successful Response To SNS Channel", async () => {
+      const OAuth = require("oauth");
 
       const fakeAccessToken = chance.string();
       const fakeAccessTokenSecret = chance.string();
       const fakeEvent = generateFakeEvent();
 
-      const mockGetOAuthAccessToken = jest.fn()
+      const mockGetOAuthAccessToken = jest
+        .fn()
         .mockImplementation((token, secret, verifier, callback) => {
           callback(undefined, fakeAccessToken, fakeAccessTokenSecret);
         });
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        getOAuthAccessToken: mockGetOAuthAccessToken
+        getOAuthAccessToken: mockGetOAuthAccessToken,
       }));
 
       const context = undefined;
-      const {thirdLegHandler} = require('../app');
-      const {publishToSNSSuccess} = require('../src/publishSNSHelper');
+      const { thirdLegHandler } = require("../App");
+      const { publishToSNSSuccess } = require("../src/PublishSNSHelper");
 
       await thirdLegHandler(fakeEvent, context);
 
       const expectedResponse = {
         statusCode: 200,
         headers: {
-          'Access-Control-Allow-Origin': '*'
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
           accessToken: fakeAccessToken,
-          accessTokenSecret: fakeAccessTokenSecret
+          accessTokenSecret: fakeAccessTokenSecret,
         }),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
-      expect(publishToSNSSuccess)
-        .toHaveBeenCalledWith({...fakeEvent, ...expectedResponse});
+      expect(publishToSNSSuccess).toHaveBeenCalledWith({
+        ...fakeEvent,
+        ...expectedResponse,
+      });
     });
 
-    it('Should Send a unSuccessful Response To SNS Channel', async () => {
-      const OAuth = require('oauth');
+    it("Should Send an UnSuccessful Response To SNS Channel", async () => {
+      const OAuth = require("oauth");
 
       const fakeError = new Error(chance.sentence());
       const fakeEvent = generateFakeEvent();
 
-      const mockGetOAuthAccessToken = jest.fn()
+      const mockGetOAuthAccessToken = jest
+        .fn()
         .mockImplementation((token, secret, verifier, callback) => {
           callback(fakeError);
         });
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        getOAuthAccessToken: mockGetOAuthAccessToken
+        getOAuthAccessToken: mockGetOAuthAccessToken,
       }));
 
       const context = undefined;
       const fakeCallback = jest.fn();
 
-      const {thirdLegHandler} = require('../app');
+      const { thirdLegHandler } = require("../App");
 
-      jest.mock('../src/publishSNSHelper');
+      jest.mock("../src/PublishSNSHelper");
 
-      const {publishToSNSUnsuccessfull} = require('../src/publishSNSHelper');
+      const { publishToSNSUnsuccessfull } = require("../src/PublishSNSHelper");
       publishToSNSUnsuccessfull.mockResolvedValue(undefined);
 
       await thirdLegHandler(fakeEvent, context, fakeCallback);
@@ -384,65 +422,25 @@ describe('Lambda handlers', () => {
       const expectedResponse = {
         statusCode: 200,
         headers: {
-          'Access-Control-Allow-Origin': '*'
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify(fakeError),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
-      expect(publishToSNSUnsuccessfull)
-        .toHaveBeenCalledWith({...fakeEvent, ...expectedResponse});
+      expect(publishToSNSUnsuccessfull).toHaveBeenCalledWith({
+        ...fakeEvent,
+        ...expectedResponse,
+      });
     });
   });
 
-  describe('OAuth Sign Request Get Handler', () => {
-    it('signs and gets the request, then returns the response', async () => {
+  describe("OAuth Sign Request Get Handler", () => {
+    it("when provided query parameters calls DoSignAndGet with same query parameters", async () => {
       const url = chance.url();
       const accessToken = chance.string();
       const accessTokenSecret = chance.string();
-
-      const event = {
-        queryStringParameters: {
-          url,
-          accessToken,
-          accessTokenSecret
-        }
-      };
-
-      const OAuthSignRequest = require('../src/OAuthSignRequest');
-
-      const fakeResponseData = {};
-      const numberOfResponseDataKeys = chance.natural({min: 2, max: 5});
-
-      for (let i = 0; i < numberOfResponseDataKeys; i += 1) {
-        fakeResponseData[chance.string()] = chance.string();
-      }
-
-      fakeResponseData.status = chance.natural();
-
-      OAuthSignRequest.doSignAndGet = jest.fn().mockResolvedValue(fakeResponseData);
-
-      const {oAuthSignRequestGet} = require('../app');
-
-      const responseData = await oAuthSignRequestGet(event);
-
-      expect(OAuthSignRequest.doSignAndGet).toBeCalledWith(url, accessToken, accessTokenSecret, undefined);
-      const response = {
-        statusCode: fakeResponseData.status,
-        headers: {
-          'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify(fakeResponseData),
-        isBase64Encoded: false
-      };
-
-      expect(responseData).toEqual(response);
-    });
-
-    it('signs and gets the request, then returns the response when an oauth_callback query param is present', async () => {
-      const url = chance.url();
-      const accessToken = chance.string();
-      const accessTokenSecret = chance.string();
+      const allData = chance.bool();
       const oauth_callback = chance.string();
 
       const event = {
@@ -450,14 +448,15 @@ describe('Lambda handlers', () => {
           url,
           accessToken,
           accessTokenSecret,
-          oauth_callback
-        }
+          allData,
+          oauth_callback,
+        },
       };
 
-      const OAuthSignRequest = require('../src/OAuthSignRequest');
+      const OAuthSignRequest = require("../src/OAuthSignRequest");
 
       const fakeResponseData = {};
-      const numberOfResponseDataKeys = chance.natural({min: 2, max: 5});
+      const numberOfResponseDataKeys = chance.natural({ min: 2, max: 5 });
 
       for (let i = 0; i < numberOfResponseDataKeys; i += 1) {
         fakeResponseData[chance.string()] = chance.string();
@@ -465,30 +464,127 @@ describe('Lambda handlers', () => {
 
       fakeResponseData.status = chance.natural();
 
-      OAuthSignRequest.doSignAndGet = jest.fn().mockResolvedValue(fakeResponseData);
+      OAuthSignRequest.doSignAndGet = jest
+        .fn()
+        .mockResolvedValue(fakeResponseData);
 
-      const {oAuthSignRequestGet} = require('../app');
+      const { oAuthSignRequestGet } = require("../App");
+
+      await oAuthSignRequestGet(event);
+
+      expect(OAuthSignRequest.doSignAndGet).toBeCalledWith(
+        event.queryStringParameters.url,
+        event.queryStringParameters.accessToken,
+        event.queryStringParameters.accessTokenSecret,
+        event.queryStringParameters.allData,
+        event.queryStringParameters.oauth_callback
+      );
+    });
+
+    it("signs and gets the request, then returns the response", async () => {
+      const url = chance.url();
+      const accessToken = chance.string();
+      const accessTokenSecret = chance.string();
+      const expectedAllDataValue = chance.bool();
+
+      const event = {
+        queryStringParameters: {
+          url,
+          accessToken,
+          accessTokenSecret,
+          allData: expectedAllDataValue,
+        },
+      };
+
+      const OAuthSignRequest = require("../src/OAuthSignRequest");
+
+      const fakeResponseData = {};
+      const numberOfResponseDataKeys = chance.natural({ min: 2, max: 5 });
+
+      for (let i = 0; i < numberOfResponseDataKeys; i += 1) {
+        fakeResponseData[chance.string()] = chance.string();
+      }
+
+      fakeResponseData.status = chance.natural();
+
+      OAuthSignRequest.doSignAndGet = jest
+        .fn()
+        .mockResolvedValue(fakeResponseData);
+
+      const { oAuthSignRequestGet } = require("../App");
 
       const responseData = await oAuthSignRequestGet(event);
-
-      expect(OAuthSignRequest.doSignAndGet).toBeCalledWith(url, accessToken, accessTokenSecret, oauth_callback);
       const response = {
         statusCode: fakeResponseData.status,
         headers: {
-          'Access-Control-Allow-Origin': '*'
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify(fakeResponseData),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
       expect(responseData).toEqual(response);
     });
 
-    it('returns an error when an error occurs during the signing and get', async () => {
-      const OAuthSignRequest = require('../src/OAuthSignRequest');
+    it("signs and gets the request, then returns the response when an oauth_callback query param is present", async () => {
+      const url = chance.url();
+      const accessToken = chance.string();
+      const accessTokenSecret = chance.string();
+      const oauth_callback = chance.string();
+      const allData = chance.bool();
+
+      const event = {
+        queryStringParameters: {
+          url,
+          accessToken,
+          accessTokenSecret,
+          allData,
+          oauth_callback,
+        },
+      };
+
+      const OAuthSignRequest = require("../src/OAuthSignRequest");
+      const fakeResponseData = {};
+      const numberOfResponseDataKeys = chance.natural({ min: 2, max: 5 });
+
+      for (let i = 0; i < numberOfResponseDataKeys; i += 1) {
+        fakeResponseData[chance.string()] = chance.string();
+      }
+
+      fakeResponseData.status = chance.natural();
+
+      OAuthSignRequest.doSignAndGet = jest
+        .fn()
+        .mockResolvedValue(fakeResponseData);
+
+      const { oAuthSignRequestGet } = require("../App");
+
+      const responseData = await oAuthSignRequestGet(event);
+
+      expect(OAuthSignRequest.doSignAndGet).toBeCalledWith(
+        url,
+        accessToken,
+        accessTokenSecret,
+        allData,
+        oauth_callback
+      );
+      const response = {
+        statusCode: fakeResponseData.status,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify(fakeResponseData),
+        isBase64Encoded: false,
+      };
+
+      expect(responseData).toEqual(response);
+    });
+
+    it("returns an error when an error occurs during the signing and get", async () => {
+      const OAuthSignRequest = require("../src/OAuthSignRequest");
 
       const fakeError = {};
-      const numberOfErrorKeys = chance.natural({min: 2, max: 5});
+      const numberOfErrorKeys = chance.natural({ min: 2, max: 5 });
 
       for (let i = 0; i < numberOfErrorKeys; i += 1) {
         fakeError[chance.string()] = chance.string();
@@ -496,7 +592,7 @@ describe('Lambda handlers', () => {
 
       OAuthSignRequest.doSignAndGet = jest.fn().mockRejectedValue(fakeError);
 
-      const {oAuthSignRequestGet} = require('../app');
+      const { oAuthSignRequestGet } = require("../App");
 
       const url = chance.url();
       const accessToken = chance.string();
@@ -506,8 +602,8 @@ describe('Lambda handlers', () => {
         queryStringParameters: {
           url,
           accessToken,
-          accessTokenSecret
-        }
+          accessTokenSecret,
+        },
       };
 
       const returnedError = await oAuthSignRequestGet(fakeEvent);
@@ -515,18 +611,18 @@ describe('Lambda handlers', () => {
       const fakeErrorResponse = {
         statusCode: 502,
         headers: {
-          'Access-Control-Allow-Origin': '*'
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify(fakeError),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
       expect(returnedError).toEqual(fakeErrorResponse);
     });
   });
 
-  describe('OAuth Sign Request Delete Handler', () => {
-    it('signs and deletes the request, then returns the response', async () => {
+  describe("OAuth Sign Request Delete Handler", () => {
+    it("signs and deletes the request, then returns the response", async () => {
       const url = chance.url();
       const accessToken = chance.string();
       const accessTokenSecret = chance.string();
@@ -535,14 +631,14 @@ describe('Lambda handlers', () => {
         queryStringParameters: {
           url,
           accessToken,
-          accessTokenSecret
-        }
+          accessTokenSecret,
+        },
       };
 
-      const OAuthSignRequest = require('../src/OAuthSignRequest');
+      const OAuthSignRequest = require("../src/OAuthSignRequest");
 
       const fakeResponseData = {};
-      const numberOfResponseDataKeys = chance.natural({min: 2, max: 5});
+      const numberOfResponseDataKeys = chance.natural({ min: 2, max: 5 });
 
       for (let i = 0; i < numberOfResponseDataKeys; i += 1) {
         fakeResponseData[chance.string()] = chance.string();
@@ -550,26 +646,33 @@ describe('Lambda handlers', () => {
 
       fakeResponseData.status = chance.natural();
 
-      OAuthSignRequest.doSignAndDelete = jest.fn().mockResolvedValue(fakeResponseData);
+      OAuthSignRequest.doSignAndDelete = jest
+        .fn()
+        .mockResolvedValue(fakeResponseData);
 
-      const {oAuthSignRequestDelete} = require('../app');
+      const { oAuthSignRequestDelete } = require("../App");
 
       const responseData = await oAuthSignRequestDelete(event);
 
-      expect(OAuthSignRequest.doSignAndDelete).toBeCalledWith(url, accessToken, accessTokenSecret, undefined);
+      expect(OAuthSignRequest.doSignAndDelete).toBeCalledWith(
+        url,
+        accessToken,
+        accessTokenSecret,
+        undefined
+      );
       const response = {
         statusCode: fakeResponseData.status,
         headers: {
-          'Access-Control-Allow-Origin': '*'
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify(fakeResponseData),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
       expect(responseData).toEqual(response);
     });
 
-    it('signs and deletes the request, then returns the response when an oauth_callback query param is present', async () => {
+    it("signs and deletes the request, then returns the response when an oauth_callback query param is present", async () => {
       const url = chance.url();
       const accessToken = chance.string();
       const accessTokenSecret = chance.string();
@@ -580,14 +683,14 @@ describe('Lambda handlers', () => {
           url,
           accessToken,
           accessTokenSecret,
-          oauth_callback
-        }
+          oauth_callback,
+        },
       };
 
-      const OAuthSignRequest = require('../src/OAuthSignRequest');
+      const OAuthSignRequest = require("../src/OAuthSignRequest");
 
       const fakeResponseData = {};
-      const numberOfResponseDataKeys = chance.natural({min: 2, max: 5});
+      const numberOfResponseDataKeys = chance.natural({ min: 2, max: 5 });
 
       for (let i = 0; i < numberOfResponseDataKeys; i += 1) {
         fakeResponseData[chance.string()] = chance.string();
@@ -595,37 +698,44 @@ describe('Lambda handlers', () => {
 
       fakeResponseData.status = chance.natural();
 
-      OAuthSignRequest.doSignAndDelete = jest.fn().mockResolvedValue(fakeResponseData);
+      OAuthSignRequest.doSignAndDelete = jest
+        .fn()
+        .mockResolvedValue(fakeResponseData);
 
-      const {oAuthSignRequestDelete} = require('../app');
+      const { oAuthSignRequestDelete } = require("../App");
 
       const responseData = await oAuthSignRequestDelete(event);
 
-      expect(OAuthSignRequest.doSignAndDelete).toBeCalledWith(url, accessToken, accessTokenSecret, oauth_callback);
+      expect(OAuthSignRequest.doSignAndDelete).toBeCalledWith(
+        url,
+        accessToken,
+        accessTokenSecret,
+        oauth_callback
+      );
       const response = {
         statusCode: fakeResponseData.status,
         headers: {
-          'Access-Control-Allow-Origin': '*'
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify(fakeResponseData),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
       expect(responseData).toEqual(response);
     });
 
-    it('returns an error when an error occurs during the signing and delete', async () => {
-      const OAuthSignRequest = require('../src/OAuthSignRequest');
+    it("returns an error when an error occurs during the signing and delete", async () => {
+      const OAuthSignRequest = require("../src/OAuthSignRequest");
       const fakeError = new Error(chance.string());
       OAuthSignRequest.doSignAndDelete = jest.fn().mockRejectedValue(fakeError);
-      const {oAuthSignRequestDelete} = require('../app');
+      const { oAuthSignRequestDelete } = require("../App");
 
       const fakeEvent = {
         queryStringParameters: {
           url: chance.url(),
           accessToken: chance.string(),
-          accessTokenSecret: chance.string()
-        }
+          accessTokenSecret: chance.string(),
+        },
       };
 
       const returnedError = await oAuthSignRequestDelete(fakeEvent);
@@ -633,17 +743,17 @@ describe('Lambda handlers', () => {
       const fakeErrorResponse = {
         statusCode: 502,
         headers: {
-          'Access-Control-Allow-Origin': '*'
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify(fakeError),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
       expect(returnedError).toEqual(fakeErrorResponse);
     });
   });
 
-  describe('OAuth Sign Request Post Handler', () => {
+  describe("OAuth Sign Request Post Handler", () => {
     let oAuthSignRequestPost;
 
     const createFakeEvent = (options = {}) => ({
@@ -651,130 +761,144 @@ describe('Lambda handlers', () => {
         url: options.url || chance.url(),
         accessToken: options.accessToken || chance.string(),
         accessTokenSecret: options.accessTokenSecret || chance.string(),
-        data: options.data || chance.string()
-      })
+        data: options.data || chance.string(),
+      }),
     });
 
     beforeEach(() => {
-      const OAuthSignRequest = require('../src/OAuthSignRequest');
+      const OAuthSignRequest = require("../src/OAuthSignRequest");
 
-      OAuthSignRequest.doSignAndPost = jest.fn().mockResolvedValue(chance.string());
+      OAuthSignRequest.doSignAndPost = jest
+        .fn()
+        .mockResolvedValue(chance.string());
 
-      ({oAuthSignRequestPost} = require('../app'));
+      ({ oAuthSignRequestPost } = require("../App"));
     });
 
-    it('should be a function', () => {
-      expect(typeof oAuthSignRequestPost).toEqual('function');
+    it("should be a function", () => {
+      expect(typeof oAuthSignRequestPost).toEqual("function");
     });
 
-    it('returns a promise', () => {
+    it("returns a promise", () => {
       const response = oAuthSignRequestPost(createFakeEvent());
 
       expect(response instanceof Promise).toEqual(true);
     });
 
-    it('calls doSignAndPost correctly', async () => {
+    it("calls doSignAndPost correctly", async () => {
       jest.resetModules();
 
-      const OAuthSignRequest = require('../src/OAuthSignRequest');
+      const OAuthSignRequest = require("../src/OAuthSignRequest");
 
-      OAuthSignRequest.doSignAndPost = jest.fn().mockResolvedValue(chance.string());
+      OAuthSignRequest.doSignAndPost = jest
+        .fn()
+        .mockResolvedValue(chance.string());
 
-      ({oAuthSignRequestPost} = require('../app'));
+      ({ oAuthSignRequestPost } = require("../App"));
 
       const url = chance.url();
       const accessToken = chance.string();
       const accessTokenSecret = chance.string();
       const data = chance.string();
-      const expectedContentType = process.env.OAUTH_CUSTOM_HEADERS;
       const fakeEvent = createFakeEvent({
         url,
         accessToken,
         accessTokenSecret,
-        data
+        data,
       });
 
       await oAuthSignRequestPost(fakeEvent);
 
-      expect(OAuthSignRequest.doSignAndPost)
-        .toBeCalledWith(url, accessToken, accessTokenSecret,
-          JSON.stringify(data), expectedContentType, undefined);
+      expect(OAuthSignRequest.doSignAndPost).toBeCalledWith(
+        url,
+        accessToken,
+        accessTokenSecret,
+        JSON.stringify(data),
+        undefined
+      );
     });
 
-    it('calls doSignAndPost correctly when an oauth_callback query param is present', async () => {
+    it("calls doSignAndPost correctly when an oauth_callback query param is present", async () => {
       jest.resetModules();
 
-      const OAuthSignRequest = require('../src/OAuthSignRequest');
+      const OAuthSignRequest = require("../src/OAuthSignRequest");
 
-      OAuthSignRequest.doSignAndPost = jest.fn().mockResolvedValue(chance.string());
+      OAuthSignRequest.doSignAndPost = jest
+        .fn()
+        .mockResolvedValue(chance.string());
 
-      ({oAuthSignRequestPost} = require('../app'));
+      ({ oAuthSignRequestPost } = require("../App"));
 
       const url = chance.url();
       const accessToken = chance.string();
       const accessTokenSecret = chance.string();
       const oauth_callback = chance.string();
       const data = chance.string();
-      const expectedContentType = process.env.OAUTH_CUSTOM_HEADERS;
       const fakeEvent = createFakeEvent({
         url,
         accessToken,
         accessTokenSecret,
-        data
+        data,
       });
       fakeEvent.queryStringParameters = {
-        oauth_callback
+        oauth_callback,
       };
 
       await oAuthSignRequestPost(fakeEvent);
 
-      expect(OAuthSignRequest.doSignAndPost)
-        .toBeCalledWith(url, accessToken, accessTokenSecret,
-          JSON.stringify(data), expectedContentType, oauth_callback);
+      expect(OAuthSignRequest.doSignAndPost).toBeCalledWith(
+        url,
+        accessToken,
+        accessTokenSecret,
+        JSON.stringify(data),
+        oauth_callback
+      );
     });
 
-    it('returns the correct response when the post works', async () => {
+    it("returns the correct response when the post works", async () => {
       jest.resetModules();
 
-      const OAuthSignRequest = require('../src/OAuthSignRequest');
+      const OAuthSignRequest = require("../src/OAuthSignRequest");
       const status = 200;
-      const fakeResponseData = JSON.stringify({body: chance.string()});
+      const fakeResponseData = JSON.stringify({ body: chance.string() });
       const fakeLocation = chance.string();
       const fakeResponse = {
         status,
         headers: {
-          'Access-Control-Allow-Origin': '*',
-          location: fakeLocation
+          "Access-Control-Allow-Origin": "*",
+          location: fakeLocation,
         },
         body: fakeResponseData,
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
-      OAuthSignRequest.doSignAndPost = jest.fn().mockResolvedValue(fakeResponse);
+      OAuthSignRequest.doSignAndPost = jest
+        .fn()
+        .mockResolvedValue(fakeResponse);
 
-      ({oAuthSignRequestPost} = require('../app'));
+      ({ oAuthSignRequestPost } = require("../App"));
 
       const response = await oAuthSignRequestPost(createFakeEvent());
       const expectedResponse = {
         statusCode: status,
         headers: {
-          'Access-Control-Allow-Origin': '*',
-          location: response.headers.location
+          "Access-Control-Allow-Origin": "*",
+          location: response.headers.location,
         },
         body: JSON.stringify(fakeResponseData),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
       expect(response).toEqual(expectedResponse);
     });
 
-    it('returns an error when does not resolve', async () => {
+    it("returns an error when does not resolve", async () => {
       jest.resetModules();
 
-      const OAuthSignRequest = require('../src/OAuthSignRequest');
+      const OAuthSignRequest = require("../src/OAuthSignRequest");
 
       const fakeError = {};
-      const numberOfErrorKeys = chance.natural({min: 2, max: 5});
+      const numberOfErrorKeys = chance.natural({ min: 2, max: 5 });
 
       for (let i = 0; i < numberOfErrorKeys; i += 1) {
         fakeError[chance.string()] = chance.string();
@@ -783,15 +907,15 @@ describe('Lambda handlers', () => {
       const fakeErrorResponse = {
         statusCode: 502,
         headers: {
-          'Access-Control-Allow-Origin': '*'
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify(fakeError),
-        isBase64Encoded: false
+        isBase64Encoded: false,
       };
 
       OAuthSignRequest.doSignAndPost = jest.fn().mockRejectedValue(fakeError);
 
-      ({oAuthSignRequestPost} = require('../app'));
+      ({ oAuthSignRequestPost } = require("../App"));
 
       expect.assertions(1);
 

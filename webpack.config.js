@@ -1,21 +1,21 @@
-const path = require('path');
+const path = require("path");
 
-const nodeExternals = require('webpack-node-externals');
+const nodeExternals = require("webpack-node-externals");
 
 module.exports = {
-  entry: './app.js',
+  entry: "./App.js",
   externals: [
     nodeExternals({
       whitelist: [
-        'chance',
-        'coveralls',
-        'dotenv',
-        'eslint',
-        'eslint-plugin-jest',
-        'jest',
-        'webpack',
-        'webpack-cli',
-        'webpack-command',
+        "chance",
+        "coveralls",
+        "dotenv",
+        "eslint",
+        "eslint-plugin-jest",
+        "jest",
+        "webpack",
+        "webpack-cli",
+        "webpack-command",
       ],
     }),
   ],
@@ -28,9 +28,9 @@ module.exports = {
     ],
   },
   output: {
-    filename: 'index.js',
-    libraryTarget: 'commonjs2',
-    path: path.resolve(__dirname, './'),
+    filename: "index.js",
+    libraryTarget: "commonjs2",
+    path: path.resolve(__dirname, "./"),
   },
-  target: 'node',
+  target: "node",
 };

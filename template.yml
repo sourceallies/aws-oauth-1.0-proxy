@@ -1,26 +1,10 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  aws-oauth-1.0-proxy
-
-  Proxy on AWS for John Deere
-
+Description: aws-oauth-1.0-proxy
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 3
-
-Parameters:
-  ClientKey:
-    Type: String
-  ClientSecret:
-    Type: String
-  ApiUrl:
-    Type: String
-  OAuthCustomHeaders:
-    Type: String
-  AuthorizeCallbackUri:
-    Type: String
 Resources:
   BasicOAuthLambdaExecutionPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -47,7 +31,7 @@ Resources:
       CodeUri:
       Description: OAuth First Leg Lambda Function
       FunctionName: oauth-first-leg
-      Handler: app.firstLegHandler
+      Handler: App.firstLegHandler
       Policies:
         - !Ref BasicOAuthLambdaExecutionPolicy
         - !ImportValue SharedSecurity-PipelineKeyDecryptPolicyArn
@@ -62,48 +46,20 @@ Resources:
             Method: post
       Environment:
         Variables:
-          CLIENT_KEY: !Ref ClientKey
-          CLIENT_SECRET: !Ref ClientSecret
-          API_URL: !Ref ApiUrl
-          OAUTH_CUSTOM_HEADERS: !Ref OAuthCustomHeaders
-          AUTHORIZE_CALLBACK_URI: !Ref AuthorizeCallbackUri
-          SNS_SUCCESS_ARN: !Ref SuccessTopic
-          SNS_NONSUCCESS_ARN: !Ref FailTopic
-  OAuthThirdLegLambda:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri:
-      Description: OAuth Third Leg Lambda Function
-      FunctionName: oauth-third-leg
-      Handler: app.thirdLegHandler
-      Policies:
-        - !Ref BasicOAuthLambdaExecutionPolicy
-        - !ImportValue SharedSecurity-PipelineKeyDecryptPolicyArn
-      Runtime: nodejs10.x
-      Timeout: 30
-      MemorySize: 256
-      Events:
-        PostResource:
-          Type: Api
-          Properties:
-            Path: /thirdLegAuth
-            Method: post
-      Environment:
-        Variables:
-          CLIENT_KEY: !Ref ClientKey
-          CLIENT_SECRET: !Ref ClientSecret
-          API_URL: !Ref ApiUrl
-          OAUTH_CUSTOM_HEADERS: !Ref OAuthCustomHeaders
-          AUTHORIZE_CALLBACK_URI: !Ref AuthorizeCallbackUri
-          SNS_SUCCESS_ARN: !Ref SuccessTopic
-          SNS_NONSUCCESS_ARN: !Ref FailTopic
+          CLIENT_KEY:
+          CLIENT_SECRET:
+          API_URL:
+          OAUTH_CUSTOM_HEADERS:
+          AUTHORIZE_CALLBACK_URI:
+          SNS_SUCCESS_ARN:
+          SNS_NONSUCCESS_ARN:
   OAuthSignRequestPostLambda:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri:
       Description: OAuth Sign Request Post Lambda Function
       FunctionName: oauth-sign-request-post
-      Handler: app.oAuthSignRequestPost
+      Handler: App.oAuthSignRequestPost
       Policies:
         - !Ref BasicOAuthLambdaExecutionPolicy
         - !ImportValue SharedSecurity-PipelineKeyDecryptPolicyArn
@@ -118,20 +74,20 @@ Resources:
             Method: post
       Environment:
         Variables:
-          CLIENT_KEY: !Ref ClientKey
-          CLIENT_SECRET: !Ref ClientSecret
-          API_URL: !Ref ApiUrl
-          OAUTH_CUSTOM_HEADERS: !Ref OAuthCustomHeaders
-          AUTHORIZE_CALLBACK_URI: !Ref AuthorizeCallbackUri
-          SNS_SUCCESS_ARN: !Ref SuccessTopic
-          SNS_NONSUCCESS_ARN: !Ref FailTopic
+          CLIENT_KEY:
+          CLIENT_SECRET:
+          API_URL:
+          AUTHORIZE_CALLBACK_URI:
+          SNS_SUCCESS_ARN:
+          SNS_NONSUCCESS_ARN:
+          POST_CONTENT_TYPE:
   OAuthSignRequestGetLambda:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri:
       Description: OAuth Sign Request Get Lambda Function
       FunctionName: oauth-sign-request-get
-      Handler: app.oAuthSignRequestGet
+      Handler: App.oAuthSignRequestGet
       Policies:
         - !Ref BasicOAuthLambdaExecutionPolicy
         - !ImportValue SharedSecurity-PipelineKeyDecryptPolicyArn
@@ -146,20 +102,20 @@ Resources:
             Method: get
       Environment:
         Variables:
-          CLIENT_KEY: !Ref ClientKey
-          CLIENT_SECRET: !Ref ClientSecret
-          API_URL: !Ref ApiUrl
-          OAUTH_CUSTOM_HEADERS: !Ref OAuthCustomHeaders
-          AUTHORIZE_CALLBACK_URI: !Ref AuthorizeCallbackUri
-          SNS_SUCCESS_ARN: !Ref SuccessTopic
-          SNS_NONSUCCESS_ARN: !Ref FailTopic
+          CLIENT_KEY:
+          CLIENT_SECRET:
+          API_URL:
+          OAUTH_CUSTOM_HEADERS:
+          AUTHORIZE_CALLBACK_URI:
+          SNS_SUCCESS_ARN:
+          SNS_NONSUCCESS_ARN:
   OAuthSignRequestDeleteLambda:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri:
       Description: OAuth Sign Request Delete Lambda Function
       FunctionName: oauth-sign-request-delete
-      Handler: app.oAuthSignRequestDelete
+      Handler: App.oAuthSignRequestDelete
       Policies:
         - !Ref BasicOAuthLambdaExecutionPolicy
         - !ImportValue SharedSecurity-PipelineKeyDecryptPolicyArn
@@ -174,13 +130,12 @@ Resources:
             Method: delete
       Environment:
         Variables:
-          CLIENT_KEY: !Ref ClientKey
-          CLIENT_SECRET: !Ref ClientSecret
-          API_URL: !Ref ApiUrl
-          OAUTH_CUSTOM_HEADERS: !Ref OAuthCustomHeaders
-          AUTHORIZE_CALLBACK_URI: !Ref AuthorizeCallbackUri
-          SNS_SUCCESS_ARN: !Ref SuccessTopic
-          SNS_NONSUCCESS_ARN: !Ref FailTopic
+          CLIENT_KEY:
+          CLIENT_SECRET:
+          API_URL:
+          AUTHORIZE_CALLBACK_URI:
+          SNS_SUCCESS_ARN:
+          SNS_NONSUCCESS_ARN:
   SuccessTopic:
     Type: AWS::SNS::Topic
     Properties:

@@ -6,3 +6,4 @@ coverage
 .DS_Store
 *.zip
 index.js
+.aws-sam
