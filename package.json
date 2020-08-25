@@ -5,13 +5,13 @@
   "author": "sourceallies",
   "license": "SEE LICENSE IN LICENSE",
   "repository": "github:sourceallies/aws-oauth-1.0-proxy",
-  "main": "App.js",
+  "main": "app.js",
   "engines": {
     "node": ">6.3.0"
   },
   "scripts": {
-    "start": "node -r dotenv/config App.js",
-    "coverage": "jest --coverage --collectCoverageFrom=src/**/*.{js,jsx} --collectCoverageFrom=App.js",
+    "start": "node -r dotenv/config app.js",
+    "coverage": "jest --coverage --collectCoverageFrom=src/**/*.{js,jsx} --collectCoverageFrom=app.js",
     "test": "jest",
     "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls",
     "build": "webpack-cli --mode production --config ./webpack.config.js",
@@ -37,9 +37,6 @@
   "jest": {
     "setupFiles": [
       "./test/jestSetup.js"
-    ],
-    "modulePathIgnorePatterns": [
-      ".aws-sam"
     ]
   },
   "dependencies": {
