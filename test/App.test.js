@@ -2,7 +2,7 @@ describe("Lambda handlers", () => {
   afterEach(() => {
     jest.resetModules();
 
-    jest.mock("../src/publishSNSHelper");
+    jest.mock("../src/PublishSNSHelper");
 
     const {
       publishToSNSSuccess,
@@ -174,7 +174,7 @@ describe("Lambda handlers", () => {
       const context = chance.string();
       const callback = jest.fn();
 
-      jest.mock("../src/publishSNSHelper");
+      jest.mock("../src/PublishSNSHelper");
 
       const { publishToSNSSuccess } = require("../src/PublishSNSHelper");
 
@@ -229,7 +229,7 @@ describe("Lambda handlers", () => {
         isBase64Encoded: false,
       };
 
-      jest.mock("../src/publishSNSHelper");
+      jest.mock("../src/PublishSNSHelper");
 
       const { publishToSNSUnsuccessfull } = require("../src/PublishSNSHelper");
 
@@ -412,7 +412,7 @@ describe("Lambda handlers", () => {
 
       const { thirdLegHandler } = require("../App");
 
-      jest.mock("../src/publishSNSHelper");
+      jest.mock("../src/PublishSNSHelper");
 
       const { publishToSNSUnsuccessfull } = require("../src/PublishSNSHelper");
       publishToSNSUnsuccessfull.mockResolvedValue(undefined);

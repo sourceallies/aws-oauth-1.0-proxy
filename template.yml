@@ -31,7 +31,7 @@ Resources:
       CodeUri:
       Description: OAuth First Leg Lambda Function
       FunctionName: oauth-first-leg
-      Handler: app.firstLegHandler
+      Handler: App.firstLegHandler
       Policies:
         - !Ref BasicOAuthLambdaExecutionPolicy
         - !ImportValue SharedSecurity-PipelineKeyDecryptPolicyArn
@@ -59,7 +59,7 @@ Resources:
       CodeUri:
       Description: OAuth Sign Request Post Lambda Function
       FunctionName: oauth-sign-request-post
-      Handler: app.oAuthSignRequestPost
+      Handler: App.oAuthSignRequestPost
       Policies:
         - !Ref BasicOAuthLambdaExecutionPolicy
         - !ImportValue SharedSecurity-PipelineKeyDecryptPolicyArn
@@ -87,7 +87,7 @@ Resources:
       CodeUri:
       Description: OAuth Sign Request Get Lambda Function
       FunctionName: oauth-sign-request-get
-      Handler: app.oAuthSignRequestGet
+      Handler: App.oAuthSignRequestGet
       Policies:
         - !Ref BasicOAuthLambdaExecutionPolicy
         - !ImportValue SharedSecurity-PipelineKeyDecryptPolicyArn
@@ -115,7 +115,7 @@ Resources:
       CodeUri:
       Description: OAuth Sign Request Delete Lambda Function
       FunctionName: oauth-sign-request-delete
-      Handler: app.oAuthSignRequestDelete
+      Handler: App.oAuthSignRequestDelete
       Policies:
         - !Ref BasicOAuthLambdaExecutionPolicy
         - !ImportValue SharedSecurity-PipelineKeyDecryptPolicyArn
