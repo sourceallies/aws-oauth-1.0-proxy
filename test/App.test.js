@@ -391,7 +391,7 @@ describe("Lambda handlers", () => {
       });
     });
 
-    it("Should Send a unSuccessful Response To SNS Channel", async () => {
+    it("Should Send an UnSuccessful Response To SNS Channel", async () => {
       const OAuth = require("oauth");
 
       const fakeError = new Error(chance.sentence());
