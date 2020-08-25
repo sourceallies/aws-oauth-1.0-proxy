@@ -519,11 +519,7 @@ describe("OAuth Sign Request", () => {
       const OAuth = require("oauth");
       const error = chance.string();
 
-      let statusCode = chance.natural({ min: 0, max: 500 });
-
-      while (statusCode > 200 && statusCode < 300) {
-        statusCode = chance.natural({ min: 0, max: 500 });
-      }
+      let statusCode = chance.natural({ min: 400, max: 505 });
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         post: (
