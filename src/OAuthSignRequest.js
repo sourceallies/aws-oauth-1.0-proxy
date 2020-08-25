@@ -1,27 +1,10 @@
-const { OAuth } = require("oauth");
-const getConfig = require("../config");
-const { getStatusText } = require("../src/HttpResponses");
+const { OAuth } = require('oauth');
+const getConfig = require('../config');
+const { getStatusText } = require('../src/HttpResponses');
 
-const doSignAndGet = async (
-  linkToOpen,
-  accessToken,
-  accessTokenSecret,
-  allData,
-  optionalAuthorizeCallbackUri
-) => {
+const doSignAndGet = async (linkToOpen, accessToken, accessTokenSecret, optionalAuthorizeCallbackUri) => {
   const config = await getConfig();
-  const authorizeCallbackUri =
-    optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
-
-  let oAuthCustomHeaders = Object.assign({}, config.oAuthCustomHeaders);
-
-  if (!oAuthCustomHeaders) {
-    throw new Error("Missing required oAuthCustomHeaders from config");
-  }
-
-  if (allData) {
-    oAuthCustomHeaders["No_Paging"] = true;
-  }
+  const authorizeCallbackUri = optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
 
   const oAuthSession = new OAuth(
     config.firstLegUri,
@@ -32,7 +15,7 @@ const doSignAndGet = async (
     authorizeCallbackUri,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
-    oAuthCustomHeaders
+    config.oAuthCustomHeaders,
   );
 
   return await new Promise((resolve, reject) => {
@@ -48,20 +31,14 @@ const doSignAndGet = async (
         } else {
           resolve(responseData);
         }
-      }
+      },
     );
   });
 };
 
-const doSignAndDelete = async (
-  linkToOpen,
-  accessToken,
-  accessTokenSecret,
-  optionalAuthorizeCallbackUri
-) => {
+const doSignAndDelete = async (linkToOpen, accessToken, accessTokenSecret, optionalAuthorizeCallbackUri) => {
   const config = await getConfig();
-  const authorizeCallbackUri =
-    optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
+  const authorizeCallbackUri = optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
 
   const oAuthSession = new OAuth(
     config.firstLegUri,
@@ -72,16 +49,17 @@ const doSignAndDelete = async (
     authorizeCallbackUri,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
-    config.oAuthCustomHeaders
+    config.oAuthCustomHeaders,
   );
 
   return await new Promise((resolve, reject) => {
+    console.log(oAuthSession);
     oAuthSession.delete(
       linkToOpen,
       accessToken,
       accessTokenSecret,
       (error, responseData, result) => {
-        console.log("Delete Result", {
+        console.log('Delete Result', {
           error,
           responseData,
           result,
@@ -93,7 +71,7 @@ const doSignAndDelete = async (
           resolve(responseData);
         }
         resolve(getStatusText(result.statusCode));
-      }
+      },
     );
   });
 };
@@ -103,11 +81,11 @@ const doSignAndPost = async (
   accessToken,
   accessTokenSecret,
   postBody,
+  postBodyContentType,
   optionalAuthorizeCallbackUri
 ) => {
   const config = await getConfig();
-  const authorizeCallbackUri =
-    optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
+  const authorizeCallbackUri = optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
 
   const oAuthSession = new OAuth(
     config.firstLegUri,
@@ -118,7 +96,7 @@ const doSignAndPost = async (
     authorizeCallbackUri,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
-    config.oAuthCustomHeaders
+    config.oAuthCustomHeaders,
   );
 
   return await new Promise((resolve, reject) => {
@@ -127,9 +105,9 @@ const doSignAndPost = async (
       accessToken,
       accessTokenSecret,
       postBody,
-      config.postContentType,
+      postBodyContentType,
       (error, responseData, result) => {
-        console.log("Post Response From Deere", {
+        console.log('Post Response From Deere', {
           error,
           responseData,
           result,
@@ -142,7 +120,7 @@ const doSignAndPost = async (
         } else {
           resolve({ headers: result.headers, body: responseData });
         }
-      }
+      },
     );
   });
 };
