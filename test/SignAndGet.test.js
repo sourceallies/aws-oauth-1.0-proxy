@@ -90,6 +90,29 @@ describe("SignAndGet", () => {
     );
   });
 
+  it("gets a set of temporary OAuth tokens with same values from config when optionalAuthorizeCallbackUri is provided", async () => {
+    const expectedAuthorizeCallbackUri = chance.string();
+
+    await underTest.doSignAndGet(
+      chance.string(),
+      chance.string(),
+      chance.string(),
+      expectedAuthorizeCallbackUri
+    );
+
+    expect(OAuth.OAuth).toBeCalledWith(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      expectedAuthorizeCallbackUri,
+      undefined,
+      undefined,
+      undefined
+    );
+  });
+
   it("throws an error when there is an error in the OAuth get response", async () => {
     const expectedError = chance.string();
     jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
@@ -167,7 +190,7 @@ describe("SignAndGet", () => {
         callback(undefined, undefined, { statusCode: 200 });
       },
     }));
-       
+
     await underTest.doSignAndGet(
       expectedLinkToOpen,
       expectedAccessToken,
