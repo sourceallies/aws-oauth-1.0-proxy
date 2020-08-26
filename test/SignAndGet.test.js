@@ -144,4 +144,18 @@ describe("SignAndGet", () => {
       underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
     ).resolves.toMatch(expectedStatusText);
   });
+
+  it("return response data when status code betweeen 200 and 300", async () => {
+    const fakeResponse = chance.string();
+    const statusCode = chance.natural({ min: 200, max: 300 });
+    jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
+      get: (link, accessToken, accessTokenSecret, callback) => {
+        callback(undefined, fakeResponse, { statusCode });
+      },
+    }));
+
+    await expect(
+      underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
+    ).resolves.toMatch(fakeResponse);
+  })
 });
