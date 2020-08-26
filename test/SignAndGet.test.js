@@ -2,15 +2,16 @@
 // jest.mock("aws-sdk");
 
 jest.mock("oauth");
+jest.mock("../config");
 
 const Chance = require("chance");
 const { getStatusText } = require("../src/HttpResponses");
 const OAuth = require("oauth");
-// const getConfig = require("../config");
-// const underTest = require("../src/SignAndGet");
+const getConfig = require("../config");
 
 describe("SignAndGet", () => {
   let chance;
+  let underTest;
 
   const setUp = () => {
     chance = Chance();
@@ -30,6 +31,18 @@ describe("SignAndGet", () => {
         },
       };
     });
+
+    getConfig.mockImplementation(() => {
+        return { };
+    });
+
+    OAuth.OAuth = jest.fn().mockImplementation(() => ({
+      get: (link, accessToken, accessTokenSecret, callback) => {
+        callback(null, null, { statusCode: 200 });
+      },
+    }));
+
+    underTest = require("../src/SignAndGet");
   };
 
   beforeEach(async () => {
@@ -45,24 +58,13 @@ describe("SignAndGet", () => {
   });
 
   it("gets a set of temporary OAuth tokens", async () => {
-    const fakeLink = chance.url();
-    const fakeAccessToken = chance.string();
-    const fakeAccessTokenSecret = chance.string();
+    const config = await getConfig();
 
-    const config = await require("../config")();
-
-    OAuth.OAuth = jest.fn().mockImplementation(() => ({
-      get: (link, accessToken, accessTokenSecret, callback) => {
-        callback(null, null, { statusCode: 200 });
-      },
-    }));
-
-    const underTest = require("../src/SignAndGet");
 
     await underTest.doSignAndGet(
-      fakeLink,
-      fakeAccessToken,
-      fakeAccessTokenSecret
+      chance.string(),
+      chance.string(),
+      chance.string()
     );
 
     expect(OAuth.OAuth).toBeCalledWith(
