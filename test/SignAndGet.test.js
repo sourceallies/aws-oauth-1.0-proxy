@@ -2,12 +2,6 @@
 // jest.mock("aws-sdk");
 
 jest.mock("oauth");
-jest.mock("../config");
-jest.mock("aws-sdk", () => {
-  const KMS = class {};
-  KMS.prototype.decrypt = jest.fn();
-  return { KMS };
-});
 
 const Chance = require("chance");
 const { getStatusText } = require("../src/HttpResponses");
@@ -22,6 +16,13 @@ describe("SignAndGet", () => {
   const setUp = () => {
     chance = Chance();
 
+    jest.mock("aws-sdk", () => {
+      const KMS = class {};
+      KMS.prototype.decrypt = jest.fn();
+      return { KMS };
+    });
+
+    const { KMS } = require("aws-sdk");
     const { decrypt } = KMS.prototype;
     decrypt.mockImplementation(({ CiphertextBlob }) => {
       return {
@@ -49,7 +50,7 @@ describe("SignAndGet", () => {
   });
 
   afterEach(() => {
-    jest.resetModules();
+    // jest.resetModules();
   });
 
   it("gets a set of temporary OAuth tokens with same values from config", async () => {
@@ -93,6 +94,33 @@ describe("SignAndGet", () => {
       expectedOAuthSignatureMethod,
       expectedOAuthNonceSize,
       expectedOAuthCustomHeaders
+    );
+  });
+
+    OAuth.OAuth = jest.fn().mockImplementation(() => ({
+      get: (link, accessToken, accessTokenSecret, callback) => {
+        callback(null, null, { statusCode: 200 });
+      },
+    }));
+
+    const underTest = require("../src/SignAndGet");
+
+    await underTest.doSignAndGet(
+      fakeLink,
+      fakeAccessToken,
+      fakeAccessTokenSecret
+    );
+
+    expect(OAuth.OAuth).toBeCalledWith(
+      config.firstLegUri,
+      config.thirdLegUri,
+      config.clientKey,
+      config.clientSecret,
+      config.oAuthVersion,
+      config.authorizeCallbackUri,
+      config.oAuthSignatureMethod,
+      config.oAuthNonceSize,
+      config.oAuthCustomHeaders
     );
   });
 });
