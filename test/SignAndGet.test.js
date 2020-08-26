@@ -2,6 +2,12 @@
 // jest.mock("aws-sdk");
 
 jest.mock("oauth");
+jest.mock("../config");
+jest.mock("aws-sdk", () => {
+  const KMS = class {};
+  KMS.prototype.decrypt = jest.fn();
+  return { KMS };
+});
 
 const Chance = require("chance");
 const { getStatusText } = require("../src/HttpResponses");
@@ -16,13 +22,6 @@ describe("SignAndGet", () => {
   const setUp = () => {
     chance = Chance();
 
-    jest.mock("aws-sdk", () => {
-      const KMS = class {};
-      KMS.prototype.decrypt = jest.fn();
-      return { KMS };
-    });
-
-    const { KMS } = require("aws-sdk");
     const { decrypt } = KMS.prototype;
     decrypt.mockImplementation(({ CiphertextBlob }) => {
       return {
@@ -32,15 +31,15 @@ describe("SignAndGet", () => {
       };
     });
 
-    getConfig.mockImplementation(() => {
-      return {};
-    });
-
-    OAuth.OAuth = jest.fn().mockImplementation(() => ({
+    jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
       get: (link, accessToken, accessTokenSecret, callback) => {
         callback(null, null, { statusCode: 200 });
       },
     }));
+
+    getConfig.mockImplementation(() => {
+      return {};
+    });
 
     underTest = require("../src/SignAndGet");
   };
@@ -51,6 +50,7 @@ describe("SignAndGet", () => {
 
   afterEach(() => {
     // jest.resetModules();
+    jest.clearAllMocks();
   });
 
   it("gets a set of temporary OAuth tokens with same values from config", async () => {
@@ -63,6 +63,12 @@ describe("SignAndGet", () => {
     const expectedOAuthSignatureMethod = chance.string();
     const expectedOAuthNonceSize = chance.string();
     const expectedOAuthCustomHeaders = chance.string();
+
+    jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
+      get: (link, accessToken, accessTokenSecret, callback) => {
+        callback(null, null, { statusCode: 200 });
+      },
+    }));
 
     getConfig.mockImplementation(() => {
       return {
@@ -97,31 +103,18 @@ describe("SignAndGet", () => {
     );
   });
 
-    OAuth.OAuth = jest.fn().mockImplementation(() => ({
+  it("throws an error when there is an error in the response", async () => {
+    const fakeError = chance.string();
+
+    jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
       get: (link, accessToken, accessTokenSecret, callback) => {
-        callback(null, null, { statusCode: 200 });
+        callback(fakeError, undefined, { statusCode: 200 });
       },
     }));
 
-    const underTest = require("../src/SignAndGet");
-
-    await underTest.doSignAndGet(
-      fakeLink,
-      fakeAccessToken,
-      fakeAccessTokenSecret
-    );
-
-    expect(OAuth.OAuth).toBeCalledWith(
-      config.firstLegUri,
-      config.thirdLegUri,
-      config.clientKey,
-      config.clientSecret,
-      config.oAuthVersion,
-      config.authorizeCallbackUri,
-      config.oAuthSignatureMethod,
-      config.oAuthNonceSize,
-      config.oAuthCustomHeaders
-    );
+    await expect(
+      underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
+    ).rejects.toMatch(fakeError);
   });
 });
 
