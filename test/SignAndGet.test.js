@@ -1,8 +1,10 @@
 // jest.mock("../src/HttpResponses");
-
-import { Chance } from "chance";
-import { getStatusText } from "../src/HttpResponses";
-import * as underTest from "../src/SignAndGet";
+const Chance = require("chance");
+const { getStatusText } = require("../src/HttpResponses");
+const underTest = require("../src/SignAndGet")
+const config = require("../config");
+const OAuth = require("oauth");
+const { KMS } = require("aws-sdk");
 
 describe("OAuth Sign Request", () => {
   let chance;
@@ -17,7 +19,6 @@ describe("OAuth Sign Request", () => {
       return { KMS };
     });
 
-    const { KMS } = require("aws-sdk");
     const { decrypt } = KMS.prototype;
     decrypt.mockImplementation(({ CiphertextBlob }) => {
       return {
@@ -36,7 +37,7 @@ describe("OAuth Sign Request", () => {
     let config;
 
     beforeEach(async () => {
-      config = await require("../config")();
+      config = config();
       config.oAuthCustomHeaders = { [chance.string()]: chance.string() };
       config.authorizeCallbackUri = chance.string();
     });
@@ -56,8 +57,6 @@ describe("OAuth Sign Request", () => {
 
     it("creates OAuth config with correct values when allDataFlag is true", async () => {
       const allDataFlag = true;
-      const OAuth = require("oauth");
-
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         get: (link, accessToken, accessTokenSecret, callback) => {
           callback(null, null, { statusCode: 200 });
@@ -90,7 +89,6 @@ describe("OAuth Sign Request", () => {
     it("returns correct response when allDataFlag is true", async () => {
       const allDataFlag = true;
       const fakeResponseData = chance.string();
-      const OAuth = require("oauth");
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         get: (link, accessToken, accessTokenSecret, callback) => {
           callback(null, fakeResponseData, { statusCode: 200 });
@@ -109,8 +107,6 @@ describe("OAuth Sign Request", () => {
 
     it("creates OAuth config with correct values when allDataFlag is false and there are preexisting custom headers", async () => {
       const allDataFlag = false;
-      const OAuth = require("oauth");
-
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         get: (link, accessToken, accessTokenSecret, callback) => {
           callback(null, null, { statusCode: 200 });
@@ -142,16 +138,13 @@ describe("OAuth Sign Request", () => {
     it("returns correct response when allDataFlag is false", async () => {
       const allDataFlag = false;
       const fakeResponseData = chance.string();
-      const OAuth = require("oauth");
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         get: (link, accessToken, accessTokenSecret, callback) => {
           callback(null, fakeResponseData, { statusCode: 200 });
         },
       }));
 
-      const { doSignAndGet } = require("../src/OAuthSignRequest");
-
-      const response = await doSignAndGet(
+      const response = await underTest.doSignAndGet(
         chance.url(),
         chance.string(),
         chance.string(),
@@ -165,21 +158,15 @@ describe("OAuth Sign Request", () => {
       const fakeLink = chance.url();
       const fakeAccessToken = chance.string();
       const fakeAccessTokenSecret = chance.string();
-
       const fakeError = chance.string();
-
-      const OAuth = require("oauth");
-
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         get: (link, accessToken, accessTokenSecret, callback) => {
           callback(fakeError, null, { statusCode: 200 });
         },
       }));
 
-      const { doSignAndGet } = require("../src/OAuthSignRequest");
-
       await expect(
-        doSignAndGet(fakeLink, fakeAccessToken, fakeAccessTokenSecret)
+        underTest.doSignAndGet(fakeLink, fakeAccessToken, fakeAccessTokenSecret)
       ).rejects.toMatch(fakeError);
     });
 
@@ -187,10 +174,7 @@ describe("OAuth Sign Request", () => {
       const fakeLink = chance.url();
       const fakeAccessToken = chance.string();
       const fakeAccessTokenSecret = chance.string();
-
       const fakeError = chance.string();
-
-      const OAuth = require("oauth");
       let statusCode = chance.natural({ min: 0, max: 500 });
 
       while (statusCode > 200 && statusCode < 300) {
@@ -203,8 +187,7 @@ describe("OAuth Sign Request", () => {
         },
       }));
 
-      const { doSignAndGet } = require("../src/OAuthSignRequest");
-      const doSignandGet = doSignAndGet(
+      const doSignandGet = underTest.doSignAndGet(
         fakeLink,
         fakeAccessToken,
         fakeAccessTokenSecret
