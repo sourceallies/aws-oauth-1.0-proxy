@@ -1,3 +1,7 @@
+const getConfig = require("../config");
+const { OAuth } = require("oauth");
+const { getStatusText } = require("../src/HttpResponses");
+
 const doSignAndDelete = async (
   linkToOpen,
   accessToken,
