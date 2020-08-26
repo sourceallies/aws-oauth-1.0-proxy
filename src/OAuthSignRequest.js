@@ -97,7 +97,6 @@ const doSignAndPost = async (
 };
 
 module.exports = {
-  doSignAndGet,
   doSignAndDelete,
   doSignAndPost,
 };

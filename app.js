@@ -2,7 +2,8 @@ const {OAuth} = require('oauth');
 const {sendResponse, sendError} = require('./src/responses');
 const getConfig = require('./config');
 const {publishToSNSSuccess, publishToSNSUnsuccessfull} = require('./src/publishSNSHelper');
-const {doSignAndGet, doSignAndPost, doSignAndDelete} = require('./src/OAuthSignRequest');
+const {doSignAndPost, doSignAndDelete} = require('./src/OAuthSignRequest');
+const { doSignAndGet } = require('./src/SignAndGet');
 
 const parsedEnv = require('dotenv').config();
 
