@@ -409,7 +409,7 @@ describe('Lambda handlers', () => {
         }
       };
 
-      const OAuthSignRequest = require('../src/OAuthSignRequest');
+      const SignAndGet = require('../src/SignAndGet');
 
       const fakeResponseData = {};
       const numberOfResponseDataKeys = chance.natural({min: 2, max: 5});
@@ -420,13 +420,13 @@ describe('Lambda handlers', () => {
 
       fakeResponseData.status = chance.natural();
 
-      OAuthSignRequest.doSignAndGet = jest.fn().mockResolvedValue(fakeResponseData);
+      SignAndGet.doSignAndGet = jest.fn().mockResolvedValue(fakeResponseData);
 
       const {oAuthSignRequestGet} = require('../app');
 
       const responseData = await oAuthSignRequestGet(event);
 
-      expect(OAuthSignRequest.doSignAndGet).toBeCalledWith(url, accessToken, accessTokenSecret, undefined);
+      expect(SignAndGet.doSignAndGet).toBeCalledWith(url, accessToken, accessTokenSecret, undefined);
       const response = {
         statusCode: fakeResponseData.status,
         headers: {
@@ -454,7 +454,7 @@ describe('Lambda handlers', () => {
         }
       };
 
-      const OAuthSignRequest = require('../src/OAuthSignRequest');
+      const SignAndGet = require('../src/SignAndGet');
 
       const fakeResponseData = {};
       const numberOfResponseDataKeys = chance.natural({min: 2, max: 5});
@@ -465,13 +465,13 @@ describe('Lambda handlers', () => {
 
       fakeResponseData.status = chance.natural();
 
-      OAuthSignRequest.doSignAndGet = jest.fn().mockResolvedValue(fakeResponseData);
+      SignAndGet.doSignAndGet = jest.fn().mockResolvedValue(fakeResponseData);
 
       const {oAuthSignRequestGet} = require('../app');
 
       const responseData = await oAuthSignRequestGet(event);
 
-      expect(OAuthSignRequest.doSignAndGet).toBeCalledWith(url, accessToken, accessTokenSecret, oauth_callback);
+      expect(SignAndGet.doSignAndGet).toBeCalledWith(url, accessToken, accessTokenSecret, oauth_callback);
       const response = {
         statusCode: fakeResponseData.status,
         headers: {
@@ -485,7 +485,7 @@ describe('Lambda handlers', () => {
     });
 
     it('returns an error when an error occurs during the signing and get', async () => {
-      const OAuthSignRequest = require('../src/OAuthSignRequest');
+      const SignAndGet = require('../src/SignAndGet');
 
       const fakeError = {};
       const numberOfErrorKeys = chance.natural({min: 2, max: 5});
@@ -494,7 +494,7 @@ describe('Lambda handlers', () => {
         fakeError[chance.string()] = chance.string();
       }
 
-      OAuthSignRequest.doSignAndGet = jest.fn().mockRejectedValue(fakeError);
+      SignAndGet.doSignAndGet = jest.fn().mockRejectedValue(fakeError);
 
       const {oAuthSignRequestGet} = require('../app');
 
