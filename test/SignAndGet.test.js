@@ -9,10 +9,8 @@ const OAuth = require("oauth");
 // const getConfig = require("../config");
 // const underTest = require("../src/SignAndGet");
 
-
 describe("SignAndGet", () => {
   let chance;
-  let get;
 
   const setUp = () => {
     chance = Chance();
