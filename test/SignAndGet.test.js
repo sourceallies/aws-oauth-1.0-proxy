@@ -99,16 +99,16 @@ describe("SignAndGet", () => {
   });
 
   it("throws an error when there is an error in the OAuth get response", async () => {
-    const fakeError = chance.string();
+    const expectedError = chance.string();
     jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
       get: (link, accessToken, accessTokenSecret, callback) => {
-        callback(fakeError, undefined, { statusCode: 200 });
+        callback(expectedError, undefined, { statusCode: 200 });
       },
     }));
 
     await expect(
       underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
-    ).rejects.toMatch(fakeError);
+    ).rejects.toMatch(expectedError);
   });
 
   it("return an error when there is an http error below 200 from OAuth Sign Request endpoint", async () => {
@@ -146,16 +146,16 @@ describe("SignAndGet", () => {
   });
 
   it("return response data when status code betweeen 200 and 300", async () => {
-    const fakeResponse = chance.string();
+    const expectedResponse = chance.string();
     const statusCode = chance.natural({ min: 200, max: 300 });
     jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
       get: (link, accessToken, accessTokenSecret, callback) => {
-        callback(undefined, fakeResponse, { statusCode });
+        callback(undefined, expectedResponse, { statusCode });
       },
     }));
 
     await expect(
       underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
-    ).resolves.toMatch(fakeResponse);
+    ).resolves.toMatch(expectedResponse);
   })
 });
