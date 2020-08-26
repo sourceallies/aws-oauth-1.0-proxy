@@ -46,10 +46,6 @@ describe("SignAndGet", () => {
     setUp();
   });
 
-  afterEach(() => {
-    // jest.clearAllMocks();
-  });
-
   it("gets a set of temporary OAuth tokens with same values from config", async () => {
     const expectedFirstLegUri = chance.string();
     const expectedThirdLegUri = chance.string();
