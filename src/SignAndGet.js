@@ -1,4 +1,5 @@
-import { getConfig } from "../config";
+const getConfig = require("../config");
+const { OAuth } = require('oauth');
 
 const doSignAndGet = async (
   linkToOpen,
@@ -50,3 +51,7 @@ const doSignAndGet = async (
     );
   });
 };
+
+module.exports = {
+  doSignAndGet
+}
