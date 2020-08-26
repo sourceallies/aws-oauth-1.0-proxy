@@ -64,12 +64,6 @@ describe("SignAndGet", () => {
     const expectedOAuthNonceSize = chance.string();
     const expectedOAuthCustomHeaders = chance.string();
 
-    jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
-      get: (link, accessToken, accessTokenSecret, callback) => {
-        callback(null, null, { statusCode: 200 });
-      },
-    }));
-
     getConfig.mockImplementation(() => {
       return {
         firstLegUri: expectedFirstLegUri,
