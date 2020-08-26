@@ -5,22 +5,11 @@ const doSignAndGet = async (
   linkToOpen,
   accessToken,
   accessTokenSecret,
-  allData,
   optionalAuthorizeCallbackUri
 ) => {
   const config = await getConfig();
   const authorizeCallbackUri =
     optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
-
-  let oAuthCustomHeaders = Object.assign({}, config.oAuthCustomHeaders);
-
-  if (!oAuthCustomHeaders) {
-    throw new Error("Missing required oAuthCustomHeaders from config");
-  }
-
-  if (allData) {
-    oAuthCustomHeaders["No_Paging"] = true;
-  }
 
   const oAuthSession = new OAuth(
     config.firstLegUri,
@@ -31,7 +20,7 @@ const doSignAndGet = async (
     authorizeCallbackUri,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
-    oAuthCustomHeaders
+    config.oAuthCustomHeaders
   );
 
   return await new Promise((resolve, reject) => {

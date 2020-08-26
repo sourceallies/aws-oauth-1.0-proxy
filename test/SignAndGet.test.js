@@ -1,24 +1,29 @@
 // jest.mock("../src/HttpResponses");
+// jest.mock("aws-sdk");
+
+jest.mock("oauth");
+
 const Chance = require("chance");
 const { getStatusText } = require("../src/HttpResponses");
-const underTest = require("../src/SignAndGet")
-const config = require("../config");
 const OAuth = require("oauth");
-const { KMS } = require("aws-sdk");
+// const getConfig = require("../config");
+// const underTest = require("../src/SignAndGet");
 
-describe("OAuth Sign Request", () => {
+
+describe("SignAndGet", () => {
   let chance;
+  let get;
 
-  beforeEach(() => {
+  const setUp = () => {
     chance = Chance();
 
     jest.mock("aws-sdk", () => {
       const KMS = class {};
       KMS.prototype.decrypt = jest.fn();
-
       return { KMS };
     });
 
+    const { KMS } = require("aws-sdk");
     const { decrypt } = KMS.prototype;
     decrypt.mockImplementation(({ CiphertextBlob }) => {
       return {
@@ -27,173 +32,116 @@ describe("OAuth Sign Request", () => {
         },
       };
     });
+  };
+
+  beforeEach(async () => {
+    setUp();
+
+    // config = await getConfig();
+    // config.oAuthCustomHeaders = { [chance.string()]: chance.string() };
+    // config.authorizeCallbackUri = chance.string();
   });
 
   afterEach(() => {
     jest.resetModules();
   });
 
-  describe("Do Sign and Get", () => {
-    let config;
+  it("gets a set of temporary OAuth tokens", async () => {
+    const fakeLink = chance.url();
+    const fakeAccessToken = chance.string();
+    const fakeAccessTokenSecret = chance.string();
 
-    beforeEach(async () => {
-      config = config();
-      config.oAuthCustomHeaders = { [chance.string()]: chance.string() };
-      config.authorizeCallbackUri = chance.string();
-    });
+    const config = await require("../config")();
 
-    it("throws error if no oAuthCustomHeaders in config", async () => {
-      config.oAuthCustomHeaders = undefined;
+    OAuth.OAuth = jest.fn().mockImplementation(() => ({
+      get: (link, accessToken, accessTokenSecret, callback) => {
+        callback(null, null, { statusCode: 200 });
+      },
+    }));
 
-      expect(() =>
-        underTest.doSignAndGet(
-          chance.url(),
-          chance.string(),
-          chance.string(),
-          allDataFlag
-        )
-      ).toThrow(Error);
-    });
+    const underTest = require("../src/SignAndGet");
 
-    it("creates OAuth config with correct values when allDataFlag is true", async () => {
-      const allDataFlag = true;
-      OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        get: (link, accessToken, accessTokenSecret, callback) => {
-          callback(null, null, { statusCode: 200 });
-        },
-      }));
+    await underTest.doSignAndGet(
+      fakeLink,
+      fakeAccessToken,
+      fakeAccessTokenSecret
+    );
 
-      await underTest.doSignAndGet(
-        chance.url(),
-        chance.string(),
-        chance.string(),
-        allDataFlag
-      );
-
-      expect(OAuth.OAuth).toBeCalledWith(
-        config.firstLegUri,
-        config.thirdLegUri,
-        config.clientKey,
-        config.clientSecret,
-        config.oAuthVersion,
-        config.authorizeCallbackUri,
-        config.oAuthSignatureMethod,
-        config.oAuthNonceSize,
-        {
-          ...config.oAuthCustomHeaders,
-          No_Paging: true,
-        }
-      );
-    });
-
-    it("returns correct response when allDataFlag is true", async () => {
-      const allDataFlag = true;
-      const fakeResponseData = chance.string();
-      OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        get: (link, accessToken, accessTokenSecret, callback) => {
-          callback(null, fakeResponseData, { statusCode: 200 });
-        },
-      }));
-
-      const response = await underTest.doSignAndGet(
-        chance.url(),
-        chance.string(),
-        chance.string(),
-        allDataFlag
-      );
-
-      expect(response).toEqual(fakeResponseData);
-    });
-
-    it("creates OAuth config with correct values when allDataFlag is false and there are preexisting custom headers", async () => {
-      const allDataFlag = false;
-      OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        get: (link, accessToken, accessTokenSecret, callback) => {
-          callback(null, null, { statusCode: 200 });
-        },
-      }));
-
-      await underTest.doSignAndGet(
-        chance.url(),
-        chance.string(),
-        chance.string(),
-        allDataFlag
-      );
-
-      expect(OAuth.OAuth).toBeCalledWith(
-        config.firstLegUri,
-        config.thirdLegUri,
-        config.clientKey,
-        config.clientSecret,
-        config.oAuthVersion,
-        config.authorizeCallbackUri,
-        config.oAuthSignatureMethod,
-        config.oAuthNonceSize,
-        {
-          ...config.oAuthCustomHeaders,
-        }
-      );
-    });
-
-    it("returns correct response when allDataFlag is false", async () => {
-      const allDataFlag = false;
-      const fakeResponseData = chance.string();
-      OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        get: (link, accessToken, accessTokenSecret, callback) => {
-          callback(null, fakeResponseData, { statusCode: 200 });
-        },
-      }));
-
-      const response = await underTest.doSignAndGet(
-        chance.url(),
-        chance.string(),
-        chance.string(),
-        allDataFlag
-      );
-
-      expect(response).toEqual(fakeResponseData);
-    });
-
-    it("throws an error when there is an error in the response", async () => {
-      const fakeLink = chance.url();
-      const fakeAccessToken = chance.string();
-      const fakeAccessTokenSecret = chance.string();
-      const fakeError = chance.string();
-      OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        get: (link, accessToken, accessTokenSecret, callback) => {
-          callback(fakeError, null, { statusCode: 200 });
-        },
-      }));
-
-      await expect(
-        underTest.doSignAndGet(fakeLink, fakeAccessToken, fakeAccessTokenSecret)
-      ).rejects.toMatch(fakeError);
-    });
-
-    it("return an error when there is an http error from OAuth Sign Request endpoint", async () => {
-      const fakeLink = chance.url();
-      const fakeAccessToken = chance.string();
-      const fakeAccessTokenSecret = chance.string();
-      const fakeError = chance.string();
-      let statusCode = chance.natural({ min: 0, max: 500 });
-
-      while (statusCode > 200 && statusCode < 300) {
-        statusCode = chance.natural({ min: 0, max: 500 });
-      }
-
-      OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        get: (link, accessToken, accessTokenSecret, callback) => {
-          callback(fakeError, null, { statusCode });
-        },
-      }));
-
-      const doSignandGet = underTest.doSignAndGet(
-        fakeLink,
-        fakeAccessToken,
-        fakeAccessTokenSecret
-      );
-
-      await expect(doSignandGet).resolves.toMatch(getStatusText(statusCode));
-    });
+    expect(OAuth.OAuth).toBeCalledWith(
+      config.firstLegUri,
+      config.thirdLegUri,
+      config.clientKey,
+      config.clientSecret,
+      config.oAuthVersion,
+      config.authorizeCallbackUri,
+      config.oAuthSignatureMethod,
+      config.oAuthNonceSize,
+      config.oAuthCustomHeaders
+    );
   });
 });
+
+// describe("Do Sign and Get", () => {
+//   let config;
+
+//   beforeEach(async () => {
+//     config = await config();
+//     config.oAuthCustomHeaders = { [chance.string()]: chance.string() };
+//     config.authorizeCallbackUri = chance.string();
+//   });
+
+//   it("throws error if no oAuthCustomHeaders in config", async () => {
+//     config.oAuthCustomHeaders = undefined;
+
+//     expect(() =>
+//       underTest.doSignAndGet(
+//         chance.url(),
+//         chance.string(),
+//         chance.string(),
+//         allDataFlag
+//       )
+//     ).toThrow(Error);
+//   });
+
+//   it("throws an error when there is an error in the response", async () => {
+//     const fakeLink = chance.url();
+//     const fakeAccessToken = chance.string();
+//     const fakeAccessTokenSecret = chance.string();
+//     const fakeError = chance.string();
+//     OAuth.OAuth = jest.fn().mockImplementation(() => ({
+//       get: (link, accessToken, accessTokenSecret, callback) => {
+//         callback(fakeError, null, { statusCode: 200 });
+//       },
+//     }));
+
+//     await expect(
+//       underTest.doSignAndGet(fakeLink, fakeAccessToken, fakeAccessTokenSecret)
+//     ).rejects.toMatch(fakeError);
+//   });
+
+//   it("return an error when there is an http error from OAuth Sign Request endpoint", async () => {
+//     const fakeLink = chance.url();
+//     const fakeAccessToken = chance.string();
+//     const fakeAccessTokenSecret = chance.string();
+//     const fakeError = chance.string();
+//     let statusCode = chance.natural({ min: 0, max: 500 });
+
+//     while (statusCode > 200 && statusCode < 300) {
+//       statusCode = chance.natural({ min: 0, max: 500 });
+//     }
+
+//     OAuth.OAuth = jest.fn().mockImplementation(() => ({
+//       get: (link, accessToken, accessTokenSecret, callback) => {
+//         callback(fakeError, null, { statusCode });
+//       },
+//     }));
+
+//     const doSignandGet = underTest.doSignAndGet(
+//       fakeLink,
+//       fakeAccessToken,
+//       fakeAccessTokenSecret
+//     );
+
+//     await expect(doSignandGet).resolves.toMatch(getStatusText(statusCode));
+//   });
+// });
