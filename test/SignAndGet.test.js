@@ -100,7 +100,6 @@ describe("SignAndGet", () => {
 
   it("throws an error when there is an error in the OAuth get response", async () => {
     const fakeError = chance.string();
-
     jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
       get: (link, accessToken, accessTokenSecret, callback) => {
         callback(fakeError, undefined, { statusCode: 200 });
@@ -112,71 +111,37 @@ describe("SignAndGet", () => {
     ).rejects.toMatch(fakeError);
   });
 
-  it("return an error when there is an http error from OAuth Sign Request endpoint", async () => {
+  it("return an error when there is an http error below 200 from OAuth Sign Request endpoint", async () => {
     const statusCode = chance.natural({ min: 0, max: 199 });
-    let expectedStatusText = chance.string();
-
-    getStatusText.mockImplementation(() => {
-      return expectedStatusText;
-    })
-
     jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
       get: (link, accessToken, accessTokenSecret, callback) => {
         callback(undefined, undefined, { statusCode });
       },
     }));
+    const expectedStatusText = chance.string();
+    getStatusText.mockImplementation(() => {
+      return expectedStatusText;
+    })
+
+    await expect(
+      underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
+    ).resolves.toMatch(expectedStatusText);
+  });
+
+  it("return an error when there is an http error above 300 from OAuth Sign Request endpoint", async () => {
+    const statusCode = chance.natural({ min: 301, max: 500 });
+    jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
+      get: (link, accessToken, accessTokenSecret, callback) => {
+        callback(undefined, undefined, { statusCode });
+      },
+    }));
+    const expectedStatusText = chance.string();
+    getStatusText.mockImplementation(() => {
+      return expectedStatusText;
+    })
 
     await expect(
       underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
     ).resolves.toMatch(expectedStatusText);
   });
 });
-
-// describe("Do Sign and Get", () => {
-//   let config;
-
-//   beforeEach(async () => {
-//     config = await config();
-//     config.oAuthCustomHeaders = { [chance.string()]: chance.string() };
-//     config.authorizeCallbackUri = chance.string();
-//   });
-
-//   it("throws error if no oAuthCustomHeaders in config", async () => {
-//     config.oAuthCustomHeaders = undefined;
-
-//     expect(() =>
-//       underTest.doSignAndGet(
-//         chance.url(),
-//         chance.string(),
-//         chance.string(),
-//         allDataFlag
-//       )
-//     ).toThrow(Error);
-//   });
-
-//   it("return an error when there is an http error from OAuth Sign Request endpoint", async () => {
-//     const fakeLink = chance.url();
-//     const fakeAccessToken = chance.string();
-//     const fakeAccessTokenSecret = chance.string();
-//     const fakeError = chance.string();
-//     let statusCode = chance.natural({ min: 0, max: 500 });
-
-//     while (statusCode > 200 && statusCode < 300) {
-//       statusCode = chance.natural({ min: 0, max: 500 });
-//     }
-
-//     OAuth.OAuth = jest.fn().mockImplementation(() => ({
-//       get: (link, accessToken, accessTokenSecret, callback) => {
-//         callback(fakeError, null, { statusCode });
-//       },
-//     }));
-
-//     const doSignandGet = underTest.doSignAndGet(
-//       fakeLink,
-//       fakeAccessToken,
-//       fakeAccessTokenSecret
-//     );
-
-//     await expect(doSignandGet).resolves.toMatch(getStatusText(statusCode));
-//   });
-// });
