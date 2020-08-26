@@ -3,11 +3,17 @@
 
 jest.mock("oauth");
 jest.mock("../config");
+jest.mock("aws-sdk", () => {
+  const KMS = class {};
+  KMS.prototype.decrypt = jest.fn();
+  return { KMS };
+});
 
 const Chance = require("chance");
 const { getStatusText } = require("../src/HttpResponses");
 const OAuth = require("oauth");
 const getConfig = require("../config");
+const { KMS } = require("aws-sdk");
 
 describe("SignAndGet", () => {
   let chance;
@@ -16,13 +22,6 @@ describe("SignAndGet", () => {
   const setUp = () => {
     chance = Chance();
 
-    jest.mock("aws-sdk", () => {
-      const KMS = class {};
-      KMS.prototype.decrypt = jest.fn();
-      return { KMS };
-    });
-
-    const { KMS } = require("aws-sdk");
     const { decrypt } = KMS.prototype;
     decrypt.mockImplementation(({ CiphertextBlob }) => {
       return {
@@ -47,10 +46,6 @@ describe("SignAndGet", () => {
 
   beforeEach(async () => {
     setUp();
-
-    // config = await getConfig();
-    // config.oAuthCustomHeaders = { [chance.string()]: chance.string() };
-    // config.authorizeCallbackUri = chance.string();
   });
 
   afterEach(() => {
@@ -59,7 +54,6 @@ describe("SignAndGet", () => {
 
   it("gets a set of temporary OAuth tokens", async () => {
     const config = await getConfig();
-
 
     await underTest.doSignAndGet(
       chance.string(),
