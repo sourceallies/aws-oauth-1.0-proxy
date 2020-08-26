@@ -32,7 +32,7 @@ describe("SignAndGet", () => {
     });
 
     getConfig.mockImplementation(() => {
-        return { };
+      return {};
     });
 
     OAuth.OAuth = jest.fn().mockImplementation(() => ({
@@ -52,8 +52,30 @@ describe("SignAndGet", () => {
     jest.resetModules();
   });
 
-  it("gets a set of temporary OAuth tokens", async () => {
-    const config = await getConfig();
+  it("gets a set of temporary OAuth tokens with same values from config", async () => {
+    const expectedFirstLegUri = chance.string();
+    const expectedThirdLegUri = chance.string();
+    const expectedClientKey = chance.string();
+    const expectedClientSecret = chance.string();
+    const expectedOAuthVersion = chance.string();
+    const expectedAuthorizeCallbackUri = chance.string();
+    const expectedOAuthSignatureMethod = chance.string();
+    const expectedOAuthNonceSize = chance.string();
+    const expectedOAuthCustomHeaders = chance.string();
+
+    getConfig.mockImplementation(() => {
+      return {
+        firstLegUri: expectedFirstLegUri,
+        thirdLegUri: expectedThirdLegUri,
+        clientKey: expectedClientKey,
+        clientSecret: expectedClientSecret,
+        oAuthVersion: expectedOAuthVersion,
+        authorizeCallbackUri: expectedAuthorizeCallbackUri,
+        oAuthSignatureMethod: expectedOAuthSignatureMethod,
+        oAuthNonceSize: expectedOAuthNonceSize,
+        oAuthCustomHeaders: expectedOAuthCustomHeaders,
+      };
+    });
 
     await underTest.doSignAndGet(
       chance.string(),
@@ -62,15 +84,15 @@ describe("SignAndGet", () => {
     );
 
     expect(OAuth.OAuth).toBeCalledWith(
-      config.firstLegUri,
-      config.thirdLegUri,
-      config.clientKey,
-      config.clientSecret,
-      config.oAuthVersion,
-      config.authorizeCallbackUri,
-      config.oAuthSignatureMethod,
-      config.oAuthNonceSize,
-      config.oAuthCustomHeaders
+      expectedFirstLegUri,
+      expectedThirdLegUri,
+      expectedClientKey,
+      expectedClientSecret,
+      expectedOAuthVersion,
+      expectedAuthorizeCallbackUri,
+      expectedOAuthSignatureMethod,
+      expectedOAuthNonceSize,
+      expectedOAuthCustomHeaders
     );
   });
 });
