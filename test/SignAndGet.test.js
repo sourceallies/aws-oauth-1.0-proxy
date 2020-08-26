@@ -1,20 +1,17 @@
-// jest.mock("../src/HttpResponses");
-// jest.mock("aws-sdk");
-
-jest.mock("oauth");
-jest.mock("../config");
-jest.mock("../src/HttpResponses")
-jest.mock("aws-sdk", () => {
-  const KMS = class {};
-  KMS.prototype.decrypt = jest.fn();
-  return { KMS };
-});
-
 const Chance = require("chance");
 const { getStatusText } = require("../src/HttpResponses");
 const OAuth = require("oauth");
 const getConfig = require("../config");
 const { KMS } = require("aws-sdk");
+
+jest.mock("oauth");
+jest.mock("../config");
+jest.mock("../src/HttpResponses");
+jest.mock("aws-sdk", () => {
+  const KMS = class {};
+  KMS.prototype.decrypt = jest.fn();
+  return { KMS };
+});
 
 describe("SignAndGet", () => {
   let chance;
@@ -50,7 +47,6 @@ describe("SignAndGet", () => {
   });
 
   afterEach(() => {
-    // jest.resetModules();
     // jest.clearAllMocks();
   });
 
@@ -121,7 +117,7 @@ describe("SignAndGet", () => {
     const expectedStatusText = chance.string();
     getStatusText.mockImplementation(() => {
       return expectedStatusText;
-    })
+    });
 
     await expect(
       underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
@@ -138,7 +134,7 @@ describe("SignAndGet", () => {
     const expectedStatusText = chance.string();
     getStatusText.mockImplementation(() => {
       return expectedStatusText;
-    })
+    });
 
     await expect(
       underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
@@ -157,5 +153,33 @@ describe("SignAndGet", () => {
     await expect(
       underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
     ).resolves.toMatch(expectedResponse);
-  })
+  });
+
+  it("should pass parameters to oauthSession", async () => {
+    const expectedLinkToOpen = chance.string();
+    const expectedAccessToken = chance.string();
+    const expectedAccesssTokenSecret = chance.string();
+    let actualLinkToOpen;
+    let actualAccessToken;
+    let actualAccessTokenSecret;
+
+    jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
+      get: (link, accessToken, accessTokenSecret, callback) => {
+        actualLinkToOpen = link;
+        actualAccessToken = accessToken;
+        actualAccessTokenSecret = accessTokenSecret;
+        callback(undefined, undefined, { statusCode: 200 });
+      },
+    }));
+       
+    await underTest.doSignAndGet(
+      expectedLinkToOpen,
+      expectedAccessToken,
+      expectedAccesssTokenSecret
+    );
+
+    expect(actualLinkToOpen).toBe(expectedLinkToOpen);
+    expect(actualAccessToken).toBe(expectedAccessToken);
+    expect(actualAccessTokenSecret).toBe(expectedAccesssTokenSecret);
+  });
 });
