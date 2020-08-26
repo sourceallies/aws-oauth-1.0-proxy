@@ -1,17 +1,17 @@
-const Chance = require('chance');
-const { getStatusText } = require('../src/HttpResponses');
+const Chance = require("chance");
+const { getStatusText } = require("../src/HttpResponses");
 
 
-describe('OAuth Sign Request', () => {
+describe("OAuth Sign Request", () => {
   let chance;
 
   beforeEach(() => {
     chance = Chance();
 
     jest.mock("aws-sdk", () => {
-      const KMS = class {}
+      const KMS = class {};
       KMS.prototype.decrypt = jest.fn();
-    
+
       return { KMS };
     });
 
@@ -21,8 +21,8 @@ describe('OAuth Sign Request', () => {
       return {
         promise() {
           return Promise.resolve({ Plaintext: CiphertextBlob });
-        }
-      }
+        },
+      };
     });
   });
 
@@ -80,20 +80,21 @@ describe('OAuth Sign Request', () => {
         },
       }));
 
-      const { doSignAndGet } = require('../src/OAuthSignRequest');
+      const { doSignAndGet } = require("../src/OAuthSignRequest");
 
-      await expect(doSignAndGet(fakeLink, fakeAccessToken, fakeAccessTokenSecret))
-        .rejects.toMatch(fakeError);
+      await expect(
+        doSignAndGet(fakeLink, fakeAccessToken, fakeAccessTokenSecret)
+      ).rejects.toMatch(fakeError);
     });
 
-    it('return an error when there is an http error from OAuth Sign Request endpoint', async () => {
+    it("return an error when there is an http error from OAuth Sign Request endpoint", async () => {
       const fakeLink = chance.url();
       const fakeAccessToken = chance.string();
       const fakeAccessTokenSecret = chance.string();
 
       const fakeError = chance.string();
 
-      const OAuth = require('oauth');
+      const OAuth = require("oauth");
       let statusCode = chance.natural({ min: 0, max: 500 });
 
       while (statusCode > 200 && statusCode < 300) {
@@ -106,19 +107,28 @@ describe('OAuth Sign Request', () => {
         },
       }));
 
-      const { doSignAndGet } = require('../src/OAuthSignRequest');
-      const doSignandGet = doSignAndGet(fakeLink, fakeAccessToken, fakeAccessTokenSecret);
+      const { doSignAndGet } = require("../src/OAuthSignRequest");
+      const doSignandGet = doSignAndGet(
+        fakeLink,
+        fakeAccessToken,
+        fakeAccessTokenSecret
+      );
 
       await expect(doSignandGet).resolves.toMatch(getStatusText(statusCode));
     });
   });
 
-  describe('Do Sign and Delete', () => {
+  describe("Do Sign and Delete", () => {
     const mockOAuth = (fakeResponseData = chance.string()) => {
-      const OAuth = require('oauth');
+      const OAuth = require("oauth");
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        delete: (fakeLink, fakeAccessToken, fakeAccessTokenSecret, callback) => {
+        delete: (
+          fakeLink,
+          fakeAccessToken,
+          fakeAccessTokenSecret,
+          callback
+        ) => {
           callback(null, fakeResponseData, { statusCode: 200 });
         },
       }));
@@ -126,22 +136,22 @@ describe('OAuth Sign Request', () => {
       return OAuth;
     };
 
-    it('is a function', () => {
-      const { doSignAndDelete } = require('../src/OAuthSignRequest');
+    it("is a function", () => {
+      const { doSignAndDelete } = require("../src/OAuthSignRequest");
 
       expect(doSignAndDelete).toEqual(expect.any(Function));
     });
 
-    it('create an Oauth correctly with correct params', async () => {
+    it("create an Oauth correctly with correct params", async () => {
       process.env.CLIENT_KEY = chance.string();
       process.env.CLIENT_SECRET = chance.string();
 
-      const oauthConfig = await require('../config')();
+      const oauthConfig = await require("../config")();
 
       oauthConfig.oAuthNonceSize = chance.string();
       const OAuth = mockOAuth();
 
-      const { doSignAndDelete } = require('../src/OAuthSignRequest');
+      const { doSignAndDelete } = require("../src/OAuthSignRequest");
 
       await doSignAndDelete();
 
@@ -154,16 +164,21 @@ describe('OAuth Sign Request', () => {
         oauthConfig.authorizeCallbackUri,
         oauthConfig.oAuthSignatureMethod,
         oauthConfig.oAuthNonceSize,
-        oauthConfig.oAuthCustomHeaders,
+        oauthConfig.oAuthCustomHeaders
       );
 
       delete process.env.CLIENT_KEY;
       delete process.env.CLIENT_SECRET;
     });
 
-    it('calls Oauth delete with the provided link, token, and secret', async () => {
-      const OAuth = require('oauth');
-      const mockDelete = jest.fn().mockImplementation((linkToOpen, accessToken, accessTokenSecret, callback) => callback(null, "", {}));
+    it("calls Oauth delete with the provided link, token, and secret", async () => {
+      const OAuth = require("oauth");
+      const mockDelete = jest
+        .fn()
+        .mockImplementation(
+          (linkToOpen, accessToken, accessTokenSecret, callback) =>
+            callback(null, "", {})
+        );
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         delete: mockDelete,
@@ -173,7 +188,7 @@ describe('OAuth Sign Request', () => {
       const accessToken = chance.string();
       const accessTokenSecret = chance.string();
 
-      const { doSignAndDelete } = require('../src/OAuthSignRequest');
+      const { doSignAndDelete } = require("../src/OAuthSignRequest");
 
       await doSignAndDelete(linkToOpen, accessToken, accessTokenSecret);
 
@@ -181,30 +196,36 @@ describe('OAuth Sign Request', () => {
         linkToOpen,
         accessToken,
         accessTokenSecret,
-        expect.any(Function),
+        expect.any(Function)
       );
     });
-    
-    it('returns a promise', () => {
+
+    it("returns a promise", () => {
       mockOAuth();
 
       const linkToOpen = chance.url();
       const accessToken = chance.string();
       const accessTokenSecret = chance.string();
 
-      const { doSignAndDelete } = require('../src/OAuthSignRequest');
+      const { doSignAndDelete } = require("../src/OAuthSignRequest");
 
-      expect(doSignAndDelete(linkToOpen, accessToken, accessTokenSecret))
-        .toBeInstanceOf(Promise);
+      expect(
+        doSignAndDelete(linkToOpen, accessToken, accessTokenSecret)
+      ).toBeInstanceOf(Promise);
     });
 
-    it('rejects when api offline', async () => {
+    it("rejects when api offline", async () => {
       expect.assertions(1);
 
-      const OAuth = require('oauth');
+      const OAuth = require("oauth");
       const fakeError = new Error(chance.string());
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        delete: (fakeLink, fakeAccessToken, fakeAccessTokenSecret, callback) => {
+        delete: (
+          fakeLink,
+          fakeAccessToken,
+          fakeAccessTokenSecret,
+          callback
+        ) => {
           callback(fakeError, null, null);
         },
       }));
@@ -213,7 +234,7 @@ describe('OAuth Sign Request', () => {
       const accessToken = chance.string();
       const accessTokenSecret = chance.string();
 
-      const { doSignAndDelete } = require('../src/OAuthSignRequest');
+      const { doSignAndDelete } = require("../src/OAuthSignRequest");
 
       try {
         await doSignAndDelete(linkToOpen, accessToken, accessTokenSecret);
@@ -222,15 +243,20 @@ describe('OAuth Sign Request', () => {
       }
     });
 
-    it('resolves with status code message upon non-2xx responses', async () => {
+    it("resolves with status code message upon non-2xx responses", async () => {
       expect.assertions(1);
 
-      const OAuth = require('oauth');
+      const OAuth = require("oauth");
       const fakeResponse = {
         statusCode: chance.integer({ min: 300, max: 599 }),
       };
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        delete: (fakeLink, fakeAccessToken, fakeAccessTokenSecret, callback) => {
+        delete: (
+          fakeLink,
+          fakeAccessToken,
+          fakeAccessTokenSecret,
+          callback
+        ) => {
           callback(null, null, fakeResponse);
         },
       }));
@@ -239,20 +265,31 @@ describe('OAuth Sign Request', () => {
       const accessToken = chance.string();
       const accessTokenSecret = chance.string();
 
-      const { doSignAndDelete } = require('../src/OAuthSignRequest');
+      const { doSignAndDelete } = require("../src/OAuthSignRequest");
 
-      const result = await doSignAndDelete(linkToOpen, accessToken, accessTokenSecret);
+      const result = await doSignAndDelete(
+        linkToOpen,
+        accessToken,
+        accessTokenSecret
+      );
       expect(result).toBe(getStatusText(fakeResponse.statusCode));
     });
 
-    it('resolves with the response body upon 2xx response', async () => {
+    it("resolves with the response body upon 2xx response", async () => {
       expect.assertions(1);
 
-      const OAuth = require('oauth');
+      const OAuth = require("oauth");
       const fakeResponse = { stuff: chance.string() };
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        delete: (fakeLink, fakeAccessToken, fakeAccessTokenSecret, callback) => {
-          callback(null, fakeResponse, { statusCode: chance.integer({ min: 200, max: 299 }) });
+        delete: (
+          fakeLink,
+          fakeAccessToken,
+          fakeAccessTokenSecret,
+          callback
+        ) => {
+          callback(null, fakeResponse, {
+            statusCode: chance.integer({ min: 200, max: 299 }),
+          });
         },
       }));
 
@@ -260,20 +297,30 @@ describe('OAuth Sign Request', () => {
       const accessToken = chance.string();
       const accessTokenSecret = chance.string();
 
-      const { doSignAndDelete } = require('../src/OAuthSignRequest');
+      const { doSignAndDelete } = require("../src/OAuthSignRequest");
 
-      const result = await doSignAndDelete(linkToOpen, accessToken, accessTokenSecret);
+      const result = await doSignAndDelete(
+        linkToOpen,
+        accessToken,
+        accessTokenSecret
+      );
       expect(result).toBe(fakeResponse);
     });
   });
 
-  describe('Do Sign and Post', () => {
+  describe("Do Sign and Post", () => {
     const mockOAuth = (fakeResponseData = chance.string()) => {
-      const OAuth = require('oauth');
+      const OAuth = require("oauth");
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        post: (fakeLink, fakeAccessToken, fakeAccessTokenSecret,
-          fakePostBody, fakePostBodyContentType, callback) => {
+        post: (
+          fakeLink,
+          fakeAccessToken,
+          fakeAccessTokenSecret,
+          fakePostBody,
+          fakePostBodyContentType,
+          callback
+        ) => {
           callback(null, fakeResponseData, { statusCode: 200 });
         },
       }));
@@ -281,23 +328,22 @@ describe('OAuth Sign Request', () => {
       return OAuth;
     };
 
-    it('is a function', () => {
-      const { doSignAndPost } = require('../src/OAuthSignRequest');
+    it("is a function", () => {
+      const { doSignAndPost } = require("../src/OAuthSignRequest");
 
       expect(doSignAndPost).toEqual(expect.any(Function));
     });
 
-    it('create an Oauth correctly with correct params', async () => {
+    it("create an Oauth correctly with correct params", async () => {
       process.env.CLIENT_KEY = chance.string();
       process.env.CLIENT_SECRET = chance.string();
 
-
-      const oauthConfig = await require('../config')();
+      const oauthConfig = await require("../config")();
 
       oauthConfig.oAuthNonceSize = chance.string();
       const OAuth = mockOAuth();
 
-      const { doSignAndPost } = require('../src/OAuthSignRequest');
+      const { doSignAndPost } = require("../src/OAuthSignRequest");
 
       await doSignAndPost();
 
@@ -365,26 +411,37 @@ describe('OAuth Sign Request', () => {
       const fakePostBody = chance.string();
       const fakePostBodyContentType = chance.string();
 
-      let response = await doSignAndPost(fakeLink, fakeAccessToken, fakeAccessTokenSecret,
-        fakePostBody, fakePostBodyContentType);
-      
+      let response = await doSignAndPost(
+        fakeLink,
+        fakeAccessToken,
+        fakeAccessTokenSecret,
+        fakePostBody,
+        fakePostBodyContentType
+      );
+
       expect(response).toMatch(getStatusText(statusCode));
     });
 
-    it('returns an error', async () => {
+    it("returns an error", async () => {
       expect.assertions(1);
 
-      const OAuth = require('oauth');
+      const OAuth = require("oauth");
       const error = chance.string();
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        post: (fakeLink, fakeAccessToken, fakeAccessTokenSecret, fakePostBody,
-          fakePostBodyContentType, callback) => {
+        post: (
+          fakeLink,
+          fakeAccessToken,
+          fakeAccessTokenSecret,
+          fakePostBody,
+          fakePostBodyContentType,
+          callback
+        ) => {
           callback(error, null, { statusCode: 200 });
         },
       }));
 
-      const { doSignAndPost } = require('../src/OAuthSignRequest');
+      const { doSignAndPost } = require("../src/OAuthSignRequest");
 
       const fakeLink = chance.url();
       const fakeAccessToken = chance.string();
@@ -393,33 +450,38 @@ describe('OAuth Sign Request', () => {
       const fakePostBodyContentType = chance.string();
 
       let response;
-      
+
       try {
-        await doSignAndPost(fakeLink, fakeAccessToken, fakeAccessTokenSecret,
-          fakePostBody, fakePostBodyContentType);
-      } catch(error) {
+        await doSignAndPost(
+          fakeLink,
+          fakeAccessToken,
+          fakeAccessTokenSecret,
+          fakePostBody,
+          fakePostBodyContentType
+        );
+      } catch (error) {
         response = error;
       }
-      
+
       expect(response).toMatch(error);
     });
 
-    it('returns a promise', () => {
+    it("returns a promise", () => {
       mockOAuth();
 
-      const { doSignAndPost } = require('../src/OAuthSignRequest');
+      const { doSignAndPost } = require("../src/OAuthSignRequest");
 
       const promise = doSignAndPost();
 
       expect(promise instanceof Promise).toEqual(true);
     });
 
-    it('returns a promise that resolves with the post response data', async () => {
+    it("returns a promise that resolves with the post response data", async () => {
       const fakeResponseData = chance.string();
 
       mockOAuth(fakeResponseData);
 
-      const { doSignAndPost } = require('../src/OAuthSignRequest');
+      const { doSignAndPost } = require("../src/OAuthSignRequest");
 
       const responseData = await doSignAndPost();
 
