@@ -6,11 +6,17 @@ const doSignAndGet = async (
   linkToOpen,
   accessToken,
   accessTokenSecret,
-  optionalAuthorizeCallbackUri
+  optionalAuthorizeCallbackUri,
+  allData
 ) => {
   const config = await getConfig();
   const authorizeCallbackUri =
     optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
+
+  let customHeaders = { Accept: "application/vnd.deere.axiom.v3+json" };
+  if (allData != undefined) {
+    customHeaders["No_Paging"] = allData;
+  }
 
   const oAuthSession = new OAuth(
     config.firstLegUri,
@@ -21,7 +27,7 @@ const doSignAndGet = async (
     authorizeCallbackUri,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
-    { Accept: "application/vnd.deere.axiom.v3+json" }
+    customHeaders
   );
 
   return await new Promise((resolve, reject) => {

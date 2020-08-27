@@ -128,6 +128,26 @@ describe("SignAndGet", () => {
     ).rejects.toMatch(expectedError);
   });
 
+  it("sets the correct custom headers for OAuth Tokens when allData is not passed in", async () => {
+    await underTest.doSignAndGet(
+      chance.string(),
+      chance.string(),
+      chance.string()
+    );
+
+    expect(OAuth.OAuth).toBeCalledWith(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      { Accept: "application/vnd.deere.axiom.v3+json" }
+    );
+  });
+
   it("sets the correct custom headers for OAuth Tokens", async () => {
     await underTest.doSignAndGet(
       chance.string(),
@@ -145,6 +165,50 @@ describe("SignAndGet", () => {
       undefined,
       undefined,
       { Accept: "application/vnd.deere.axiom.v3+json" }
+    );
+  });
+
+  it("sets the correct custom headers for OAuth Tokens when allData is true", async () => {
+    await underTest.doSignAndGet(
+      chance.string(),
+      chance.string(),
+      chance.string(),
+      undefined,
+      true
+    );
+
+    expect(OAuth.OAuth).toBeCalledWith(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      { Accept: "application/vnd.deere.axiom.v3+json", No_Paging: true }
+    );
+  });
+
+  it("sets the correct custom headers for OAuth Tokens when allData is false", async () => {
+    await underTest.doSignAndGet(
+      chance.string(),
+      chance.string(),
+      chance.string(),
+      undefined,
+      false
+    );
+
+    expect(OAuth.OAuth).toBeCalledWith(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      { Accept: "application/vnd.deere.axiom.v3+json", No_Paging: false }
     );
   });
 

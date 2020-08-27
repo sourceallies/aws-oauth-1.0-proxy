@@ -121,13 +121,15 @@ exports.oAuthSignRequestGet = async (event) => {
     url,
     accessToken,
     accessTokenSecret,
+    allData,
   } = receivedData.queryStringParameters;
 
   const response = await doSignAndGet(
     url,
     accessToken,
     accessTokenSecret,
-    getOptionalAuthorizeCallbackUri(event)
+    getOptionalAuthorizeCallbackUri(event),
+    allData
   )
     .then((responseData) => sendResponse(event, responseData))
     .catch((error) => sendError(event, error));
