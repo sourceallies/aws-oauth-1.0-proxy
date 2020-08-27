@@ -50,241 +50,311 @@ describe("SignAndGet", () => {
     jest.clearAllMocks();
   });
 
-  it("gets a set of temporary OAuth tokens with same values from config", async () => {
-    const expectedFirstLegUri = chance.string();
-    const expectedThirdLegUri = chance.string();
-    const expectedClientKey = chance.string();
-    const expectedClientSecret = chance.string();
-    const expectedOAuthVersion = chance.string();
-    const expectedAuthorizeCallbackUri = chance.string();
-    const expectedOAuthSignatureMethod = chance.string();
-    const expectedOAuthNonceSize = chance.string();
+  describe("config has values defined", () => {
+    let expectedFirstLegUri;
+    let expectedThirdLegUri;
+    let expectedClientKey;
+    let expectedClientSecret;
+    let expectedOAuthVersion;
+    let expectedAuthorizeCallbackUri;
+    let expectedOAuthSignatureMethod;
+    let expectedOAuthNonceSize;
 
-    getConfig.mockImplementation(() => {
-      return {
-        firstLegUri: expectedFirstLegUri,
-        thirdLegUri: expectedThirdLegUri,
-        clientKey: expectedClientKey,
-        clientSecret: expectedClientSecret,
-        oAuthVersion: expectedOAuthVersion,
-        authorizeCallbackUri: expectedAuthorizeCallbackUri,
-        oAuthSignatureMethod: expectedOAuthSignatureMethod,
-        oAuthNonceSize: expectedOAuthNonceSize,
-      };
+    beforeEach(async () => {
+      expectedFirstLegUri = chance.string();
+      expectedThirdLegUri = chance.string();
+      expectedClientKey = chance.string();
+      expectedClientSecret = chance.string();
+      expectedOAuthVersion = chance.string();
+      expectedAuthorizeCallbackUri = chance.string();
+      expectedOAuthSignatureMethod = chance.string();
+      expectedOAuthNonceSize = chance.string();
+
+      getConfig.mockImplementation(() => {
+        return {
+          firstLegUri: expectedFirstLegUri,
+          thirdLegUri: expectedThirdLegUri,
+          clientKey: expectedClientKey,
+          clientSecret: expectedClientSecret,
+          oAuthVersion: expectedOAuthVersion,
+          authorizeCallbackUri: expectedAuthorizeCallbackUri,
+          oAuthSignatureMethod: expectedOAuthSignatureMethod,
+          oAuthNonceSize: expectedOAuthNonceSize,
+        };
+      });
+
+      await underTest.doSignAndGet(
+        chance.string(),
+        chance.string(),
+        chance.string()
+      );
     });
 
-    await underTest.doSignAndGet(
-      chance.string(),
-      chance.string(),
-      chance.string()
-    );
-
-    expect(OAuth.OAuth).toBeCalledWith(
-      expectedFirstLegUri,
-      expectedThirdLegUri,
-      expectedClientKey,
-      expectedClientSecret,
-      expectedOAuthVersion,
-      expectedAuthorizeCallbackUri,
-      expectedOAuthSignatureMethod,
-      expectedOAuthNonceSize,
-      expect.anything()
-    );
+    it("creates an OAuth with same values from config", () => {
+      expect(OAuth.OAuth).toBeCalledWith(
+        expectedFirstLegUri,
+        expectedThirdLegUri,
+        expectedClientKey,
+        expectedClientSecret,
+        expectedOAuthVersion,
+        expectedAuthorizeCallbackUri,
+        expectedOAuthSignatureMethod,
+        expectedOAuthNonceSize,
+        expect.anything()
+      );
+    });
   });
 
-  it("gets a set of temporary OAuth tokens with same values from config when optionalAuthorizeCallbackUri is provided", async () => {
-    const expectedAuthorizeCallbackUri = chance.string();
+  describe("optionalAuthorizationCallbackUri is provided", () => {
+    let expectedAuthorizeCallbackUri;
 
-    await underTest.doSignAndGet(
-      chance.string(),
-      chance.string(),
-      chance.string(),
-      expectedAuthorizeCallbackUri
-    );
+    beforeEach(async () => {
+      expectedAuthorizeCallbackUri = chance.string();
 
-    expect(OAuth.OAuth).toBeCalledWith(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      expectedAuthorizeCallbackUri,
-      undefined,
-      undefined,
-      expect.anything()
-    );
-  });
-
-  it("throws an error when there is an error in the OAuth get response", async () => {
-    const expectedError = chance.string();
-    jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
-      get: (link, accessToken, accessTokenSecret, callback) => {
-        callback(expectedError, undefined, { statusCode: 200 });
-      },
-    }));
-
-    await expect(
-      underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
-    ).rejects.toMatch(expectedError);
-  });
-
-  it("sets the correct custom headers for OAuth Tokens when allData is not passed in", async () => {
-    await underTest.doSignAndGet(
-      chance.string(),
-      chance.string(),
-      chance.string()
-    );
-
-    expect(OAuth.OAuth).toBeCalledWith(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { Accept: "application/vnd.deere.axiom.v3+json" }
-    );
-  });
-
-  it("sets the correct custom headers for OAuth Tokens", async () => {
-    await underTest.doSignAndGet(
-      chance.string(),
-      chance.string(),
-      chance.string()
-    );
-
-    expect(OAuth.OAuth).toBeCalledWith(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { Accept: "application/vnd.deere.axiom.v3+json" }
-    );
-  });
-
-  it("sets the correct custom headers for OAuth Tokens when allData is true", async () => {
-    await underTest.doSignAndGet(
-      chance.string(),
-      chance.string(),
-      chance.string(),
-      undefined,
-      true
-    );
-
-    expect(OAuth.OAuth).toBeCalledWith(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { Accept: "application/vnd.deere.axiom.v3+json", No_Paging: true }
-    );
-  });
-
-  it("sets the correct custom headers for OAuth Tokens when allData is false", async () => {
-    await underTest.doSignAndGet(
-      chance.string(),
-      chance.string(),
-      chance.string(),
-      undefined,
-      false
-    );
-
-    expect(OAuth.OAuth).toBeCalledWith(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { Accept: "application/vnd.deere.axiom.v3+json", No_Paging: false }
-    );
-  });
-
-  it("return an error when there is an http status code below 200 from OAuth Sign Request endpoint", async () => {
-    const statusCode = chance.natural({ min: 0, max: 199 });
-    jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
-      get: (link, accessToken, accessTokenSecret, callback) => {
-        callback(undefined, undefined, { statusCode });
-      },
-    }));
-    const expectedStatusText = chance.string();
-    getStatusText.mockImplementation(() => {
-      return expectedStatusText;
+      await underTest.doSignAndGet(
+        chance.string(),
+        chance.string(),
+        chance.string(),
+        expectedAuthorizeCallbackUri
+      );
     });
 
-    await expect(
-      underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
-    ).resolves.toMatch(expectedStatusText);
+    it("creates an OAuth with the provided optionalAuthorizationCallbackUri", () => {
+      expect(OAuth.OAuth).toBeCalledWith(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        expectedAuthorizeCallbackUri,
+        undefined,
+        undefined,
+        expect.anything()
+      );
+    });
   });
 
-  it("return an error when there is an http status code above 300 from OAuth Sign Request endpoint", async () => {
-    const statusCode = chance.natural({ min: 301, max: 500 });
-    jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
-      get: (link, accessToken, accessTokenSecret, callback) => {
-        callback(undefined, undefined, { statusCode });
-      },
-    }));
-    const expectedStatusText = chance.string();
-    getStatusText.mockImplementation(() => {
-      return expectedStatusText;
+  describe("OAuth get returns an error", () => {
+    let expectedError;
+    let result;
+
+    beforeEach(() => {
+      expectedError = chance.string();
+      jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
+        get: (link, accessToken, accessTokenSecret, callback) => {
+          callback(expectedError, undefined, { statusCode: 200 });
+        },
+      }));
+
+      result = underTest.doSignAndGet(
+        chance.string(),
+        chance.string(),
+        chance.string()
+      );
     });
 
-    await expect(
-      underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
-    ).resolves.toMatch(expectedStatusText);
+    it("throws an error when there is an error in the OAuth get response", async () => {
+      await expect(result).rejects.toMatch(expectedError);
+    });
   });
 
-  it("return response data when status code betweeen 200 and 300", async () => {
-    const expectedResponse = chance.string();
-    const statusCode = chance.natural({ min: 200, max: 300 });
-    jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
-      get: (link, accessToken, accessTokenSecret, callback) => {
-        callback(undefined, expectedResponse, { statusCode });
-      },
-    }));
+  describe("allData is not provided", () => {
+    beforeEach(async () => {
+      await underTest.doSignAndGet(
+        chance.string(),
+        chance.string(),
+        chance.string()
+      );
+    });
 
-    await expect(
-      underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
-    ).resolves.toMatch(expectedResponse);
+    it("sets the correct custom headers for OAuth Tokens", () => {
+      expect(OAuth.OAuth).toBeCalledWith(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        { Accept: "application/vnd.deere.axiom.v3+json" }
+      );
+    });
   });
 
-  it("should pass parameters to oauthSession", async () => {
-    const expectedLinkToOpen = chance.string();
-    const expectedAccessToken = chance.string();
-    const expectedAccesssTokenSecret = chance.string();
+  describe("allData is true", () => {
+    beforeEach(async () => {
+      await underTest.doSignAndGet(
+        chance.string(),
+        chance.string(),
+        chance.string(),
+        undefined,
+        true
+      );
+    });
+
+    it("sets the correct custom headers for OAuth Tokens", () => {
+      expect(OAuth.OAuth).toBeCalledWith(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        { Accept: "application/vnd.deere.axiom.v3+json", No_Paging: true }
+      );
+    });
+  });
+
+  describe("allData is false", () => {
+    beforeEach(async () => {
+      await underTest.doSignAndGet(
+        chance.string(),
+        chance.string(),
+        chance.string(),
+        undefined,
+        false
+      );
+    });
+
+    it("sets the correct custom headers for OAuth Tokens when allData is false", () => {
+      expect(OAuth.OAuth).toBeCalledWith(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        { Accept: "application/vnd.deere.axiom.v3+json", No_Paging: false }
+      );
+    });
+  });
+
+  describe("OAuth get returns a http status code below 200", () => {
+    let httpStatusCode;
+    let expectedStatusText;
+    let result;
+
+    beforeEach(() => {
+      httpStatusCode = chance.natural({ min: 0, max: 199 });
+      expectedStatusText = chance.string();
+
+      jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
+        get: (link, accessToken, accessTokenSecret, callback) => {
+          callback(undefined, undefined, { statusCode: httpStatusCode });
+        },
+      }));
+
+      getStatusText.mockImplementation(() => {
+        return expectedStatusText;
+      });
+
+      result = underTest.doSignAndGet(
+        chance.string(),
+        chance.string(),
+        chance.string()
+      );
+    });
+
+    it("return an error", async () => {
+      await expect(result).resolves.toMatch(expectedStatusText);
+    });
+  });
+
+  describe("OAuth get returns a http status code above 300", () => {
+    let httpStatusCode;
+    let expectedStatusText;
+    let result;
+
+    beforeEach(() => {
+      httpStatusCode = chance.natural({ min: 301, max: 500 });
+      expectedStatusText = chance.string();
+
+      jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
+        get: (link, accessToken, accessTokenSecret, callback) => {
+          callback(undefined, undefined, { statusCode: httpStatusCode });
+        },
+      }));
+
+      getStatusText.mockImplementation(() => {
+        return expectedStatusText;
+      });
+
+      result = underTest.doSignAndGet(
+        chance.string(),
+        chance.string(),
+        chance.string()
+      );
+    });
+
+    it("return an error", async () => {
+      await expect(result).resolves.toMatch(expectedStatusText);
+    });
+  });
+
+  describe("OAuth get returns a http status code between 200 and 300 and a response", () => {
+    let expectedResponse;
+    let result;
+
+    beforeEach(() => {
+      expectedResponse = chance.string();
+      const statusCode = chance.natural({ min: 200, max: 300 });
+
+      jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
+        get: (link, accessToken, accessTokenSecret, callback) => {
+          callback(undefined, expectedResponse, { statusCode });
+        },
+      }));
+
+      result = underTest.doSignAndGet(
+        chance.string(),
+        chance.string(),
+        chance.string()
+      );
+    });
+
+    it("returns the same response", async () => {
+      await expect(result).resolves.toMatch(expectedResponse);
+    });
+  });
+
+  describe("with link, accessToken, and accessTokenSecret", () => {
+    let expectedLinkToOpen;
+    let expectedAccessToken;
+    let expectedAccesssTokenSecret;
     let actualLinkToOpen;
     let actualAccessToken;
     let actualAccessTokenSecret;
 
-    jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
-      get: (link, accessToken, accessTokenSecret, callback) => {
-        actualLinkToOpen = link;
-        actualAccessToken = accessToken;
-        actualAccessTokenSecret = accessTokenSecret;
-        callback(undefined, undefined, { statusCode: 200 });
-      },
-    }));
+    beforeEach(async () => {
+      expectedLinkToOpen = chance.string();
+      expectedAccessToken = chance.string();
+      expectedAccesssTokenSecret = chance.string();
 
-    await underTest.doSignAndGet(
-      expectedLinkToOpen,
-      expectedAccessToken,
-      expectedAccesssTokenSecret
-    );
+      jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
+        get: (link, accessToken, accessTokenSecret, callback) => {
+          actualLinkToOpen = link;
+          actualAccessToken = accessToken;
+          actualAccessTokenSecret = accessTokenSecret;
+          callback(undefined, undefined, { statusCode: 200 });
+        },
+      }));
 
-    expect(actualLinkToOpen).toBe(expectedLinkToOpen);
-    expect(actualAccessToken).toBe(expectedAccessToken);
-    expect(actualAccessTokenSecret).toBe(expectedAccesssTokenSecret);
+      await underTest.doSignAndGet(
+        expectedLinkToOpen,
+        expectedAccessToken,
+        expectedAccesssTokenSecret
+      );
+    });
+
+    it("should pass parameters to oauthSession", () => {
+      expect(actualLinkToOpen).toBe(expectedLinkToOpen);
+      expect(actualAccessToken).toBe(expectedAccessToken);
+      expect(actualAccessTokenSecret).toBe(expectedAccesssTokenSecret);
+    });
   });
 });
