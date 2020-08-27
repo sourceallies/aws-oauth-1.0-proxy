@@ -233,12 +233,6 @@ describe("OAuth Sign Request", () => {
       return OAuth;
     };
 
-    it("is a function", () => {
-      const { doSignAndPost } = require("../src/OAuthSignRequest");
-
-      expect(doSignAndPost).toEqual(expect.any(Function));
-    });
-
     it("create an Oauth correctly with correct params", async () => {
       process.env.CLIENT_KEY = chance.string();
       process.env.CLIENT_SECRET = chance.string();
