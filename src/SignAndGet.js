@@ -21,7 +21,7 @@ const doSignAndGet = async (
     authorizeCallbackUri,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
-    config.oAuthCustomHeaders
+    { Accept: "application/vnd.deere.axiom.v3+json" }
   );
 
   return await new Promise((resolve, reject) => {

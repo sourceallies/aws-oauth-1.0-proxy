@@ -46,6 +46,10 @@ describe("SignAndGet", () => {
     setUp();
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("gets a set of temporary OAuth tokens with same values from config", async () => {
     const expectedFirstLegUri = chance.string();
     const expectedThirdLegUri = chance.string();
@@ -55,7 +59,6 @@ describe("SignAndGet", () => {
     const expectedAuthorizeCallbackUri = chance.string();
     const expectedOAuthSignatureMethod = chance.string();
     const expectedOAuthNonceSize = chance.string();
-    const expectedOAuthCustomHeaders = chance.string();
 
     getConfig.mockImplementation(() => {
       return {
@@ -67,7 +70,6 @@ describe("SignAndGet", () => {
         authorizeCallbackUri: expectedAuthorizeCallbackUri,
         oAuthSignatureMethod: expectedOAuthSignatureMethod,
         oAuthNonceSize: expectedOAuthNonceSize,
-        oAuthCustomHeaders: expectedOAuthCustomHeaders,
       };
     });
 
@@ -86,7 +88,7 @@ describe("SignAndGet", () => {
       expectedAuthorizeCallbackUri,
       expectedOAuthSignatureMethod,
       expectedOAuthNonceSize,
-      expectedOAuthCustomHeaders
+      expect.anything()
     );
   });
 
@@ -109,7 +111,7 @@ describe("SignAndGet", () => {
       expectedAuthorizeCallbackUri,
       undefined,
       undefined,
-      undefined
+      expect.anything()
     );
   });
 
@@ -124,6 +126,26 @@ describe("SignAndGet", () => {
     await expect(
       underTest.doSignAndGet(chance.string(), chance.string(), chance.string())
     ).rejects.toMatch(expectedError);
+  });
+
+  it("sets the correct custom headers for OAuth Tokens", async () => {
+    await underTest.doSignAndGet(
+      chance.string(),
+      chance.string(),
+      chance.string()
+    );
+
+    expect(OAuth.OAuth).toBeCalledWith(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      { Accept: "application/vnd.deere.axiom.v3+json" }
+    );
   });
 
   it("return an error when there is an http status code below 200 from OAuth Sign Request endpoint", async () => {
