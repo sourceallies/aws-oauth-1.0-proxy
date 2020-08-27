@@ -14,7 +14,7 @@ const doSignAndGet = async (
     optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
 
   let customHeaders = { Accept: "application/vnd.deere.axiom.v3+json" };
-  if (allData != undefined) {
+  if (allData !== undefined) {
     customHeaders["No_Paging"] = allData;
   }
 
