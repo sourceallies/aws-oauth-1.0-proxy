@@ -2,7 +2,7 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/sourceallies/aws-oauth-1.0-proxy/badge.svg?branch=master&t=VpXCpR)](https://coveralls.io/github/sourceallies/aws-oauth-1.0-proxy?branch=master)
 
-This project serves as a proxy for OAuth 1.0a requests. We leverage Lambdas created with [AWS SAM](https://github.com/awslabs/serverless-application-model) to sign requests using the specified app ID and secret. The Lambdas cover the first and third legs of OAuth 1.0a authentication as well as signing and proxying GET and POST requests.
+This project serves as a proxy for OAuth 1.0a requests with [John Deere APIs](https://developer.deere.com/). We leverage Lambdas created with [AWS SAM](https://github.com/awslabs/serverless-application-model) to sign requests using the specified app ID and secret. The Lambdas cover the first and third legs of OAuth 1.0a authentication as well as signing and proxying GET and POST requests.
 
 ## Initial Setup
 
