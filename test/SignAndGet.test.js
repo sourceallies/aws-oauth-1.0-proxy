@@ -126,7 +126,7 @@ describe("SignAndGet", () => {
     ).rejects.toMatch(expectedError);
   });
 
-  it("return an error when there is an http error below 200 from OAuth Sign Request endpoint", async () => {
+  it("return an error when there is an http status code below 200 from OAuth Sign Request endpoint", async () => {
     const statusCode = chance.natural({ min: 0, max: 199 });
     jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
       get: (link, accessToken, accessTokenSecret, callback) => {
@@ -143,7 +143,7 @@ describe("SignAndGet", () => {
     ).resolves.toMatch(expectedStatusText);
   });
 
-  it("return an error when there is an http error above 300 from OAuth Sign Request endpoint", async () => {
+  it("return an error when there is an http status code above 300 from OAuth Sign Request endpoint", async () => {
     const statusCode = chance.natural({ min: 301, max: 500 });
     jest.spyOn(OAuth, "OAuth").mockImplementation(() => ({
       get: (link, accessToken, accessTokenSecret, callback) => {
