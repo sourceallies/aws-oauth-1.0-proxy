@@ -47,12 +47,6 @@ describe("OAuth Sign Request", () => {
       return OAuth;
     };
 
-    it("is a function", () => {
-      const { doSignAndDelete } = require("../src/OAuthSignRequest");
-
-      expect(doSignAndDelete).toEqual(expect.any(Function));
-    });
-
     it("create an Oauth correctly with correct params", async () => {
       process.env.CLIENT_KEY = chance.string();
       process.env.CLIENT_SECRET = chance.string();
@@ -267,23 +261,33 @@ describe("OAuth Sign Request", () => {
         oauthConfig.authorizeCallbackUri,
         oauthConfig.oAuthSignatureMethod,
         oauthConfig.oAuthNonceSize,
-        oauthConfig.oAuthCustomHeaders,
+        oauthConfig.oAuthCustomHeaders
       );
 
       delete process.env.CLIENT_KEY;
       delete process.env.CLIENT_SECRET;
     });
 
-    it('posts correctly', async () => {
-      const OAuth = require('oauth');
-      const mockPost = jest.fn().mockImplementation((linkToOpen, accessToken, accessTokenSecret, 
-        postBody, postBodyContentType, callback) => callback(null, "", {}));
+    it("posts correctly", async () => {
+      const OAuth = require("oauth");
+      const mockPost = jest
+        .fn()
+        .mockImplementation(
+          (
+            linkToOpen,
+            accessToken,
+            accessTokenSecret,
+            postBody,
+            postBodyContentType,
+            callback
+          ) => callback(null, "", {})
+        );
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
         post: mockPost,
       }));
 
-      const { doSignAndPost } = require('../src/OAuthSignRequest');
+      const { doSignAndPost } = require("../src/OAuthSignRequest");
 
       const fakeLink = chance.url();
       const fakeAccessToken = chance.string();
@@ -291,30 +295,46 @@ describe("OAuth Sign Request", () => {
       const fakePostBody = chance.string();
       const fakePostBodyContentType = chance.string();
 
-      await doSignAndPost(fakeLink, fakeAccessToken, fakeAccessTokenSecret,
-        fakePostBody, fakePostBodyContentType);
+      await doSignAndPost(
+        fakeLink,
+        fakeAccessToken,
+        fakeAccessTokenSecret,
+        fakePostBody,
+        fakePostBodyContentType
+      );
 
-      expect(mockPost).toBeCalledWith(fakeLink, fakeAccessToken,
-        fakeAccessTokenSecret, fakePostBody, fakePostBodyContentType,
-        expect.any(Function));
+      expect(mockPost).toBeCalledWith(
+        fakeLink,
+        fakeAccessToken,
+        fakeAccessTokenSecret,
+        fakePostBody,
+        fakePostBodyContentType,
+        expect.any(Function)
+      );
     });
 
-    it('returns an error', async () => {
+    it("returns an error", async () => {
       expect.assertions(1);
 
-      const OAuth = require('oauth');
+      const OAuth = require("oauth");
       const error = chance.string();
 
       let statusCode = chance.natural({ min: 400, max: 505 });
 
       OAuth.OAuth = jest.fn().mockImplementation(() => ({
-        post: (fakeLink, fakeAccessToken, fakeAccessTokenSecret,
-          fakePostBody, fakePostBodyContentType, callback) => {
+        post: (
+          fakeLink,
+          fakeAccessToken,
+          fakeAccessTokenSecret,
+          fakePostBody,
+          fakePostBodyContentType,
+          callback
+        ) => {
           callback(error, null, { statusCode });
         },
       }));
 
-      const { doSignAndPost } = require('../src/OAuthSignRequest');
+      const { doSignAndPost } = require("../src/OAuthSignRequest");
 
       const fakeLink = chance.url();
       const fakeAccessToken = chance.string();
