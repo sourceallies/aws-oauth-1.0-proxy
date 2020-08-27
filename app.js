@@ -124,15 +124,20 @@ exports.oAuthSignRequestGet = async (event) => {
     allData,
   } = receivedData.queryStringParameters;
 
-  const response = await doSignAndGet(
-    url,
-    accessToken,
-    accessTokenSecret,
-    getOptionalAuthorizeCallbackUri(event),
-    allData
-  )
-    .then((responseData) => sendResponse(event, responseData))
-    .catch((error) => sendError(event, error));
+  let response;
+  try {
+    const body = await doSignAndGet(
+      url,
+      accessToken,
+      accessTokenSecret,
+      getOptionalAuthorizeCallbackUri(event),
+      allData
+    );
+
+    response = sendResponse(event, body);
+  } catch (error) {
+    response = sendError(event, error);
+  }
 
   return response;
 };
