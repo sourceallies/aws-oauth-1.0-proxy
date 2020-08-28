@@ -12,6 +12,8 @@ const doSignAndDelete = async (
   const authorizeCallbackUri =
     optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
 
+  let customHeaders = { Accept: "application/vnd.deere.axiom.v3+json" };
+
   const oAuthSession = new OAuth(
     config.firstLegUri,
     config.thirdLegUri,
@@ -21,7 +23,8 @@ const doSignAndDelete = async (
     authorizeCallbackUri,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
-    config.oAuthCustomHeaders
+    // config.oAuthCustomHeaders,
+    customHeaders
   );
 
   return await new Promise((resolve, reject) => {
@@ -46,4 +49,8 @@ const doSignAndDelete = async (
       }
     );
   });
+};
+
+module.exports = {
+  doSignAndDelete,
 };
