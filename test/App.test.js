@@ -619,7 +619,7 @@ describe("Lambda handlers", () => {
         },
       };
 
-      const OAuthSignRequest = require("../src/OAuthSignRequest");
+      const SignAndDelete = require("../src/SignAndDelete");
 
       const fakeResponseData = {};
       const numberOfResponseDataKeys = chance.natural({ min: 2, max: 5 });
@@ -630,7 +630,7 @@ describe("Lambda handlers", () => {
 
       fakeResponseData.status = chance.natural();
 
-      OAuthSignRequest.doSignAndDelete = jest
+      SignAndDelete.doSignAndDelete = jest
         .fn()
         .mockResolvedValue(fakeResponseData);
 
@@ -638,7 +638,7 @@ describe("Lambda handlers", () => {
 
       const responseData = await oAuthSignRequestDelete(event);
 
-      expect(OAuthSignRequest.doSignAndDelete).toBeCalledWith(
+      expect(SignAndDelete.doSignAndDelete).toBeCalledWith(
         url,
         accessToken,
         accessTokenSecret,
@@ -671,7 +671,7 @@ describe("Lambda handlers", () => {
         },
       };
 
-      const OAuthSignRequest = require("../src/OAuthSignRequest");
+      const SignAndDelete = require("../src/SignAndDelete");
 
       const fakeResponseData = {};
       const numberOfResponseDataKeys = chance.natural({ min: 2, max: 5 });
@@ -682,7 +682,7 @@ describe("Lambda handlers", () => {
 
       fakeResponseData.status = chance.natural();
 
-      OAuthSignRequest.doSignAndDelete = jest
+      SignAndDelete.doSignAndDelete = jest
         .fn()
         .mockResolvedValue(fakeResponseData);
 
@@ -690,7 +690,7 @@ describe("Lambda handlers", () => {
 
       const responseData = await oAuthSignRequestDelete(event);
 
-      expect(OAuthSignRequest.doSignAndDelete).toBeCalledWith(
+      expect(SignAndDelete.doSignAndDelete).toBeCalledWith(
         url,
         accessToken,
         accessTokenSecret,
@@ -709,9 +709,9 @@ describe("Lambda handlers", () => {
     });
 
     it("returns an error when an error occurs during the signing and delete", async () => {
-      const OAuthSignRequest = require("../src/OAuthSignRequest");
+      const SignAndDelete = require("../src/SignAndDelete");
       const fakeError = new Error(chance.string());
-      OAuthSignRequest.doSignAndDelete = jest.fn().mockRejectedValue(fakeError);
+      SignAndDelete.doSignAndDelete = jest.fn().mockRejectedValue(fakeError);
       const { oAuthSignRequestDelete } = require("../app");
 
       const fakeEvent = {

@@ -1,6 +1,7 @@
 const { OAuth } = require('oauth');
 const getConfig = require('../config');
 const { getStatusText } = require('../src/HttpResponses');
+
 const doSignAndPost = async (
   linkToOpen,
   accessToken,
@@ -51,6 +52,5 @@ const doSignAndPost = async (
 };
 
 module.exports = {
-  doSignAndDelete,
   doSignAndPost,
 };
