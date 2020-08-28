@@ -124,7 +124,6 @@ exports.oAuthSignRequestGet = async (event) => {
     allData,
   } = receivedData.queryStringParameters;
 
-  let response;
   try {
     const body = await doSignAndGet(
       url,
@@ -134,12 +133,10 @@ exports.oAuthSignRequestGet = async (event) => {
       allData
     );
 
-    response = sendResponse(event, body);
+    return sendResponse(event, body);
   } catch (error) {
-    response = sendError(event, error);
+    return sendError(event, error);
   }
-
-  return response;
 };
 
 exports.oAuthSignRequestPost = async (event) => {

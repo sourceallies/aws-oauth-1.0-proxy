@@ -260,7 +260,7 @@ describe("SignAndGet", () => {
       );
     });
 
-    it("return an error", async () => {
+    it("should return an error", async () => {
       await expect(result).resolves.toMatch(expectedStatusText);
     });
   });
@@ -291,7 +291,7 @@ describe("SignAndGet", () => {
       );
     });
 
-    it("return an error", async () => {
+    it("should return an error", async () => {
       await expect(result).resolves.toMatch(expectedStatusText);
     });
   });
