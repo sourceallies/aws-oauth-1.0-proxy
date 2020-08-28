@@ -37,6 +37,9 @@
   "jest": {
     "setupFiles": [
       "./test/jestSetup.js"
+    ],
+    "modulePathIgnorePatterns": [
+      ".aws-sam"
     ]
   },
   "dependencies": {
