@@ -372,11 +372,23 @@ describe("SignAndPost", () => {
       );
     });
 
-    it("should pass parameters to oauthSession", () => {
+    it("should pass linkToOpen to oauthSession", () => {
       expect(actualLinkToOpen).toBe(expectedLinkToOpen);
+    });
+
+    it("should pass accessToken to oauthSession", () => {
       expect(actualAccessToken).toBe(expectedAccessToken);
+    });
+
+    it("should pass accessTokenSecret to oauthSession", () => {
       expect(actualAccessTokenSecret).toBe(expectedAccesssTokenSecret);
+    });
+
+    it("should pass postBody to oauthSession", () => {
       expect(actualPostBody).toBe(expectedPostBody);
+    });
+
+    it("should pass postBodyContentType to oauthSession", () => {
       expect(actualPostBodyContentType).toBe(expectedPostBodyContentType);
     });
   });
