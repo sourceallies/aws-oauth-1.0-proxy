@@ -156,7 +156,7 @@ describe("SignAndPost", () => {
       );
     });
 
-    it("creates an OAuth with the provided optionalAuthorizationCallbackUri", () => {
+    it("should create an OAuth with the provided optionalAuthorizationCallbackUri", () => {
       expect(OAuth.OAuth).toBeCalledWith(
         undefined,
         undefined,
