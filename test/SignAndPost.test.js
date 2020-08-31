@@ -316,7 +316,7 @@ describe("SignAndPost", () => {
       );
     });
 
-    it("returns the same response", async () => {
+    it("should return the same response", async () => {
         const expectedResponse = {
             body: jdResponse,
             headers: headers
