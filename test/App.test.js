@@ -839,7 +839,7 @@ describe("Lambda handlers", () => {
       );
     });
 
-    it("returns the correct response when the post works", async () => {
+    it("should return the correct response when the post works", async () => {
       jest.resetModules();
 
       const SignAndPost = require("../src/SignAndPost");
