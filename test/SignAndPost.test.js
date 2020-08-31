@@ -125,7 +125,7 @@ describe("SignAndPost", () => {
       );
     });
 
-    it("creates an OAuth with the custom JD Accept header", () => {
+    it("should create an OAuth with the custom JD Accept header", () => {
       expect(OAuth.OAuth).toBeCalledWith(
         undefined,
         undefined,
