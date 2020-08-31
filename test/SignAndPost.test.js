@@ -279,7 +279,7 @@ describe("SignAndPost", () => {
       );
     });
 
-    it("should return an error", async () => {
+    it("should return the correct status text", async () => {
       await expect(result).resolves.toMatch(expectedStatusText);
     });
   });
