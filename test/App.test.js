@@ -759,10 +759,6 @@ describe("Lambda handlers", () => {
       ({ oAuthSignRequestPost } = require("../app"));
     });
 
-    it("should be a function", () => {
-      expect(typeof oAuthSignRequestPost).toEqual("function");
-    });
-
     it("returns a promise", () => {
       const response = oAuthSignRequestPost(createFakeEvent());
 

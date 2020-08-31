@@ -147,18 +147,20 @@ exports.oAuthSignRequestPost = async (event) => {
 
   const { url, accessToken, accessTokenSecret, data } = receivedBody;
 
-  const response = await doSignAndPost(
-    url,
-    accessToken,
-    accessTokenSecret,
-    JSON.stringify(data),
-    config.oAuthCustomContentType,
-    getOptionalAuthorizeCallbackUri(event)
-  )
-    .then((responseData) => sendResponse(event, responseData))
-    .catch((error) => sendError(event, error));
+  try {
+    const body = await doSignAndPost(
+      url,
+      accessToken,
+      accessTokenSecret,
+      JSON.stringify(data),
+      config.oAuthCustomContentType,
+      getOptionalAuthorizeCallbackUri(event)
+    );
 
-  return response;
+    return sendResponse(event, body);
+  } catch (error) {
+    return sendError(event, error);
+  }
 };
 
 exports.oAuthSignRequestDelete = async (event) => {
