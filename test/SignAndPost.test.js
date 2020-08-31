@@ -199,7 +199,7 @@ describe("SignAndPost", () => {
       );
     });
 
-    it("throws an error when there is an error in the OAuth post response", async () => {
+    it("should reject with the same error", async () => {
       await expect(result).rejects.toMatch(expectedError);
     });
   });
