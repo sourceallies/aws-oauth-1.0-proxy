@@ -239,7 +239,7 @@ describe("SignAndDelete", () => {
       );
     });
 
-    it("should return the same status text, async () => {
+    it("should return the same status text", async () => {
       await expect(result).resolves.toMatch(expectedStatusText);
     });
   });
