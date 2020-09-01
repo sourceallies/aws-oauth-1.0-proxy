@@ -169,14 +169,15 @@ exports.oAuthSignRequestDelete = async (event) => {
     accessTokenSecret,
   } = receivedData.queryStringParameters;
 
-  const response = await doSignAndDelete(
-    url,
-    accessToken,
-    accessTokenSecret,
-    getOptionalAuthorizeCallbackUri(event)
-  )
-    .then((responseData) => sendResponse(event, responseData))
-    .catch((error) => sendError(event, error));
-
-  return response;
+  try {
+    const data = await doSignAndDelete(
+      url,
+      accessToken,
+      accessTokenSecret,
+      getOptionalAuthorizeCallbackUri(event)
+    );
+    return sendResponse(event, data);
+  } catch (error) {
+    return sendError(event, error);
+  }
 };
