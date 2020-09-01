@@ -299,9 +299,15 @@ describe("SignAndDelete", () => {
       );
     });
 
-    it("should pass parameters to oauthSession", () => {
+    it("should pass linkToOpen to oauthSession", () => {
       expect(actualLinkToOpen).toBe(expectedLinkToOpen);
+    });
+
+    it("should pass accessToken to oauthSession", () => {
       expect(actualAccessToken).toBe(expectedAccessToken);
+    });
+
+    it("should pass accessTokenSecret to oauthSession", () => {
       expect(actualAccessTokenSecret).toBe(expectedAccesssTokenSecret);
     });
   });
