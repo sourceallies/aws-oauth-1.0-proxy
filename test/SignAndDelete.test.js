@@ -114,7 +114,7 @@ describe("SignAndDelete", () => {
       );
     });
 
-    it("passed JD Accept header", () => {
+    it("should have the JD Accept header", () => {
       expect(OAuth.OAuth).toBeCalledWith(
         undefined,
         undefined,
