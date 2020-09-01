@@ -23,7 +23,6 @@ const doSignAndDelete = async (
     authorizeCallbackUri,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
-    // config.oAuthCustomHeaders,
     customHeaders
   );
 
