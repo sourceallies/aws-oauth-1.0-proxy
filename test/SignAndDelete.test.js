@@ -265,7 +265,7 @@ describe("SignAndDelete", () => {
       );
     });
 
-    it("returns the same response", async () => {
+    it("should return the same response", async () => {
       await expect(result).resolves.toMatch(expectedResponse);
     });
   });
