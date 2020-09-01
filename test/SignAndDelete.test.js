@@ -177,7 +177,7 @@ describe("SignAndDelete", () => {
       );
     });
 
-    it("throws an error when there is an error in the OAuth delete response", async () => {
+    it("should reject with the same error", async () => {
       await expect(result).rejects.toMatch(expectedError);
     });
   });
