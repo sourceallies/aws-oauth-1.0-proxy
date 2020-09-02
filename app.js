@@ -5,8 +5,9 @@ const {
   publishToSNSSuccess,
   publishToSNSUnsuccessfull,
 } = require("./src/publishSNSHelper");
-const { doSignAndPost, doSignAndDelete } = require("./src/OAuthSignRequest");
+const { doSignAndPost } = require("./src/OAuthSignRequest");
 const { doSignAndGet } = require("./src/SignAndGet");
+const { doSignAndDelete } = require("./src/SignAndDelete");
 
 const parsedEnv = require("dotenv").config();
 
@@ -168,14 +169,15 @@ exports.oAuthSignRequestDelete = async (event) => {
     accessTokenSecret,
   } = receivedData.queryStringParameters;
 
-  const response = await doSignAndDelete(
-    url,
-    accessToken,
-    accessTokenSecret,
-    getOptionalAuthorizeCallbackUri(event)
-  )
-    .then((responseData) => sendResponse(event, responseData))
-    .catch((error) => sendError(event, error));
-
-  return response;
+  try {
+    const data = await doSignAndDelete(
+      url,
+      accessToken,
+      accessTokenSecret,
+      getOptionalAuthorizeCallbackUri(event)
+    );
+    return sendResponse(event, data);
+  } catch (error) {
+    return sendError(event, error);
+  }
 };
