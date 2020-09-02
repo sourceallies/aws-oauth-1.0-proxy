@@ -750,17 +750,13 @@ describe("Lambda handlers", () => {
     });
 
     beforeEach(() => {
-      const OAuthSignRequest = require("../src/OAuthSignRequest");
+      const SignAndPost = require("../src/SignAndPost");
 
-      OAuthSignRequest.doSignAndPost = jest
+      SignAndPost.doSignAndPost = jest
         .fn()
         .mockResolvedValue(chance.string());
 
       ({ oAuthSignRequestPost } = require("../app"));
-    });
-
-    it("should be a function", () => {
-      expect(typeof oAuthSignRequestPost).toEqual("function");
     });
 
     it("returns a promise", () => {
@@ -772,9 +768,9 @@ describe("Lambda handlers", () => {
     it("calls doSignAndPost correctly", async () => {
       jest.resetModules();
 
-      const OAuthSignRequest = require("../src/OAuthSignRequest");
+      const SignAndPost = require("../src/SignAndPost");
 
-      OAuthSignRequest.doSignAndPost = jest
+      SignAndPost.doSignAndPost = jest
         .fn()
         .mockResolvedValue(chance.string());
 
@@ -794,7 +790,7 @@ describe("Lambda handlers", () => {
 
       await oAuthSignRequestPost(fakeEvent);
 
-      expect(OAuthSignRequest.doSignAndPost).toBeCalledWith(
+      expect(SignAndPost.doSignAndPost).toBeCalledWith(
         url,
         accessToken,
         accessTokenSecret,
@@ -807,9 +803,9 @@ describe("Lambda handlers", () => {
     it("calls doSignAndPost correctly when an oauth_callback query param is present", async () => {
       jest.resetModules();
 
-      const OAuthSignRequest = require("../src/OAuthSignRequest");
+      const SignAndPost = require("../src/SignAndPost");
 
-      OAuthSignRequest.doSignAndPost = jest
+      SignAndPost.doSignAndPost = jest
         .fn()
         .mockResolvedValue(chance.string());
 
@@ -833,7 +829,7 @@ describe("Lambda handlers", () => {
 
       await oAuthSignRequestPost(fakeEvent);
 
-      expect(OAuthSignRequest.doSignAndPost).toBeCalledWith(
+      expect(SignAndPost.doSignAndPost).toBeCalledWith(
         url,
         accessToken,
         accessTokenSecret,
@@ -843,10 +839,10 @@ describe("Lambda handlers", () => {
       );
     });
 
-    it("returns the correct response when the post works", async () => {
+    it("should return the correct response when the post works", async () => {
       jest.resetModules();
 
-      const OAuthSignRequest = require("../src/OAuthSignRequest");
+      const SignAndPost = require("../src/SignAndPost");
       const status = 200;
       const fakeResponseData = JSON.stringify({ body: chance.string() });
       const fakeLocation = chance.string();
@@ -860,7 +856,7 @@ describe("Lambda handlers", () => {
         isBase64Encoded: false,
       };
 
-      OAuthSignRequest.doSignAndPost = jest
+      SignAndPost.doSignAndPost = jest
         .fn()
         .mockResolvedValue(fakeResponse);
 
@@ -883,7 +879,7 @@ describe("Lambda handlers", () => {
     it("returns an error when does not resolve", async () => {
       jest.resetModules();
 
-      const OAuthSignRequest = require("../src/OAuthSignRequest");
+      const SignAndPost = require("../src/SignAndPost");
 
       const fakeError = {};
       const numberOfErrorKeys = chance.natural({ min: 2, max: 5 });
@@ -901,7 +897,7 @@ describe("Lambda handlers", () => {
         isBase64Encoded: false,
       };
 
-      OAuthSignRequest.doSignAndPost = jest.fn().mockRejectedValue(fakeError);
+      SignAndPost.doSignAndPost = jest.fn().mockRejectedValue(fakeError);
 
       ({ oAuthSignRequestPost } = require("../app"));
 

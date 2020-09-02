@@ -1,6 +1,6 @@
-const { OAuth } = require('oauth');
-const getConfig = require('../config');
-const { getStatusText } = require('../src/HttpResponses');
+const getConfig = require("../config");
+const { OAuth } = require("oauth");
+const { getStatusText } = require("../src/HttpResponses");
 
 const doSignAndPost = async (
   linkToOpen,
@@ -11,7 +11,10 @@ const doSignAndPost = async (
   optionalAuthorizeCallbackUri
 ) => {
   const config = await getConfig();
-  const authorizeCallbackUri = optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
+  const authorizeCallbackUri =
+    optionalAuthorizeCallbackUri || config.authorizeCallbackUri;
+
+  let customHeaders = { Accept: "application/vnd.deere.axiom.v3+json" };
 
   const oAuthSession = new OAuth(
     config.firstLegUri,
@@ -22,7 +25,7 @@ const doSignAndPost = async (
     authorizeCallbackUri,
     config.oAuthSignatureMethod,
     config.oAuthNonceSize,
-    config.oAuthCustomHeaders,
+    customHeaders
   );
 
   return await new Promise((resolve, reject) => {
@@ -33,11 +36,11 @@ const doSignAndPost = async (
       postBody,
       postBodyContentType,
       (error, responseData, result) => {
-        console.log('Post Response From Deere', {
+        console.log("Post Response From Deere", {
           error,
           responseData,
           result,
-          resultHeaders: result.headers,
+          resultHeaders: result.headers
         });
         if (result.statusCode < 200 || result.statusCode >= 300) {
           resolve(getStatusText(result.statusCode));
@@ -46,7 +49,7 @@ const doSignAndPost = async (
         } else {
           resolve({ headers: result.headers, body: responseData });
         }
-      },
+      }
     );
   });
 };
