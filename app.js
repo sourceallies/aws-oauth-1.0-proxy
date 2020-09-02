@@ -5,7 +5,6 @@ const {
   publishToSNSSuccess,
   publishToSNSUnsuccessfull,
 } = require("./src/publishSNSHelper");
-const { doSignAndPost, doSignAndDelete } = require("./src/OAuthSignRequest");
 const { doSignAndGet } = require("./src/SignAndGet");
 const { doSignAndDelete } = require("./src/SignAndDelete");
 const { doSignAndPost } = require("./src/SignAndPost");
